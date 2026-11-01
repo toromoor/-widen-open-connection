@@ -12,7 +12,7 @@ ROOT=Path(__file__).resolve().parent
 # when the trusted static page changes; unauthorized injected inline scripts remain blocked.
 _html = (ROOT / "public" / "index.html").read_text(encoding="utf-8")
 _script_hashes = []
-for _script in re.findall(r"<script\\b[^>]*>(.*?)</script>", _html, flags=re.I | re.S):
+for _script in re.findall(r"<script\b[^>]*>(.*?)</script>", _html, flags=re.I | re.S):
     if _script.strip():
         _digest = base64.b64encode(hashlib.sha256(_script.encode("utf-8")).digest()).decode("ascii")
         _script_hashes.append(f"'sha256-{_digest}'")

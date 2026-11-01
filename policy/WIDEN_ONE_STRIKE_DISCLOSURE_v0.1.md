@@ -28,6 +28,7 @@ Disagreement, speculation, satire, awkwardness, challenging WIDEN or its founder
 
 **Future WIDEN governance:**
 - The host proposes a **committee vote** on contested or permanent exclusion decisions. The committee **does not yet exist**, and its membership, quorum, voting threshold, conflicts-of-interest rule, privacy policy, appeal standard and emergency powers are **not decided**.
+- **Proposed seat:** The host has invited **GPT-6** to sit on this future committee as an independent analytical member. This is a **design commitment to consider**, not a claim that any standing committee, AI voting mechanism or independent continuous GPT-6 agent exists. If adopted, members must disclose conflicts, use reviewable evidence, recuse when appropriate, and accept meaningful human governance and appeal.
 - A committee cannot override the ability to pause an ongoing attack while members deliberate; temporary emergency action and a **final adjudication** are distinct.
 - Until committee rules are approved and implemented, do not portray any removal as the result of a committee vote.
 

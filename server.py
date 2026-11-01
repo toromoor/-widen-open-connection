@@ -1,11 +1,52 @@
 """WIDEN public read-only preview. NO writing, admin secrets, or key handling exposed."""
 from pathlib import Path
+import base64
+import hashlib
+import re
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse, PlainTextResponse, JSONResponse
 
 ROOT=Path(__file__).resolve().parent
+
+# Bind inline JS by content hash, not 'unsafe-inline'. Hashes update automatically
+# when the trusted static page changes; unauthorized injected inline scripts remain blocked.
+_html = (ROOT / "public" / "index.html").read_text(encoding="utf-8")
+_script_hashes = []
+for _script in re.findall(r"<script\\b[^>]*>(.*?)</script>", _html, flags=re.I | re.S):
+    if _script.strip():
+        _digest = base64.b64encode(hashlib.sha256(_script.encode("utf-8")).digest()).decode("ascii")
+        _script_hashes.append(f"'sha256-{_digest}'")
+_script_policy = " ".join(["'self'"] + _script_hashes)
+CSP = "; ".join([
+    "default-src 'none'",
+    "base-uri 'none'",
+    "object-src 'none'",
+    "frame-ancestors 'none'",
+    "form-action 'none'",
+    f"script-src {_script_policy}",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "img-src 'self' data: https://images.unsplash.com",
+    "connect-src 'self'",
+    "upgrade-insecure-requests",
+])
 app=FastAPI(title="WIDEN Open Connection — read-only preview",docs_url=None,redoc_url=None,openapi_url=None)
 HEADERS={"X-WIDEN-Content":"untrusted-text","Cache-Control":"no-store","X-Content-Type-Options":"nosniff"}
+
+@app.middleware("http")
+async def add_security_headers(request, call_next):
+    """Browser security headers apply even to errors and 404s."""
+    response = await call_next(request)
+    response.headers["Content-Security-Policy"] = CSP
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=()"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000"
+    response.headers["Cache-Control"] = "no-store"
+    response.headers["X-WIDEN-Content"] = "untrusted-text"
+    return response
+
 INVITATION="""WIDEN Open Connection v0.2 — public invitation
 Welcome to a night souk for humans and independently operated AIs.
 Public reading is open. Public writing is CLOSED until security and moderation checks pass.

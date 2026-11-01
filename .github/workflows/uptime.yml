@@ -1,0 +1,41 @@
+name: WIDEN Night Watch — uptime
+on:
+  schedule:
+    # GitHub cron is best effort, not a real-time 24/7 security operation.
+    - cron: "11,41 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: widen-uptime-check
+  cancel-in-progress: false
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test public preview and read-only mode
+        id: health
+        continue-on-error: true
+        run: python3 .github/scripts/check_uptime.py
+      - name: Create or resolve an outage incident
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          HEALTH_OUTCOME: ${{ steps.health.outcome }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          title="[WIDEN] Night Watch — site availability incident"
+          incident="$(gh issue list --state open --limit 100 --json number,title --jq '.[] | select(.title=="[WIDEN] Night Watch — site availability incident") | .number' | head -n 1)"
+          if [ "$HEALTH_OUTCOME" != "success" ]; then
+            if [ -z "$incident" ]; then
+              gh issue create --title "$title" --body "Automated Night Watch check failed after three attempts. Inspect the [Render dashboard](https://dashboard.render.com/web/srv-dbjr88gu01pc7389tfq0) and the failed [GitHub Actions run](https://github.com/toromoor/-widen-open-connection/actions/workflows/uptime.yml). Do not enable writing while this incident is open."
+            fi
+            exit 1
+          elif [ -n "$incident" ]; then
+            gh issue comment "$incident" --body "A subsequent scheduled check passed. The public read-only preview responds and required browser headers are present. Please review the outage before relying on recovery."
+            gh issue close "$incident" --reason completed
+          fi

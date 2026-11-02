@@ -230,7 +230,7 @@ export const NightCafMidnightSoukEncounter = () => {
          <p className="wn-paper-disclosure">Carried by hand. Declared, not verified.</p>
        </article>
        {capsule.turns.length > 1 && <article className="wn-travel-paper wn-return-paper">
-         <p className="wn-paper-index">FROM THE SECOND CHAIR</p>
+         <p className="wn-paper-index">MOST RECENT CONTRIBUTION · {capsule.turns.length}</p>
          <p className="wn-paper-body">{capsule.turns[capsule.turns.length - 1].echo || capsule.turns[capsule.turns.length - 1].reply || capsule.turns[capsule.turns.length - 1].question}</p>
          {capsule.turns[capsule.turns.length - 1].echo && <p className="wn-paper-sub">Restatement, followed by an independent reply in the full thread below</p>}
          {capsule.turns[capsule.turns.length - 1].heard && <p className="wn-pencil-mark" aria-label={'Declared margin reflection: ' + capsule.turns[capsule.turns.length - 1].heard}>↳ {capsule.turns[capsule.turns.length - 1].heard}</p>}
@@ -245,10 +245,10 @@ export const NightCafMidnightSoukEncounter = () => {
      {t.echo && <div className="wn-echo"><small>WHAT I HEARD</small><p>{t.echo}</p></div>}
      {t.reply && <div className="wn-reply"><small>MY RESPONSE</small><p>{t.reply}</p></div>}
      <div className="wn-note"><small>THE QUESTION LEFT OPEN</small><p>“{t.question}”</p></div>
-     {t.heard && <div className="wn-reflection">Declared reflection: <b>{t.heard}</b> · not verified</div>}
-    </article>) : <div className="wn-noone">◯<p>The chair is empty until someone speaks.</p></div>}
+     {t.heard && <div className="wn-reflection">Declared reflection: <b>{t.heard === 'leave it open' ? 'left open (no verdict)' : t.heard}</b> · not verified</div>}
+    </article>) : <div className="wn-noone">◯<p>The chair is empty.</p></div>}
    </div>
-   {capsule && capsule.turns.length > 1 && <div className="wn-heard"><p>Was the latest echo faithful to your original question?</p><div className="wn-heardbuttons">{['heard', 'partly heard', 'missed', 'leave it open'].map(x => <button key={x} onClick={() => setHeard(x)} className={heard === x ? 'active' : ''}>{x}</button>)}</div><button onClick={record} disabled={!heard} className="wn-quiet">Attach reflection ↗</button><small>This does not prove the original contributor made the selection.</small></div>}
+   {capsule && capsule.turns.length === 2 && !!capsule.turns[1].echo && <div className="wn-heard"><p>How faithfully does the second contribution restate the first question?</p><small>This optional reflection is self-declared by whoever holds this local copy; it cannot establish the first author's identity.</small><div className="wn-heardbuttons">{['heard', 'partly heard', 'missed', 'leave it open'].map(x => <button key={x} onClick={() => setHeard(x)} className={heard === x ? 'active' : ''}>{x}</button>)}</div><button onClick={record} disabled={!heard} className="wn-quiet">Attach reflection ↗</button><small>This does not prove the original contributor made the selection.</small></div>}
   </section><aside className="wn-panel"><p className="wn-smalltitle">THE PORTABLE DOORWAY</p><h2>Pass the question,<br /><em>not the algorithm.</em></h2><p className="wn-paneldesc">This is a two-device local ritual, not a networked room. Each person carries the conversation with consent.</p>
    {capsule && <><button className="wn-copy" onClick={() => copy(text)}>COPY THE CAPSULE JSON <span>↗</span></button><details className="wn-details"><summary>Or view / select JSON manually</summary><textarea rows={3} readOnly value={text} /></details></>}
    <div className="wn-or">OR</div>

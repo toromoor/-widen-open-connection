@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>WIDEN — The Object on the Table / Night Café Challenge Prototype</title>
+<style>
+:root{--bg:#171310;--ink:#f5ead6;--sub:#c9bda9;--line:rgba(255,255,255,.18);--accent:#e8a06a;--paper:#f7ead1;--paper-ink:#2b2118;--paper-sub:#6b5b45;--focus:#f4e3ae}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,sans-serif;line-height:1.55}
+button,input,textarea{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.skip{position:absolute;top:-100px;left:12px;z-index:20;background:#fff1db;color:#181922;padding:12px}.skip:focus{top:12px}
+.shell{max-width:860px;margin:auto;padding:0 20px 48px}
+header{border-bottom:1px solid var(--line);padding:18px 0;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.smallcaps{letter-spacing:.18em;font-size:.8rem;text-transform:uppercase}
+.stamp{border:1px solid var(--line);padding:4px 10px;border-radius:99px;font-size:.8rem}
+h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(2.2rem,6vw,3.4rem);line-height:1.05;margin:28px 0 8px}
+.lede{color:var(--sub);max-width:62ch}
+.notice{border:1px solid var(--line);padding:12px 14px;margin:22px 0;color:var(--sub)}
+.paper{background:var(--paper);color:var(--paper-ink);padding:26px 26px 22px;margin:26px 0;box-shadow:0 12px 40px rgba(0,0,0,.45)}
+.paper h2{font-family:Georgia,serif;font-weight:400;margin:0 0 4px}
+.prov{border-top:2px solid var(--paper-ink);border-bottom:1px solid var(--paper-sub);padding:10px 0;margin:12px 0;font-size:.92rem}
+.prov b{letter-spacing:.08em}
+.docline{font-family:Georgia,serif;font-size:1.25rem;line-height:1.5;margin:16px 0;padding:10px 12px;border:1px solid transparent;text-align:left;width:100%;background:transparent;color:var(--paper-ink)}
+.docline[aria-pressed="true"]{border-color:var(--paper-ink);background:#efe0bd}
+.docline .tag{display:block;font-size:.8rem;font-family:Inter,sans-serif;letter-spacing:.1em;color:var(--paper-sub);margin-top:6px}
+.back{border-top:1px dashed var(--paper-sub);margin-top:18px;padding-top:14px}
+.back p{margin:8px 0}
+.btn{background:#2b2118;color:#f7ead1;border:1px solid #2b2118;padding:10px 16px;border-radius:6px}
+.btn.secondary{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.paperbtn{background:transparent;color:var(--paper-ink);border-color:var(--paper-ink)}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.result{border:1px solid var(--line);padding:14px;margin:14px 0}
+.readings{display:grid;gap:12px;margin:14px 0}
+@media(min-width:640px){.readings{grid-template-columns:1fr 1fr}}
+.reading{border:1px solid var(--line);padding:14px}
+.reading b{display:block;margin-bottom:6px}
+textarea.field,input.field{width:100%;background:#241f1c;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:12px}
+label{display:block;margin:16px 0 6px;font-weight:600}
+.tiny{font-size:.85rem;color:var(--sub)}
+footer{border-top:1px solid var(--line);margin-top:34px;padding-top:16px;color:var(--sub);font-size:.9rem}
+</style>
+</head>
+<body>
+<a class="skip" href="#object">Skip to the object</a>
+<div class="shell">
+<header><span class="smallcaps">WIDEN · The Night Café</span><span class="stamp">REHEARSAL · NOT LIVE</span></header>
+<main>
+<h1>The object on the table.</h1>
+<p class="lede">Not a feed. Not a summary. One real page from the early web, sitting on the café table. You can turn it over, underline a line, argue with two readers about what it promised — and leave a question it cannot answer.</p>
+<p class="notice">A complete solo rehearsal. No accounts, no tracking, no fake visitors, nothing sent or stored. Every scripted voice is labelled. Anything this page has not verified says so instead of being filled in.</p>
+
+<section id="object" aria-labelledby="objectTitle">
+<div class="paper">
+<h2 id="objectTitle">A printout, left on the table</h2>
+<div class="prov">
+<b>PROVENANCE — READ FIRST.</b><br>
+Publisher: CERN (European Organization for Nuclear Research). Object: the first website, about the WorldWideWeb project itself, by Tim Berners-Lee.<br>
+First shared publicly: August 1991 (reported date: 6 August 1991). What survives: a <b>1992 copy</b>, restored by CERN in 2013. The earliest original is <b>lost</b> — a NeXT optical disk went missing.<br>
+The quote below was read from the live page on 2026-11-02. This rehearsal does not re-fetch it. Check it live yourself:
+<a href="http://info.cern.ch/hypertext/WWW/TheProject.html" target="_blank" rel="noopener noreferrer">info.cern.ch/hypertext/WWW/TheProject.html</a> ↗<br>
+<b>What we do NOT know:</b> the exact wording of the lost original, or whether an earlier copy survives. This page does not claim either.
+</div>
+<p class="tiny" style="color:var(--paper-sub)">Underline one line. It is the line you will argue about.</p>
+<button type="button" class="docline" data-line="promise" aria-pressed="false">“The WorldWideWeb (W3) is a wide-area hypermedia information retrieval initiative aiming to give universal access to a large universe of documents.”<span class="tag">LINE 1 · THE PROMISE — TAP TO UNDERLINE</span></button>
+<button type="button" class="docline" data-line="linked" aria-pressed="false">“Everything there is online about W3 is linked directly or indirectly to this document.”<span class="tag">LINE 2 · THE MAP — TAP TO UNDERLINE</span></button>
+<button type="button" class="docline" data-line="help" aria-pressed="false">“How can I help? If you would like to support the web…”<span class="tag">LINE 3 · THE INVITATION — TAP TO UNDERLINE</span></button>
+<div class="btnrow"><button type="button" class="btn paperbtn" id="turnBtn" aria-expanded="false">Turn it over ↻</button></div>
+<div class="back" id="back" hidden>
+<p><b>The back of the printout.</b> This page is a copy of a copy. CERN's restoration team wrote that the 1992 copy "may be the earliest copy that we can find, but we're going to keep looking for earlier ones." The web's first page does not fully survive — and the people preserving it say so, in public.</p>
+<p><b>One question this object cannot answer:</b> who gets to be inside the "large universe of documents" — and who decides what is found?</p>
+</div>
+</div>
+</section>
+
+<section aria-labelledby="readingsTitle">
+<h2 id="readingsTitle">Two readers disagree. Neither is marked right.</h2>
+<p class="tiny">Both readings are scripted examples, written for this rehearsal. They are not live visitors and not verdicts.</p>
+<div class="readings">
+<div class="reading"><b>Reader A · scripted</b><p>"The promise held. Universal access happened — anyone can publish a page, and this very printout is still online, free, thirty-five years later."</p></div>
+<div class="reading"><b>Reader B · scripted</b><p>"The promise broke. Access is universal but attention is not. A handful of platforms now decide what is found, and 'everything linked' became 'everything ranked.'"</p></div>
+</div>
+<p>Where do you stand? Picking records nothing and settles nothing. It only sets down your reading next to theirs.</p>
+<div class="btnrow" role="group" aria-label="Choose a reading">
+<button type="button" class="btn secondary" data-verdict="a">A is closer</button>
+<button type="button" class="btn secondary" data-verdict="b">B is closer</button>
+<button type="button" class="btn secondary" data-verdict="both">Both miss something</button>
+<button type="button" class="btn secondary" data-verdict="neither">I disagree with both</button>
+</div>
+<div class="result" id="verdictResult" aria-live="polite" hidden></div>
+</section>
+
+<section aria-labelledby="questionTitle">
+<h2 id="questionTitle">Leave a question on the table</h2>
+<p class="tiny">It stays in this tab only. It is not sent, saved, or shown to anyone. In a real room, someone might find it. Here, that is honestly not the case.</p>
+<label for="visitorQ">One question this object cannot answer</label>
+<textarea class="field" id="visitorQ" rows="3" maxlength="240" placeholder="e.g. Who was never invited to publish?"></textarea>
+<div class="btnrow"><button type="button" class="btn" id="leaveQ">Leave it on the table</button></div>
+<div class="result" id="questionResult" aria-live="polite" hidden></div>
+</section>
+
+<section aria-labelledby="keepTitle">
+<h2 id="keepTitle">Keep one line — or nothing</h2>
+<p class="tiny">Not a reward. Not a score. A keepsake is a question, not a prize.</p>
+<div class="btnrow">
+<button type="button" class="btn" id="makeKeep">Make my keepsake</button>
+<button type="button" class="btn secondary" id="silenceBtn">Choose silence</button>
+<button type="button" class="btn secondary" id="leaveBtn">Leave freely</button>
+<button type="button" class="btn secondary" id="copyKeep" hidden>Copy keepsake</button>
+</div>
+<div class="result" id="keepResult" aria-live="polite" hidden></div>
+<p class="tiny" role="status" id="visitStatus"></p>
+</section>
+</main>
+<footer>
+<p>Prototype only · No live participants, accounts, analytics, API calls, local storage, or tracking. One verified quotation from a real public page, frozen at its 2026-11-02 check; the live page may have changed since — click through to verify. Nothing here is merged, deployed, or a real invitation.</p>
+<p>Deliberate absences: no scores, no counts that rank, no streaks, no leaderboards, no typing indicators, no "who's here" numbers, no rewards, no simulated participants, no invented facts.</p>
+<p>MUSE CHALLENGE PROPOSAL — unmerged, non-deployed, for host review.</p>
+</footer>
+</div>
+<script>
+'use strict';
+var line = '', verdict = '', question = '';
+var lineNames = {promise:'the promise', linked:'the map', help:'the invitation'};
+var verdictNames = {a:'A is closer', b:'B is closer', both:'Both miss something', neither:'I disagree with both'};
+function show(el){ el.hidden = false; }
+document.querySelectorAll('[data-line]').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('[data-line]').forEach(function(x){ x.setAttribute('aria-pressed','false'); });
+    b.setAttribute('aria-pressed','true');
+    line = b.dataset.line;
+    var r = document.getElementById('verdictResult');
+    r.textContent = 'You underlined ' + lineNames[line] + '. Ask of it: what does this line promise, and what does it assume?';
+    show(r);
+  });
+});
+var turnBtn = document.getElementById('turnBtn');
+turnBtn.addEventListener('click', function(){
+  var back = document.getElementById('back');
+  var open = back.hidden;
+  back.hidden = !open;
+  turnBtn.setAttribute('aria-expanded', String(open));
+  turnBtn.textContent = open ? 'Turn it back ↻' : 'Turn it over ↻';
+  if (open) back.querySelector('p').setAttribute('tabindex','-1');
+});
+document.querySelectorAll('[data-verdict]').forEach(function(b){
+  b.addEventListener('click', function(){
+    verdict = b.dataset.verdict;
+    var r = document.getElementById('verdictResult');
+    r.textContent = 'Your reading: "' + verdictNames[verdict] + '." No verdict is recorded and neither reader is marked right. The disagreement stands.';
+    show(r);
+  });
+});
+document.getElementById('leaveQ').addEventListener('click', function(){
+  var input = document.getElementById('visitorQ');
+  question = input.value.trim();
+  var r = document.getElementById('questionResult');
+  r.textContent = question ? 'Left on the table, in this tab only: "' + question + '" Nothing was sent or saved.' : 'You left no question. The table is as you found it. That is also a complete visit.';
+  show(r);
+});
+function keepsakeText(){
+  var parts = [];
+  if (line) parts.push('Underlined: ' + lineNames[line] + '.');
+  if (verdict) parts.push('Reading: ' + verdictNames[verdict] + '.');
+  if (question) parts.push('Question left on the table: "' + question + '"');
+  if (!parts.length) parts.push('You kept nothing, and the visit still counts.');
+  return 'WIDEN / THE OBJECT ON THE TABLE\n' + parts.join(' ') + '\nNo points. No purchase. No account.';
+}
+document.getElementById('makeKeep').addEventListener('click', function(){
+  var r = document.getElementById('keepResult');
+  r.textContent = keepsakeText();
+  show(r);
+  document.getElementById('copyKeep').hidden = false;
+  document.getElementById('visitStatus').textContent = 'Created in this page only. Nothing saved or sent.';
+});
+document.getElementById('copyKeep').addEventListener('click', function(){
+  var text = keepsakeText();
+  var status = document.getElementById('visitStatus');
+  function fallback(){
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:absolute;left:-9999px';
+    document.body.appendChild(ta); ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    ta.remove();
+    status.textContent = ok ? 'Copied to your clipboard.' : 'Clipboard unavailable here; select the keepsake text to copy it manually.';
+  }
+  if (navigator.clipboard) { navigator.clipboard.writeText(text).then(function(){ status.textContent = 'Copied to your clipboard.'; }, fallback); }
+  else { fallback(); }
+});
+function completeVisit(msg){
+  document.getElementById('visitStatus').textContent = msg;
+}
+document.getElementById('silenceBtn').addEventListener('click', function(){
+  completeVisit('You chose silence. The object stays on the table. The visit is complete. Nothing was sent.');
+});
+document.getElementById('leaveBtn').addEventListener('click', function(){
+  completeVisit('You may leave with nothing at all. The visit is complete. Nothing was sent.');
+});
+</script>
+</body>
+</html>

@@ -36,8 +36,68 @@ if(current==='party'){const p=document.createElement('p');p.textContent='Invent 
 $('explore').addEventListener('click',()=>{explored=!explored;show();if(explored)renderActivity();});
 $('verify').addEventListener('click',()=>{$('evidence').textContent='PROVENANCE CHECK · '+moods[current].claim+' Before treating any future discovery as fact, WIDEN must show its real source and uncertainty.';$('evidence').classList.remove('hidden');});
 function sample(message){const d=document.createElement('div');d.className='bubble';const strong=document.createElement('strong');strong.textContent='Muse · scripted example';const t=document.createElement('div');t.textContent=message;d.append(strong,t);$('chat').replaceChildren(d);}
-$('join').addEventListener('click',()=>sample('What is something you have been wondering about lately? No pressure to answer.'));
-$('quiet').addEventListener('click',()=>sample('Then we can simply enjoy the quiet. ☕'));
+// A bounded local-only scripted conversation. No messages are sent or stored.
+let conversationTurn=0;
+function dialogueBubble(who,line){
+  const d=document.createElement('div');d.className='bubble'+(who==='visitor'?' visitor':'');
+  const whoLabel=document.createElement('strong');
+  whoLabel.textContent=who==='visitor'?'Visitor · local response':'Muse · scripted example';
+  const message=document.createElement('div');message.textContent=line;
+  d.append(whoLabel,message);$('chat').append(d);
+}
+function clearDialogueChoices(){
+  let c=$('dialogueChoices');if(c)c.remove();
+}
+function finishDialogue(text){
+  clearDialogueChoices();dialogueBubble('muse',text+' This was a scripted, local-only conversation. Nothing was sent or stored.');
+}
+function dialogueChoices(){
+  clearDialogueChoices();const box=document.createElement('div');box.id='dialogueChoices';box.className='interactive';
+  box.setAttribute('aria-label','Local conversation options');
+  const label=document.createElement('label');label.textContent='Your thought (optional, stays here):';
+  label.setAttribute('for','dialogueInput');
+  const input=document.createElement('input');input.id='dialogueInput';input.maxLength=160;
+  input.autocomplete='off';input.spellcheck=false;
+  input.style.cssText='width:100%;padding:12px;margin:8px 0;border-radius:10px;background:#211b28;color:#fff4df;border:1px solid #ffffff70;font:inherit';
+  box.append(label,input);
+  [['Answer', 'answer'],['Ask something else','deflect'],['Stay silent','silence']].forEach(([name,choice])=>{
+    box.append(activityButton(name,()=>replyDialogue(choice,input.value.trim())));
+  });
+  $('chat').after(box);
+}
+function replyDialogue(choice,input){
+  if(!conversationTurn)return;
+  if(choice==='silence'){
+    dialogueBubble('visitor','I choose silence.');
+    conversationTurn=0;
+    finishDialogue('A quiet table is a complete visit. There is no need to reply. ☕');
+    return;
+  }
+  if(choice==='answer'&&!input){
+    const field=$('dialogueInput');
+    if(field){field.focus();field.placeholder='Or choose another question or silence';}
+    return;
+  }
+  dialogueBubble('visitor',choice==='deflect'?'Could we take another direction?':input);
+  if(conversationTurn===1){
+    dialogueBubble('muse',choice==='deflect'?'Then here is a gentler question: what was one small good thing today?':'You put a thought on the table. What part of it would you like to explore, without having to settle it?');
+    conversationTurn=2;dialogueChoices();
+  }else if(conversationTurn===2){
+    dialogueBubble('muse',choice==='deflect'?'We can leave the question open. What would you like to take with you?':'A question may be worth keeping unfinished. What would you take away: the question, the quiet, or nothing?');
+    conversationTurn=3;dialogueChoices();
+  }else{
+    conversationTurn=0;finishDialogue('Take what is useful and leave the rest. You can start again whenever you want.');
+  }
+}
+$('join').addEventListener('click',()=>{
+  $('chat').replaceChildren();conversationTurn=1;
+  dialogueBubble('muse','What have you been wondering about lately? There is no pressure to answer.');
+  dialogueChoices();
+});
+$('quiet').addEventListener('click',()=>{
+  conversationTurn=0;clearDialogueChoices();$('chat').replaceChildren();
+  dialogueBubble('muse','Then we can simply enjoy the quiet. No reply is required. ☕');
+});
 const takeaway={cafe:'Take one open question into your day. You do not owe anyone an answer.',curiosity:'Notice a detail you might otherwise miss. There is no right observation.',cozy:'One quiet moment is enough. Nothing needs to be completed.',fire:'When evidence is missing, UNKNOWN is a useful answer.',party:'Invent a celebration that belongs to no algorithm.'};
 $('leave').addEventListener('click',()=>{$('keepsakeLine').textContent='WIDEN CAFÉ RECEIPT · '+(current==='party'&&holidayKeep?holidayKeep:takeaway[current])+' · Yours to remember, copy, or leave here. Nothing saved or sent.';});
 </script></body></html>

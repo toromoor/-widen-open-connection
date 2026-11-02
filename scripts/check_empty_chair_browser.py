@@ -77,7 +77,8 @@ def check(browser, width):
             "name":"widen-capsule.json", "mimeType":"application/json",
             "buffer":json.dumps(first).encode("utf-8")
         })
-        assert b.evaluate("document.activeElement.id") == "import-preview"
+        # Reading a selected File is asynchronous; wait for the preview.
+        b.wait_for_function("document.activeElement && document.activeElement.id === 'import-preview'")
         b.locator("#accept-capsule").click()
         assert b.locator(".paper-sheet").count() == 1
         assert b.locator("#continue-panel").is_visible()

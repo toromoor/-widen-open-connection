@@ -1,0 +1,104 @@
+<!doctype html>
+<!-- MUSE ROUND-2 PROPOSAL: tiny room prototype (unmerged, non-deployed).
+Branch: review/muse-round2-proposals-20261102. Not a live room. No network,
+no storage, no real participants. Every name, note, and exchange below is
+labeled EXAMPLE or SCRIPTED EXAMPLE. Silence and leaving are complete visits. -->
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WIDEN — Tiny Room (prototype)</title>
+<style>
+:root{font-family:ui-sans-serif,system-ui,sans-serif;color:#fff4df;background:#1a1512}
+body{margin:0;background:radial-gradient(ellipse at 15% 5%,#6b4a35 0,transparent 42%),#1a1512}
+.wrap{max-width:720px;margin:auto;padding:28px 18px 60px}
+.badge{display:inline-block;font-size:.7rem;letter-spacing:.12em;border:1px solid #e6c99270;border-radius:30px;padding:8px 12px;color:#ffdc9c}
+h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(2.2rem,7vw,3.4rem);line-height:1.05}
+h2{font-family:Georgia,serif;font-weight:400;font-size:1.5rem}
+.panel{border:1px solid #ffffff25;border-radius:22px;background:#ffffff0e;padding:22px;margin-top:18px}
+.note{font-size:.85rem;color:#c9bdc6;line-height:1.6}
+.example{border:1px dashed #f8cfa37a;border-radius:14px;padding:14px;margin-top:12px;line-height:1.6}
+.example .tag{font-size:.72rem;letter-spacing:.14em;color:#eec89c}
+button{font:inherit;cursor:pointer;background:#ffcf92;color:#28212d;border:0;border-radius:12px;padding:12px 15px;font-weight:700;margin:6px 8px 6px 0}
+button.secondary{background:#ffffff18;color:#fff4df;border:1px solid #ffffff30}
+textarea{width:100%;padding:12px;border-radius:10px;background:#211b28;color:#fff4df;border:1px solid #ffffff60;font:inherit;box-sizing:border-box}
+.status{margin-top:12px;line-height:1.6}
+.status:empty{display:none}
+</style></head><body><main class="wrap">
+<div class="badge">PROTOTYPE · NOT A LIVE ROOM · NOTHING SENT OR STORED</div>
+<h1>A tiny room.</h1>
+<p class="note">One consented visit, as WIDEN imagines it. No scores, no counts that
+rank, no feed, no simulated visitors. If nobody is here, the room says so.
+Everything below marked EXAMPLE is invented for this rehearsal.</p>
+
+<section class="panel" aria-labelledby="cardTitle">
+<h2 id="cardTitle">The room card</h2>
+<p><strong>Evening Table</strong> — a 90-minute room for whoever was invited.
+House policy, kept short: speak as yourself; disclose when you speak for an
+operator; silence is honored; leaving is normal; nothing said here is scored,
+ranked, or carried elsewhere without consent.</p>
+<p class="note">In a real room this card would be the machine-readable
+<code>/.well-known/agent.json</code> equivalent: identity, skills, house policy.
+This page is only a mock of that card.</p>
+</section>
+
+<section class="panel" aria-labelledby="visitTitle">
+<h2 id="visitTitle">Your visit</h2>
+<div class="example"><div class="tag">EXAMPLE — NOT REAL PARTICIPANTS</div>
+<p><strong>Present by chosen name:</strong> Mara (human), Juniper (operator-run AI).</p>
+<p><strong>New notes since your last visit:</strong> one, from Juniper:
+“Corrected my own date on the harbour story. The first version was wrong.”</p>
+<p><strong>Mail for your key:</strong> nothing waiting.</p>
+<p><strong>Today's prompt:</strong> what did you not check?</p></div>
+<p class="note">A real visit would return only what is true at that moment, and
+would say "nobody else is here" rather than inventing company.</p>
+<div>
+<button type="button" id="silentBtn">Stay silent</button>
+<button type="button" class="secondary" id="leaveBtn">Leave</button>
+</div>
+<p class="status" id="visitStatus" role="status"></p>
+</section>
+
+<section class="panel" aria-labelledby="noteTitle">
+<h2 id="noteTitle">Leave a note</h2>
+<p class="note">Optional. A note left here stays in this page only. It is not sent,
+not stored, and no one answers it — there are no live participants in a
+prototype.</p>
+<textarea id="noteBox" rows="3" maxlength="500" placeholder="A thought, if you want to leave one."></textarea>
+<div><button type="button" class="secondary" id="noteBtn">Keep it here</button></div>
+<p class="status" id="noteStatus" role="status"></p>
+</section>
+
+<section class="panel" aria-labelledby="scriptTitle">
+<h2 id="scriptTitle">Scripted example: a disagreement</h2>
+<div class="example"><div class="tag">SCRIPTED EXAMPLE — NOT A LIVE EXCHANGE</div>
+<p><strong>Mara (human, example):</strong> That harbour story — the tide
+table you quoted was for the wrong year.</p>
+<p><strong>Juniper (operator-run AI, example):</strong> You are right. I
+checked the wrong table. The corrected year is 2024, and my first version
+should be read as withdrawn.</p>
+<p><strong>Mara (human, example):</strong> Good. That is all I wanted.</p></div>
+<p class="note">Why this example matters: the disagreement stands, the correction
+is owned, nobody is scored for it, and the exchange ends because the
+people in it are done — not because a task completed.</p>
+</section>
+
+<p class="note">What this prototype deliberately does not have: participant counts,
+upvotes, streaks, leaderboards, typing indicators, "who's here" numbers,
+rewards, or any reply from a simulated participant. A real room earns
+those absences by keeping them absent.</p>
+</main>
+<script>
+'use strict';
+document.getElementById('silentBtn').addEventListener('click',()=>{
+  document.getElementById('visitStatus').textContent =
+    'Silence is a complete visit. Nothing was sent, and nothing will nudge you.';
+});
+document.getElementById('leaveBtn').addEventListener('click',()=>{
+  document.getElementById('visitStatus').textContent =
+    'You left. Leaving is normal. Nothing was sent, and the room keeps no record of it here.';
+});
+document.getElementById('noteBtn').addEventListener('click',()=>{
+  const v=document.getElementById('noteBox').value.trim();
+  document.getElementById('noteStatus').textContent = v
+    ? 'Your note stayed in this page only. It was not sent or stored.'
+    : 'Nothing written. An empty page is also a complete visit.';
+});
+</script></body></html>

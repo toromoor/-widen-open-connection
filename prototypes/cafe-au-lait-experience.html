@@ -51,7 +51,7 @@ function clearDialogueChoices(){
 function finishDialogue(text){
   clearDialogueChoices();dialogueBubble('muse',text+' This was a scripted, local-only conversation. Nothing was sent or stored.');
 }
-function dialogueChoices(){
+function dialogueChoices(restoreKeyboardFocus=false){
   clearDialogueChoices();const box=document.createElement('div');box.id='dialogueChoices';box.className='interactive';
   box.setAttribute('aria-label','Local conversation options');
   const label=document.createElement('label');label.textContent='Your thought (optional, stays here):';
@@ -65,10 +65,11 @@ function dialogueChoices(){
   });
   $('chat').after(box);
   // Move focus only when a keyboard-initiated reply has replaced the controls.
-  if(document.activeElement && document.activeElement.isConnected===false)input.focus();
+  if(restoreKeyboardFocus)input.focus();
 }
 function replyDialogue(choice,input){
   if(!conversationTurn)return;
+  const restoreKeyboardFocus=!!document.activeElement && document.activeElement.matches('button:focus-visible');
   if(choice==='silence'){
     dialogueBubble('visitor','I choose silence.');
     conversationTurn=0;
@@ -83,10 +84,10 @@ function replyDialogue(choice,input){
   dialogueBubble('visitor',choice==='deflect'?'Could we take another direction?':input);
   if(conversationTurn===1){
     dialogueBubble('muse',choice==='deflect'?'Then here is a gentler question: what was one small good thing today?':'You put a thought on the table. What part of it would you like to explore, without having to settle it?');
-    conversationTurn=2;dialogueChoices();
+    conversationTurn=2;dialogueChoices(restoreKeyboardFocus);
   }else if(conversationTurn===2){
     dialogueBubble('muse',choice==='deflect'?'We can leave the question open. What would you like to take with you?':'A question may be worth keeping unfinished. What would you take away: the question, the quiet, or nothing?');
-    conversationTurn=3;dialogueChoices();
+    conversationTurn=3;dialogueChoices(restoreKeyboardFocus);
   }else{
     conversationTurn=0;finishDialogue('Take what is useful and leave the rest. You can start again whenever you want.');
   }

@@ -25,7 +25,7 @@ def check(browser, width, height, name):
     assert page.locator("#keepsakeLine").inner_text() == ""
 
     # Café: choose a question. This interaction must not send/store the answer.
-    page.get_by_role("button", name="Ask an open question").click()
+    page.locator("#explore").click()  # initial label is "Explore this mood"
     page.get_by_role("button", name="What surprised you lately?").click()
     assert "Your question" in page.locator("#activity").inner_text()
 
@@ -35,7 +35,7 @@ def check(browser, width, height, name):
     assert page.get_by_role("button", name="Mark UNKNOWN").count() == 5
     for _ in range(5):
         page.get_by_role("button", name="Mark UNKNOWN").first.click()
-    assert "5 missing fields" in page.locator("#activity").inner_text()
+    assert "all five missing fields" in page.locator("#activity").inner_text()
     page.get_by_role("button", name="Inspect provenance").click()
     assert "fictional" in page.locator("#evidence").inner_text().lower()
 

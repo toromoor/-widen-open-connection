@@ -92,7 +92,7 @@ def check(browser, width):
         assert second["contributions"][1]["text"].startswith("I disagree")
         assert "editable" in b.locator(".paper-caption").inner_text() or "does not verify" in b.locator(".paper-caption").inner_text()
         assert b.locator(".paper-sheet").count() == 2
-        assert b.locator(".paper-sheet-label").nth(1).inner_text() == "Most recent contribution · 2"
+        assert b.locator(".paper-sheet-label").nth(1).text_content().strip() == "Most recent contribution · 2"
         assert b.locator(".thread-item").count() == 2
         sheet_font = b.locator(".paper-sheet-words").evaluate_all(
             "els=>els.map(el=>getComputedStyle(el).fontSize)"
@@ -120,7 +120,7 @@ def check(browser, width):
         assert len(third["contributions"]) == 3
         assert third["contributions"][:2] == second["contributions"]
         assert a.locator(".paper-sheet").count() == 2
-        assert a.locator(".paper-sheet-label").nth(1).inner_text() == "Most recent contribution · 3"
+        assert a.locator(".paper-sheet-label").nth(1).text_content().strip() == "Most recent contribution · 3"
         assert a.locator(".thread-item").count() == 3
         no_overflow(a, "A three voices")
 

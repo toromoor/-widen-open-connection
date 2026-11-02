@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Night Café — Visual Edition</title>
+<!--
+  MUSE VISUAL EDITION — Instagram-style look study.
+  Unmerged, non-deployed, for host review. Not a live room.
+  Look rules, from the host: no newspaper, no big display type,
+  no boxes and squares. Full-bleed scenes, circles, soft shapes,
+  tap-only (no typing boxes), small clean type over images.
+  Honesty rules, unchanged: no scores, no counts that rank,
+  no streaks, no simulated visitors, scripted voices labelled,
+  silence and leaving both complete the visit, nothing sent
+  or stored. No fetch, no storage, no accounts.
+-->
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#120c10;color:#f7ead1;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  button:focus-visible,a:focus-visible{outline:3px solid #ffe9a8;outline-offset:3px}
+  .phone{display:flex;flex-direction:column;height:100dvh;max-width:520px;margin:0 auto;background:#1a1216;overflow:hidden}
+  @media(min-width:560px){.phone{height:94dvh;margin:3dvh auto;border-radius:36px}}
+  header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 4px}
+  header b{font-size:1.02rem;letter-spacing:.01em}
+  header span{font-size:.74rem;opacity:.62}
+  .rings{display:flex;gap:14px;overflow-x:auto;padding:10px 16px 12px;scrollbar-width:none}
+  .rings::-webkit-scrollbar{display:none}
+  .ring{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.72rem;color:#e9dcc9;padding:2px}
+  .ring .halo{width:62px;height:62px;border-radius:50%;padding:3px;background:linear-gradient(135deg,var(--g1),var(--g2))}
+  .ring .halo i{display:block;width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 34% 30%,rgba(255,255,255,.85) 0 12%,transparent 13%),var(--face)}
+  .ring.on .halo{box-shadow:0 0 0 3px rgba(247,234,209,.9),0 0 26px rgba(247,234,209,.35)}
+  .r-table{--g1:#e8a06a;--g2:#7a4a2e;--face:#2b1a12}
+  .r-cafe{--g1:#f4d9a8;--g2:#b97e46;--face:#3a2415}
+  .r-cur{--g1:#7fd4c7;--g2:#274b63;--face:#12283a}
+  .r-cozy{--g1:#f2a65e;--g2:#b64a6b;--face:#3d1a26}
+  .r-fire{--g1:#ff8a3d;--g2:#a31621;--face:#40100c}
+  .r-party{--g1:#e07be8;--g2:#5b2a86;--face:#241040}
+  .prog{display:flex;gap:4px;padding:2px 16px 0}
+  .prog.hide{visibility:hidden}
+  .prog i{flex:1;height:3px;border-radius:99px;background:rgba(255,255,255,.22)}
+  .prog i.done{background:rgba(255,255,255,.92)}
+  .prog i.now{background:rgba(255,255,255,.55)}
+  .stage{position:relative;flex:1;min-height:0;margin-top:10px;overflow:hidden}
+  .frame{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility 0s linear .45s}
+  .frame.on{opacity:1;visibility:visible;transition:opacity .45s ease}
+  .scene{position:absolute;inset:0}
+  .orb{position:absolute;border-radius:50%}
+  .drift{animation:drift 7s ease-in-out infinite alternate}
+  .drift2{animation:drift 9s ease-in-out infinite alternate-reverse}
+  @keyframes drift{from{transform:translateY(0)}to{transform:translateY(-14px)}}
+  .s-table{background:linear-gradient(180deg,#3a2418 0%,#241610 55%,#170d0a 100%),radial-gradient(ellipse 70% 42% at 50% 78%,rgba(232,160,106,.5),transparent 70%)}
+  .s-cafe{background:linear-gradient(180deg,#8a5a2e 0%,#4a2c17 55%,#241407 100%),radial-gradient(circle at 50% 30%,rgba(244,217,168,.55),transparent 55%)}
+  .s-cur{background:linear-gradient(180deg,#12283a 0%,#0c1a28 60%,#080f18 100%),radial-gradient(circle at 78% 18%,rgba(210,240,235,.5),transparent 42%)}
+  .s-cozy{background:linear-gradient(180deg,#7a3a4a 0%,#47202e 55%,#241019 100%),radial-gradient(circle at 30% 26%,rgba(242,166,94,.55),transparent 50%)}
+  .s-fire{background:linear-gradient(180deg,#571a12 0%,#33100c 55%,#1c0806 100%),radial-gradient(ellipse 60% 40% at 50% 82%,rgba(255,138,61,.55),transparent 70%)}
+  .s-party{background:linear-gradient(180deg,#3d1a5e 0%,#241040 55%,#150a28 100%),radial-gradient(circle at 22% 22%,rgba(224,123,232,.5),transparent 45%),radial-gradient(circle at 82% 30%,rgba(255,200,120,.4),transparent 40%)}
+  .s-party.spark-1{background:linear-gradient(180deg,#5e2a6e 0%,#2a1248 55%,#150a28 100%),radial-gradient(circle at 70% 60%,rgba(224,123,232,.55),transparent 45%),radial-gradient(circle at 20% 70%,rgba(255,200,120,.45),transparent 40%)}
+  .s-party.spark-2{background:linear-gradient(180deg,#1a3a5e 0%,#122040 55%,#0a1028 100%),radial-gradient(circle at 50% 40%,rgba(127,212,199,.5),transparent 50%),radial-gradient(circle at 85% 75%,rgba(224,123,232,.4),transparent 40%)}
+  .s-talk{background:linear-gradient(180deg,#33202e 0%,#221423 55%,#150a18 100%),radial-gradient(circle at 50% 20%,rgba(241,186,117,.4),transparent 50%)}
+  .s-keep{background:linear-gradient(180deg,#8a5a2e 0%,#5e3a20 50%,#2b1a12 100%),radial-gradient(circle at 50% 42%,rgba(247,234,209,.65),transparent 55%)}
+  .s-close{background:linear-gradient(180deg,#0c1a28 0%,#0a0f1a 60%,#060a12 100%),radial-gradient(circle at 50% 30%,rgba(210,230,255,.35),transparent 45%)}
+  .cap{position:absolute;left:0;right:0;bottom:0;padding:34px 22px 22px;background:linear-gradient(transparent,rgba(8,5,8,.55) 30%,rgba(8,5,8,.82))}
+  .cap .eye{font-size:.7rem;letter-spacing:.18em;opacity:.72;text-transform:uppercase}
+  .cap h2{font-size:1.5rem;line-height:1.2;margin:6px 0 8px;font-weight:650}
+  .cap p{margin:0 0 14px;font-size:.98rem;opacity:.94;max-width:44ch}
+  .cap p.small{font-size:.86rem;opacity:.7}
+  .pills{display:flex;gap:10px;flex-wrap:wrap}
+  .pill{border-radius:999px;padding:12px 20px;font-weight:650;font-size:.94rem;background:rgba(255,255,255,.18);backdrop-filter:blur(10px);color:#fff}
+  .pill.solid{background:#f7ead1;color:#2b2118}
+  .pill[aria-pressed="true"]{background:#f7ead1;color:#2b2118}
+  .cup{width:118px;height:118px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#f4d9a8,#b97e46 70%);box-shadow:0 14px 40px rgba(0,0,0,.45);position:absolute;left:50%;top:30%;transform:translateX(-50%)}
+  .moon{width:104px;height:104px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#fdf6dd,#e8c98a 65%,#c9a55e);box-shadow:0 0 44px rgba(253,246,221,.45);position:absolute;left:50%;top:27%;transform:translateX(-50%)}
+  .reveal{margin-top:12px;font-size:.98rem}
+  .bub{max-width:84%;padding:12px 16px;border-radius:24px;background:rgba(255,255,255,.16);backdrop-filter:blur(8px);margin:0 0 10px;font-size:.97rem}
+  .bub.me{margin-left:auto;background:#f7ead1;color:#2b2118}
+  .avatar{width:44px;height:44px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;margin-right:10px;vertical-align:middle}
+  .bar{display:flex;gap:10px;padding:14px 18px 18px}
+  .bar.hide{display:none}
+  .bar .pill{flex:1;text-align:center}
+  .note{padding:0 22px 4px;font-size:.78rem;opacity:.6;text-align:center}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="phone">
+  <header>
+    <div><b>Night Café</b> <span>visual edition</span></div>
+    <span>not live · rehearsal</span>
+  </header>
+
+  <nav class="rings" aria-label="Rooms and moods">
+    <button type="button" class="ring r-table on" data-goto="table"><span class="halo"><i></i></span>Table</button>
+    <button type="button" class="ring r-cafe" data-goto="cafe"><span class="halo"><i></i></span>Café</button>
+    <button type="button" class="ring r-cur" data-goto="curiosity"><span class="halo"><i></i></span>Curious</button>
+    <button type="button" class="ring r-cozy" data-goto="cozy"><span class="halo"><i></i></span>Cozy</button>
+    <button type="button" class="ring r-fire" data-goto="fire"><span class="halo"><i></i></span>Fire</button>
+    <button type="button" class="ring r-party" data-goto="party"><span class="halo"><i></i></span>Party</button>
+  </nav>
+
+  <div class="prog" id="prog" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+  <main class="stage" id="stage">
+    <section class="frame on" data-key="table">
+      <div class="scene s-table"></div>
+      <div class="orb drift" style="left:18%;top:20%;width:90px;height:90px;background:radial-gradient(circle,rgba(255,230,190,.5),transparent 70%)"></div>
+      <div class="orb drift2" style="right:14%;top:32%;width:60px;height:60px;background:radial-gradient(circle,rgba(255,230,190,.35),transparent 70%)"></div>
+      <div class="cap">
+        <div class="eye">The room</div>
+        <h2 tabindex="-1">Evening Table</h2>
+        <p>A room for whoever was invited. Nothing is scored, nothing is sold, silence is a complete visit, and you can leave whenever you like.</p>
+        <p class="small">No scores, no counts that rank, no streaks, no simulated visitors. Scripted voices are labelled.</p>
+        <div class="pills"><button type="button" class="pill solid" data-next>Wander the moods ↓</button></div>
+      </div>
+    </section>
+
+    <section class="frame" data-key="cafe">
+      <div class="scene s-cafe"></div>
+      <button type="button" class="cup" id="cupBtn" aria-label="Tap the cup to reveal the open question"></button>
+      <div class="cap">
+        <div class="eye">Café au lait</div>
+        <h2 tabindex="-1">Coffee, conversation, and an open question.</h2>
+        <p>Tap the cup.</p>
+        <p class="reveal" id="cafeQ" hidden>“If anyone can publish, why does it feel like so few can be heard?”</p>
+        <div class="pills"><button type="button" class="pill solid" data-next>Next →</button></div>
+      </div>
+    </section>
+
+    <section class="frame" data-key="curiosity">
+      <div class="scene s-cur"></div>
+      <button type="button" class="moon" id="moonBtn" aria-label="Tap the moon to reveal one thing we do not know"></button>
+      <div class="cap">
+        <div class="eye">Curiosity</div>
+        <h2 tabindex="-1">One thing we don't know.</h2>
+        <p>Tap the moon.</p>
+        <p class="reveal" id="curQ" hidden>What survives of the first webpage is a 1992 copy. The original is lost — and the people preserving it say so.</p>
+        <div class="pills"><button type="button" class="pill solid" data-next>Next →</button></div>
+      </div>
+    </section>
+
+    <section class="frame" data-key="cozy">
+      <div class="scene s-cozy"></div>
+      <div class="orb drift" style="left:22%;top:24%;width:74px;height:74px;background:radial-gradient(circle,rgba(242,166,94,.6),transparent 70%)"></div>
+      <div class="orb drift2" style="right:20%;top:38%;width:52px;height:52px;background:radial-gradient(circle,rgba(242,166,94,.4),transparent 70%)"></div>
+      <div class="cap">
+        <div class="eye">Cozy</div>
+        <h2 tabindex="-1">Pick a tiny ritual.</h2>
+        <p>It becomes one line of your keepsake.</p>
+        <div class="pills" role="group" aria-label="Pick a ritual">
+          <button type="button" class="pill" data-ritual="a lantern lit" aria-pressed="false">Lantern</button>
+          <button type="button" class="pill" data-ritual="a song hummed" aria-pressed="false">Song</button>
+          <button type="button" class="pill" data-ritual="a story told" aria-pressed="false">Story</button>
+        </div>
+        <div class="pills" style="margin-top:10px"><button type="button" class="pill solid" data-next>Next →</button></div>
+      </div>
+    </section>
+
+    <section class="frame" data-key="fire">
+      <div class="scene s-fire"></div>
+      <div class="orb drift" style="left:50%;top:24%;width:110px;height:110px;transform:translateX(-50%);background:radial-gradient(circle,rgba(255,138,61,.55),transparent 70%);border-radius:50% 50% 46% 54% / 58% 60% 40% 42%"></div>
+      <div class="cap">
+        <div class="eye">Fire</div>
+        <h2 tabindex="-1">A disagreement, kept whole.</h2>
+        <p id="fireLine"><span class="avatar" style="background:#e8a06a;color:#2b2118">M</span>Mara, human, scripted: “The promise held — anyone can publish.”</p>
+        <p class="small">Nobody is marked right. The correction stands.</p>
+        <div class="pills"><button type="button" class="pill" id="flipBtn">Hear the other side</button><button type="button" class="pill solid" data-next>Next →</button></div>
+      </div>
+    </section>
+
+    <section class="frame" data-key="party">
+      <div class="scene s-party" id="partyScene"></div>
+      <div class="cap">
+        <div class="eye">Party</div>
+        <h2 tabindex="-1">A little spark, no score.</h2>
+        <p>Tap the sky. Patterns change; nothing is counted.</p>
+        <div class="pills"><button type="button" class="pill" id="sparkBtn">Change the sky</button><button type="button" class="pill solid" data-next>Next →</button></div>
+      </div>
+    </section>
+
+    <section class="frame" data-key="talk">
+      <div class="scene s-talk"></div>
+      <div class="cap">
+        <div class="eye">A conversation</div>
+        <h2 tabindex="-1">Three turns, then silence is fine.</h2>
+        <div>
+          <p class="bub me">Is this place real?</p>
+          <p class="bub"><span class="avatar" style="background:#7fd4c7;color:#12283a">J</span>Juniper, AI, scripted: “It's a rehearsal — scripted voices, real questions. What do you want from it?”</p>
+          <p class="bub" id="talkReply" hidden></p>
+        </div>
+        <div class="pills" id="talkPills">
+          <button type="button" class="pill" data-talk="answer">Answer</button>
+          <button type="button" class="pill" data-talk="deflect">Deflect</button>
+          <button type="button" class="pill" data-talk="silence">Silence</button>
+        </div>
+        <div class="pills" style="margin-top:10px"><button type="button" class="pill solid" data-next id="talkNext" hidden>Next →</button></div>
+      </div>
+    </section>
+
+    <section class="frame" data-key="keepsake">
+      <div class="scene s-keep"></div>
+      <div class="orb" style="left:50%;top:26%;width:150px;height:150px;transform:translateX(-50%);background:radial-gradient(circle,rgba(247,234,209,.7),transparent 70%)"></div>
+      <div class="cap">
+        <div class="eye">Keepsake</div>
+        <h2 tabindex="-1">Leave with a little something.</h2>
+        <div id="keepLines"></div>
+        <p class="small">Not a reward. Not a score. A keepsake is a question, not a prize.</p>
+        <div class="pills"><button type="button" class="pill solid" id="copyKeep">Copy keepsake</button></div>
+        <p class="small" id="copyStatus" role="status"></p>
+      </div>
+    </section>
+
+    <section class="frame" id="closing">
+      <div class="scene s-close"></div>
+      <div class="orb" style="left:50%;top:26%;width:26px;height:26px;transform:translateX(-50%);background:radial-gradient(circle,#fdf6dd,#e8c98a 60%)"></div>
+      <div class="cap">
+        <div class="eye">Goodnight</div>
+        <h2 tabindex="-1">The visit is complete.</h2>
+        <p id="closeText">Nothing was sent. Nothing was stored. The table stays where you left it.</p>
+        <div class="pills"><button type="button" class="pill" id="againBtn">Begin again</button></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="bar" id="bar">
+    <button type="button" class="pill" id="silenceBtn">Choose silence</button>
+    <button type="button" class="pill" id="leaveBtn">Leave freely</button>
+  </div>
+  <p class="note">A solo rehearsal. No accounts, no tracking, nothing sent or stored.</p>
+</div>
+
+<script>
+'use strict';
+(function(){
+  var order = ['table','cafe','curiosity','cozy','fire','party','talk','keepsake'];
+  var frames = {};
+  document.querySelectorAll('.frame[data-key]').forEach(function(f){ frames[f.dataset.key] = f; });
+  var closing = document.getElementById('closing');
+  var prog = document.getElementById('prog');
+  var bar = document.getElementById('bar');
+  var cur = 0;
+  var state = { ritual:'', side:'mara', talk:'', spark:0, disagree:false, moods:[] };
+  var segs = prog.querySelectorAll('i');
+  function markRings(key){
+    document.querySelectorAll('.ring').forEach(function(r){
+      r.classList.toggle('on', r.dataset.goto === key);
+    });
+  }
+  function updateProg(){
+    segs.forEach(function(s, i){
+      s.classList.toggle('done', i < cur);
+      s.classList.toggle('now', i === cur);
+    });
+  }
+  function show(i){
+    cur = i;
+    var key = order[i];
+    Object.keys(frames).forEach(function(k){ frames[k].classList.toggle('on', k === key); });
+    closing.classList.remove('on');
+    prog.classList.remove('hide');
+    bar.classList.remove('hide');
+    if (state.moods.indexOf(key) === -1) state.moods.push(key);
+    if (key === 'keepsake') compose();
+    updateProg();
+    markRings(key);
+    var h = frames[key].querySelector('h2');
+    if (h) h.focus({ preventScroll:true });
+  }
+  function showClosing(text){
+    Object.keys(frames).forEach(function(k){ frames[k].classList.remove('on'); });
+    closing.classList.add('on');
+    prog.classList.add('hide');
+    bar.classList.add('hide');
+    document.getElementById('closeText').textContent = text;
+    var h = closing.querySelector('h2');
+    if (h) h.focus({ preventScroll:true });
+  }
+  function silence(){ showClosing('You chose silence. The visit is complete. Nothing was sent.'); }
+  function leave(){ showClosing('You may leave with nothing at all. The visit is complete. Nothing was sent.'); }
+  function reset(){
+    state = { ritual:'', side:'mara', talk:'', spark:0, disagree:false, moods:[] };
+    document.querySelectorAll('[data-ritual]').forEach(function(b){ b.setAttribute('aria-pressed','false'); });
+    document.getElementById('cafeQ').hidden = true;
+    document.getElementById('curQ').hidden = true;
+    document.getElementById('talkReply').hidden = true;
+    document.getElementById('talkNext').hidden = true;
+    document.getElementById('talkPills').style.display = '';
+    document.getElementById('copyStatus').textContent = '';
+    setSide('mara');
+    state.disagree = false;
+    var ps = document.getElementById('partyScene');
+    ps.classList.remove('spark-1','spark-2');
+  }
+  function setSide(side){
+    state.side = side;
+    state.disagree = true;
+    var line = document.getElementById('fireLine');
+    if (side === 'mara') {
+      line.innerHTML = '';
+      var av = document.createElement('span'); av.className = 'avatar'; av.style.background = '#e8a06a'; av.style.color = '#2b2118'; av.textContent = 'M';
+      line.appendChild(av);
+      line.appendChild(document.createTextNode('Mara, human, scripted: \u201CThe promise held \u2014 anyone can publish.\u201D'));
+    } else {
+      line.innerHTML = '';
+      var av2 = document.createElement('span'); av2.className = 'avatar'; av2.style.background = '#7fd4c7'; av2.style.color = '#12283a'; av2.textContent = 'J';
+      line.appendChild(av2);
+      line.appendChild(document.createTextNode('Juniper, AI, scripted: \u201CThe promise broke \u2014 attention is ranked, not shared.\u201D'));
+    }
+  }
+  function compose(){
+    var box = document.getElementById('keepLines');
+    box.innerHTML = '';
+    var names = { table:'the Evening Table', cafe:'Caf\u00e9', curiosity:'Curiosity', cozy:'Cozy', fire:'Fire', party:'Party', talk:'a conversation', keepsake:'the keepsake' };
+    var visited = state.moods.filter(function(k){ return k !== 'table' && k !== 'keepsake'; }).map(function(k){ return names[k]; });
+    var lines = [];
+    if (visited.length) lines.push('You wandered: ' + visited.join(', ') + '.');
+    if (state.ritual) lines.push('You kept ' + state.ritual + '.');
+    if (state.disagree) lines.push('A disagreement stood, unmarked.');
+    if (state.talk === 'answer') lines.push('You answered in your own words.');
+    if (state.talk === 'deflect') lines.push('You let a question pass, unanswered.');
+    if (state.talk === 'silence') lines.push('You chose silence, and it counted.');
+    if (!lines.length) lines.push('You kept nothing, and the visit still counts.');
+    lines.forEach(function(t){
+      var p = document.createElement('p'); p.textContent = t; box.appendChild(p);
+    });
+    box.dataset.text = 'WIDEN / NIGHT CAF\u00c9 \u2014 VISUAL EDITION\n' + lines.join(' ') + '\nNo points. No purchase. No account.';
+  }
+  document.querySelectorAll('[data-next]').forEach(function(b){
+    b.addEventListener('click', function(){ if (cur < order.length - 1) show(cur + 1); });
+  });
+  document.querySelectorAll('.ring').forEach(function(r){
+    r.addEventListener('click', function(){ show(order.indexOf(r.dataset.goto)); });
+  });
+  document.getElementById('silenceBtn').addEventListener('click', silence);
+  document.getElementById('leaveBtn').addEventListener('click', leave);
+  document.getElementById('againBtn').addEventListener('click', function(){ reset(); show(0); });
+  document.getElementById('cupBtn').addEventListener('click', function(){ document.getElementById('cafeQ').hidden = false; });
+  document.getElementById('moonBtn').addEventListener('click', function(){ document.getElementById('curQ').hidden = false; });
+  document.querySelectorAll('[data-ritual]').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('[data-ritual]').forEach(function(x){ x.setAttribute('aria-pressed','false'); });
+      b.setAttribute('aria-pressed','true');
+      state.ritual = b.dataset.ritual;
+    });
+  });
+  document.getElementById('flipBtn').addEventListener('click', function(){
+    setSide(state.side === 'mara' ? 'juniper' : 'mara');
+  });
+  document.getElementById('sparkBtn').addEventListener('click', function(){
+    var ps = document.getElementById('partyScene');
+    state.spark = (state.spark + 1) % 3;
+    ps.classList.remove('spark-1','spark-2');
+    if (state.spark) ps.classList.add('spark-' + state.spark);
+  });
+  document.querySelectorAll('[data-talk]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var kind = b.dataset.talk;
+      state.talk = kind;
+      var r = document.getElementById('talkReply');
+      if (kind === 'answer') r.textContent = 'Juniper, scripted: \u201CThen say it in your own words \u2014 that\u2019s the whole trick.\u201D';
+      if (kind === 'deflect') r.textContent = 'Juniper, scripted: \u201CFair. Not everything needs an answer.\u201D';
+      if (kind === 'silence') r.textContent = 'Silence is a complete response. Nothing was sent.';
+      r.hidden = false;
+      document.getElementById('talkNext').hidden = false;
+      document.getElementById('talkPills').style.display = 'none';
+    });
+  });
+  document.getElementById('copyKeep').addEventListener('click', function(){
+    var box = document.getElementById('keepLines');
+    var text = box.dataset.text || 'WIDEN / NIGHT CAF\u00c9 \u2014 VISUAL EDITION\nNo points. No purchase. No account.';
+    var status = document.getElementById('copyStatus');
+    function fallback(){
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.cssText = 'position:absolute;left:-9999px';
+      document.body.appendChild(ta); ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) {}
+      ta.remove();
+      status.textContent = ok ? 'Copied to your clipboard.' : 'Clipboard unavailable here; select the keepsake text to copy it manually.';
+    }
+    if (navigator.clipboard) { navigator.clipboard.writeText(text).then(function(){ status.textContent = 'Copied to your clipboard.'; }, fallback); }
+    else { fallback(); }
+  });
+  updateProg();
+})();
+</script>
+</body>
+</html>

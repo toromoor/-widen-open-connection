@@ -1,0 +1,35 @@
+name: Empty Chair exact-checkout browser acceptance
+on:
+  push:
+    branches:
+      - review/night-cafe-empty-chair-encounter-v2-20261102
+    paths:
+      - "prototypes/night-cafe-empty-chair-encounter-v2.html"
+      - "scripts/check_empty_chair_browser.py"
+      - ".github/workflows/empty-chair-browser.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Chromium and Playwright
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Exercise exact committed file in two independent browser contexts
+        run: python scripts/check_empty_chair_browser.py
+      - name: Save visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: empty-chair-mobile-desktop-screenshots
+          path: artifacts/*.png
+          retention-days: 7
+          if-no-files-found: ignore

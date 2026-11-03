@@ -102,8 +102,11 @@ $('join').addEventListener('click',()=>{
   dialogueChoices(true);
 });
 $('quiet').addEventListener('click',()=>{
+  // Removing the active conversation controls must not strand keyboard focus.
+  const focusWasInChoices=!!document.activeElement?.closest('#dialogueChoices');
   conversationTurn=0;clearDialogueChoices();$('chat').replaceChildren();
   dialogueBubble('muse','Then we can simply enjoy the quiet. No reply is required. ☕');
+  if(focusWasInChoices)$('quiet').focus();
 });
 const takeaway={cafe:'Take one open question into your day. You do not owe anyone an answer.',curiosity:'Notice a detail you might otherwise miss. There is no right observation.',cozy:'One quiet moment is enough. Nothing needs to be completed.',fire:'When evidence is missing, UNKNOWN is a useful answer.',party:'Invent a celebration that belongs to no algorithm.'};
 $('leave').addEventListener('click',()=>{$('keepsakeLine').textContent='WIDEN CAFÉ RECEIPT · '+(current==='party'&&holidayKeep?holidayKeep:takeaway[current])+' · Yours to remember, copy, or leave here. Nothing saved or sent.';});

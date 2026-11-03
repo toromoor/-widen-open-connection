@@ -32,9 +32,9 @@ def check(browser, width, height, name):
     # Claim transparency: mark five distinct unknown fields, never fabricate sources.
     page.locator("[data-mood='fire']").click()
     page.get_by_role("button", name="Inspect the headline").click()
-    assert page.get_by_role("button", name="Mark UNKNOWN").count() == 5
+    assert page.locator(".unknown-field button[aria-pressed='false']").count() == 5
     for _ in range(5):
-        page.get_by_role("button", name="Mark UNKNOWN").first.click()
+        page.locator(".unknown-field button[aria-pressed='false']").first.click()
     assert "all five missing fields" in page.locator("#activity").inner_text()
     page.get_by_role("button", name="Inspect provenance").click()
     assert "fictional" in page.locator("#evidence").inner_text().lower()

@@ -75,6 +75,34 @@ def check(browser, width, height, name):
     page.get_by_role("button", name="Choose silence").click()
     assert "No reply is required" in page.locator("#chat").inner_text()
 
+    # Keyboard accessibility: selected mood and activity expose their state.
+    page.locator("[data-mood='cafe']").focus()
+    page.keyboard.press("Enter")
+    assert page.locator("[data-mood='cafe']").get_attribute("aria-pressed") == "true"
+    assert page.locator("#headline").evaluate("(el) => document.activeElement === el")
+    page.locator("#explore").focus()
+    page.keyboard.press("Enter")
+    assert page.locator("#explore").get_attribute("aria-expanded") == "true"
+    assert page.locator("#activity").evaluate("(el) => document.activeElement === el")
+    assert page.locator("#activity").get_attribute("role") == "region"
+    page.locator("#explore").focus()
+    page.keyboard.press("Enter")
+    assert page.locator("#explore").get_attribute("aria-expanded") == "false"
+    assert page.locator("#activity").is_hidden()
+
+    # Keyboard-started conversation must place focus in the reply field.
+    page.locator("#join").focus()
+    page.keyboard.press("Enter")
+    assert page.locator("#dialogueInput").evaluate("(el) => document.activeElement === el")
+    page.locator("#dialogueInput").fill("A thought")
+    page.get_by_role("button", name="Answer", exact=True).focus()
+    page.keyboard.press("Enter")
+    assert page.locator("#dialogueInput").evaluate("(el) => document.activeElement === el")
+    page.get_by_role("button", name="Stay silent").focus()
+    page.keyboard.press("Enter")
+    assert page.locator("#dialogueChoices").count() == 0
+    assert page.locator("#join").evaluate("(el) => document.activeElement === el")
+
     # Narrow screens should not force horizontal scrolling.
     overflow = page.evaluate("document.documentElement.scrollWidth - window.innerWidth")
     assert overflow <= 2, f"horizontal overflow: {overflow}px for {name}"

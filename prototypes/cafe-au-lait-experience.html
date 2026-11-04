@@ -68,6 +68,16 @@ function dialogueChoices(restoreKeyboardFocus=false){
     box.append(activityButton(name,()=>replyDialogue(choice,input.value.trim())));
   });
   $('chat').after(box);
+  // Escape is a non-submitting exit from the scripted conversation.
+  // Keep this local to the choices so other page controls remain unaffected.
+  box.addEventListener('keydown',event=>{
+    if(event.key!=='Escape')return;
+    event.preventDefault();
+    conversationTurn=0;
+    clearDialogueChoices();
+    dialogueBubble('muse','You can leave the question unanswered. The table remains open. ☕');
+    $('join').focus();
+  });
   // Restore focus whenever a reply replaces the active controls.
   if(restoreKeyboardFocus)input.focus();
 }

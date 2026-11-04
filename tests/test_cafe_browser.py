@@ -29,8 +29,28 @@ def main():
                 assert page.locator("#explore").get_attribute("aria-expanded") == "false"
                 assert page.locator("#explore").is_focused()
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), f"activity overflow {mood} at {width}px"
+            # Regression: the claim-clinic button must announce its new state.
+            page.locator('[data-mood="fire"]').click()
+            page.locator("#explore").click()
+            unknown = page.get_by_role("button", name="Mark Publisher as unknown")
+            unknown.click()
+            assert page.get_by_role("button", name="Publisher: UNKNOWN").get_attribute("aria-pressed") == "true"
+            # Regression: switching moods clears the finished keepsake, as the notice promises.
+            page.locator("#leave").click()
+            assert page.locator("#keepsakeLine").inner_text().strip()
+            page.locator('[data-mood="cafe"]').click()
+            assert not page.locator("#keepsakeLine").inner_text().strip()
             page.locator("#join").click()
             assert page.locator("#dialogueChoices").count() == 1
+            # Escape exits without a reply and restores focus.
+            page.locator("#dialogueInput").focus()
+            page.keyboard.press("Escape")
+            assert page.locator("#dialogueChoices").count() == 0
+            assert page.locator("#join").is_focused()
+            # Replacing a clicked response must focus the replacement input.
+            page.locator("#join").click()
+            page.get_by_role("button", name="Answer", exact=True).click()
+            assert page.locator("#dialogueInput").is_focused()
             page.locator("#quiet").click()
             assert page.locator("#dialogueChoices").count() == 0
             page.locator("#leave").click()

@@ -68,12 +68,14 @@ function dialogueChoices(restoreKeyboardFocus=false){
     box.append(activityButton(name,()=>replyDialogue(choice,input.value.trim())));
   });
   $('chat').after(box);
-  // Move focus only when a keyboard-initiated reply has replaced the controls.
+  // Restore focus whenever a reply replaces the active controls.
   if(restoreKeyboardFocus)input.focus();
 }
 function replyDialogue(choice,input){
   if(!conversationTurn)return;
-  const restoreKeyboardFocus=!!document.activeElement && document.activeElement.matches('button:focus-visible');
+  // The clicked choice is removed on reply; always move focus to the replacement input.
+  // This covers mouse, touch, assistive technology, and keyboard activation alike.
+  const restoreKeyboardFocus=true;
   if(choice==='silence'){
     dialogueBubble('visitor','I choose silence.');
     conversationTurn=0;

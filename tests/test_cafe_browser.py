@@ -29,6 +29,26 @@ def main():
                 assert page.locator("#explore").get_attribute("aria-expanded") == "false"
                 assert page.locator("#explore").is_focused()
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), f"activity overflow {mood} at {width}px"
+            # Newly updated local activities must announce their changed text to AT.
+            page.locator('[data-mood="cafe"]').click()
+            page.locator("#explore").click()
+            cafe_status = page.locator("#activity [role=status]")
+            assert cafe_status.get_attribute("aria-live") == "polite"
+            page.get_by_role("button", name="What surprised you lately?").click()
+            assert "Your question:" in cafe_status.inner_text()
+            page.locator('[data-mood="cozy"]').click()
+            page.locator("#explore").click()
+            cozy_status = page.locator("#activity [role=status]")
+            assert cozy_status.get_attribute("aria-live") == "polite"
+            page.get_by_role("button", name="Let the room settle").click()
+            assert "The room is quiet" in cozy_status.inner_text()
+            # The one official source is opt-in, attributed and not auto-fetched.
+            page.locator('[data-mood="curiosity"]').click()
+            page.locator("#explore").click()
+            nasa = page.get_by_role("link", name="NASA Astronomy Picture of the Day (official NASA page)")
+            assert nasa.get_attribute("href") == "https://apod.nasa.gov/apod/astropix.html"
+            assert "noopener" in nasa.get_attribute("rel")
+            assert "noreferrer" in nasa.get_attribute("rel")
             # Regression: the claim-clinic button must announce its new state.
             page.locator('[data-mood="fire"]').click()
             page.locator("#explore").click()

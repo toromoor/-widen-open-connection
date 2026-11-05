@@ -67,9 +67,12 @@ def main():
             assert "all five missing fields" in page.locator("#activity [role=status]").inner_text()
             page.locator("#verify").click()
             assert "fictional example" in page.locator("#evidence").inner_text().lower()
-            # Regression: the claim-clinic button must announce its new state.
-            page.locator('[data-mood="fire"]').click()
+            # Regression: re-opening the same mood starts with fresh UNKNOWN controls.
+            # Clicking the already-selected mood is intentionally a no-op; close and reopen.
             page.locator("#explore").click()
+            assert page.locator("#explore").get_attribute("aria-expanded") == "false"
+            page.locator("#explore").click()
+            assert page.locator("#explore").get_attribute("aria-expanded") == "true"
             unknown = page.get_by_role("button", name="Mark Publisher as unknown")
             unknown.click()
             assert page.get_by_role("button", name="Publisher: UNKNOWN").get_attribute("aria-pressed") == "true"

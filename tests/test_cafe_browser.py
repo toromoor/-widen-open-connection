@@ -20,14 +20,14 @@ def main():
             for mood in ["curiosity", "cozy", "fire", "party", "cafe"]:
                 page.locator(f'[data-mood="{mood}"]').click()
                 assert page.locator(f'[data-mood="{mood}"]').get_attribute("aria-pressed") == "true"
-                assert page.locator("#headline").is_focused()
+                assert page.locator("#headline").evaluate("(el) => document.activeElement === el")
                 page.locator("#explore").click()
                 assert page.locator("#explore").get_attribute("aria-expanded") == "true"
                 assert page.locator("#activity").is_visible()
                 page.locator("#activity").focus()
                 page.keyboard.press("Escape")
                 assert page.locator("#explore").get_attribute("aria-expanded") == "false"
-                assert page.locator("#explore").is_focused()
+                assert page.locator("#explore").evaluate("(el) => document.activeElement === el")
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), f"activity overflow {mood} at {width}px"
             # Newly updated local activities must announce their changed text to AT.
             page.locator('[data-mood="cafe"]').click()
@@ -66,18 +66,18 @@ def main():
             page.locator("#dialogueInput").focus()
             page.keyboard.press("Escape")
             assert page.locator("#dialogueChoices").count() == 0
-            assert page.locator("#join").is_focused()
+            assert page.locator("#join").evaluate("(el) => document.activeElement === el")
             # Replacing a clicked response must focus the replacement input.
             page.locator("#join").click()
             page.get_by_role("button", name="Answer", exact=True).click()
-            assert page.locator("#dialogueInput").is_focused()
+            assert page.locator("#dialogueInput").evaluate("(el) => document.activeElement === el")
             # Mood switching must discard an unfinished local conversation,
             # remove its temporary controls, and put focus on the new heading.
             page.locator("#join").click()
             page.locator("#dialogueInput").fill("Unfinished private thought")
             page.locator('[data-mood="party"]').click()
             assert page.locator("#dialogueChoices").count() == 0
-            assert page.locator("#headline").is_focused()
+            assert page.locator("#headline").evaluate("(el) => document.activeElement === el")
             assert page.locator("#chat .bubble").count() == 1
             assert "Welcome. You can talk" in page.locator("#chat").inner_text()
             assert "Unfinished private thought" not in page.locator("#chat").inner_text()

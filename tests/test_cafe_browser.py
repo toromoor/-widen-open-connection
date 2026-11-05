@@ -5,7 +5,7 @@ def main():
     assert page_path.is_file(), "Must test the checked-out repository file"
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        for width, height in [(390, 844), (1280, 800)]:
+        for width, height in [(320, 720), (390, 844), (1280, 800)]:
             context = browser.new_context(viewport={"width": width, "height": height}, reduced_motion="reduce")
             page = context.new_page()
             outbound = []

@@ -49,6 +49,24 @@ def main():
             assert nasa.get_attribute("href") == "https://apod.nasa.gov/apod/astropix.html"
             assert "noopener" in nasa.get_attribute("rel")
             assert "noreferrer" in nasa.get_attribute("rel")
+            # Exercise local-only input and composition, not just mood navigation.
+            page.locator("#activity input").fill("A person who listens before speaking")
+            page.get_by_role("button", name="Reflect locally").click()
+            assert "Your words stay in this browser" in page.locator("#activity").inner_text()
+            page.locator('[data-mood="party"]').click()
+            page.locator("#explore").click()
+            page.get_by_role("button", name="Invent my holiday").click()
+            assert "The Day of Lost Socks" in page.locator("#activity").inner_text()
+            page.locator("#leave").click()
+            assert "The Day of Lost Socks" in page.locator("#keepsakeLine").inner_text()
+            page.locator('[data-mood="fire"]').click()
+            page.locator("#explore").click()
+            for field in ["Publisher", "Publication date", "Population or sample", "Method", "What would disprove it?"]:
+                page.get_by_role("button", name=f"Mark {field} as unknown").click()
+                assert page.get_by_role("button", name=f"{field}: UNKNOWN").get_attribute("aria-pressed") == "true"
+            assert "all five missing fields" in page.locator("#activity [role=status]").inner_text()
+            page.locator("#verify").click()
+            assert "fictional example" in page.locator("#evidence").inner_text().lower()
             # Regression: the claim-clinic button must announce its new state.
             page.locator('[data-mood="fire"]').click()
             page.locator("#explore").click()

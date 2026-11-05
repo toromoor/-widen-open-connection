@@ -71,6 +71,19 @@ def main():
             page.locator("#join").click()
             page.get_by_role("button", name="Answer", exact=True).click()
             assert page.locator("#dialogueInput").is_focused()
+            # Mood switching must discard an unfinished local conversation,
+            # remove its temporary controls, and put focus on the new heading.
+            page.locator("#join").click()
+            page.locator("#dialogueInput").fill("Unfinished private thought")
+            page.locator('[data-mood="party"]').click()
+            assert page.locator("#dialogueChoices").count() == 0
+            assert page.locator("#headline").is_focused()
+            assert page.locator("#chat .bubble").count() == 1
+            assert "Welcome. You can talk" in page.locator("#chat").inner_text()
+            assert "Unfinished private thought" not in page.locator("#chat").inner_text()
+            page.locator("#join").click()
+            assert page.locator("#dialogueChoices").count() == 1
+            assert "What have you been wondering" in page.locator("#chat").inner_text()
             page.locator("#quiet").click()
             assert page.locator("#dialogueChoices").count() == 0
             page.locator("#leave").click()

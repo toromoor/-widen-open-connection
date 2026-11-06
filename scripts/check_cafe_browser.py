@@ -97,7 +97,11 @@ def check(browser, width, height, name):
     for link in (nasa_mission, nasa_apod, reuters):
         assert "noopener" in link.get_attribute("rel")
         assert "noreferrer" in link.get_attribute("rel")
+    event_question = story.locator(".event-question")
+    assert event_question.get_attribute("role") == "status"
+    assert event_question.get_attribute("aria-live") == "polite"
     page.get_by_role("button", name="Carry this question into the café").click()
+    assert "For your visit receipt" in event_question.inner_text()
     page.get_by_role("button", name="Make my keepsake").click()
     assert "What remains when an instrument goes quiet?" in page.locator("#keepsakeLine").inner_text()
     page.locator("[data-mood='cozy']").click()

@@ -40,7 +40,7 @@ def check(browser, width, height, name):
         mood_backgrounds[mood] = page.evaluate("getComputedStyle(document.body).backgroundImage")
         page.screenshot(path=str(ARTIFACTS / f"mood-{mood}-{name}.png"), full_page=True)
     assert len(set(mood_visuals.values())) == 6, f"mood hero art is not distinct: {mood_visuals}"
-    assert len(set(mood_backgrounds.values())) == 5, f"mood atmospheres are not distinct: {mood_backgrounds}"
+    assert len(set(mood_backgrounds.values())) == 6, f"mood atmospheres are not distinct: {mood_backgrounds}"
     page.locator("[data-mood='cafe']").click()
 
     # Café: choose a question. This interaction must not send/store the answer.

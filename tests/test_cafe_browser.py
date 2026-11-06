@@ -76,6 +76,9 @@ def main():
             assert "For your visit receipt" in event_question.inner_text()
             page.locator("#leave").click()
             assert "What remains when an instrument goes quiet?" in page.locator("#keepsakeLine").inner_text()
+            # Curiosity remains a separate local thought experiment.
+            page.locator('[data-mood="curiosity"]').click()
+            page.locator("#explore").click()
             # Exercise local-only input and composition, not just mood navigation.
             page.locator("#activity input").fill("A person who listens before speaking")
             page.get_by_role("button", name="Reflect locally").click()

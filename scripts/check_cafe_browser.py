@@ -50,27 +50,44 @@ def check(browser, width, height, name):
     # Other moods also open an interaction.
     page.locator("[data-mood='curiosity']").click()
     page.get_by_role("button", name="Try the nameless challenge").click()
-    assert "NASA Astronomy Picture of the Day" in page.locator("#activity").inner_text()
+    source_card = page.locator("#activity details.source-card")
+    assert source_card.count() == 1
+    assert source_card.locator("summary").inner_text() == "One real thread · NASA APOD · 6 Nov 2026"
+    assert not source_card.evaluate("(el) => el.open")
+    source_card.locator("summary").click()
+    assert source_card.evaluate("(el) => el.open")
+    assert source_card.get_by_role("heading", name="A Farewell to Swift").is_visible()
+    assert "Archive sample checked 6 November 2026" in source_card.inner_text()
+    nasa = page.get_by_role("link", name="Read NASA’s original APOD entry: A Farewell to Swift")
+    assert nasa.get_attribute("href") == "https://science.nasa.gov/image-article/apod-2026-november-6-a-farewell-to-swift/"
+    assert "noopener" in nasa.get_attribute("rel")
+    assert "noreferrer" in nasa.get_attribute("rel")
     page.locator("[data-mood='cozy']").click()
     page.get_by_role("button", name="Let the room be quiet").click()
     assert "Nothing to complete" in page.locator("#activity").inner_text()
 
     # Three rounds with an independent exit/silence choice at every round.
     page.get_by_role("button", name="Try a conversation").click()
-    assert page.locator("#dialogueChoices").count() == 1
+    assert page.locator("#join").get_attribute("aria-controls") == "dialogueChoices"
+    assert page.locator("#join").get_attribute("aria-expanded") == "true"
+    assert page.locator("#dialogueChoices").is_visible()
+    assert page.locator("#dialogueChoices").get_attribute("role") == "group"
     page.locator("#dialogueInput").fill("What does listening mean?")
     page.get_by_role("button", name="Answer", exact=True).click()
     page.get_by_role("button", name="Ask something else").click()
     page.locator("#dialogueInput").fill("The question.")
     page.get_by_role("button", name="Answer", exact=True).click()
-    assert page.locator("#dialogueChoices").count() == 0
+    assert page.locator("#dialogueChoices").is_hidden()
+    assert page.locator("#dialogueChoices button").count() == 0
+    assert page.locator("#join").get_attribute("aria-expanded") == "false"
     assert page.locator("#chat .visitor").count() == 3
     assert "scripted, local-only" in page.locator("#chat").inner_text()
 
     # Restart, then choose silence. No residual input controls.
     page.get_by_role("button", name="Try a conversation").click()
     page.get_by_role("button", name="Stay silent").click()
-    assert page.locator("#dialogueChoices").count() == 0
+    assert page.locator("#dialogueChoices").is_hidden()
+    assert page.locator("#join").get_attribute("aria-expanded") == "false"
     assert "quiet table" in page.locator("#chat").inner_text()
     page.get_by_role("button", name="Choose silence").click()
     assert "No reply is required" in page.locator("#chat").inner_text()
@@ -94,13 +111,16 @@ def check(browser, width, height, name):
     page.locator("#join").focus()
     page.keyboard.press("Enter")
     assert page.locator("#dialogueInput").evaluate("(el) => document.activeElement === el")
+    assert page.locator("#join").get_attribute("aria-expanded") == "true"
+    assert page.locator("#dialogueChoices").is_visible()
     page.locator("#dialogueInput").fill("A thought")
     page.get_by_role("button", name="Answer", exact=True).focus()
     page.keyboard.press("Enter")
     assert page.locator("#dialogueInput").evaluate("(el) => document.activeElement === el")
     page.get_by_role("button", name="Stay silent").focus()
     page.keyboard.press("Enter")
-    assert page.locator("#dialogueChoices").count() == 0
+    assert page.locator("#dialogueChoices").is_hidden()
+    assert page.locator("#join").get_attribute("aria-expanded") == "false"
     assert page.locator("#join").evaluate("(el) => document.activeElement === el")
 
     # Narrow screens should not force horizontal scrolling.

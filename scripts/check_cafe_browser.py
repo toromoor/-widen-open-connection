@@ -89,6 +89,7 @@ def check(browser, width, height, name):
     assert trail.evaluate("(el) => el.open")
     assert "not two independent tracking measurements" in trail.inner_text()
     assert "Cecilia Chirenti, Robert Nemiroff, Jerry Bonnell, and Keighley Rockcliffe" in trail.inner_text()
+    page.screenshot(path=str(ARTIFACTS / f"events-story-{name}.png"), full_page=True)
     nasa_mission = page.get_by_role("link", name="NASA mission update · Alise Fisher · 2 Nov 2026, updated 4 Nov")
     assert nasa_mission.get_attribute("href") == "https://science.nasa.gov/blogs/swift/2026/11/02/nasas-swift-observatory-to-re-enter-atmosphere/"
     nasa_apod = page.get_by_role("link", name="NASA APOD · “A Farewell to Swift” · 6 Nov 2026")

@@ -39,7 +39,7 @@ def check(browser, width, height, name):
         mood_visuals[mood] = page.locator("#visual").evaluate("(el) => getComputedStyle(el).backgroundImage")
         mood_backgrounds[mood] = page.evaluate("getComputedStyle(document.body).backgroundImage")
         page.screenshot(path=str(ARTIFACTS / f"mood-{mood}-{name}.png"), full_page=True)
-    assert len(set(mood_visuals.values())) == 5, f"mood hero art is not distinct: {mood_visuals}"
+    assert len(set(mood_visuals.values())) == 6, f"mood hero art is not distinct: {mood_visuals}"
     assert len(set(mood_backgrounds.values())) == 5, f"mood atmospheres are not distinct: {mood_backgrounds}"
     page.locator("[data-mood='cafe']").click()
 

@@ -14,6 +14,11 @@ def main():
             page.on("pageerror", lambda exc: errors.append(str(exc)))
             page.goto(page_path.as_uri())
             assert page.title().startswith("WIDEN"), page.title()
+            page.get_by_role("link", name="Skip to experience").focus()
+            page.keyboard.press("Enter")
+            assert page.locator("#experience").evaluate("(el) => document.activeElement === el")
+            assert page.get_by_role("region", name="Experience panels").count() == 1
+            assert page.locator("#experience").evaluate("(el) => getComputedStyle(el).outlineStyle") == "solid"
             assert page.locator('[data-mood]').count() == 5
             assert page.locator('#headline').is_visible()
             assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), f"horizontal overflow at {width}px"
@@ -45,7 +50,7 @@ def main():
             # The one official source is opt-in, attributed and not auto-fetched.
             page.locator('[data-mood="curiosity"]').click()
             page.locator("#explore").click()
-            source_card = page.locator("#activity details.source-card")
+            source_card = page.locator("#activity details.source-card:not(.source-followup)")
             assert source_card.count() == 1
             assert source_card.locator("summary").inner_text() == "One real thread · NASA APOD · 6 Nov 2026"
             assert not source_card.evaluate("(el) => el.open")
@@ -57,6 +62,19 @@ def main():
             assert nasa.get_attribute("href") == "https://science.nasa.gov/image-article/apod-2026-november-6-a-farewell-to-swift/"
             assert "noopener" in nasa.get_attribute("rel")
             assert "noreferrer" in nasa.get_attribute("rel")
+            followup = page.locator("#activity details.source-followup")
+            assert followup.count() == 1
+            assert not followup.evaluate("(el) => el.open")
+            assert followup.locator("summary").inner_text() == "Compare the reporting · NASA + Reuters"
+            followup.locator("summary").click()
+            assert followup.evaluate("(el) => el.open")
+            assert "not two independent tracking measurements" in followup.inner_text()
+            mission = page.get_by_role("link", name="Read NASA’s mission update: Swift re-entry confirmation")
+            assert mission.get_attribute("href") == "https://science.nasa.gov/blogs/swift/2026/11/02/nasas-swift-observatory-to-re-enter-atmosphere/"
+            assert "noopener" in mission.get_attribute("rel") and "noreferrer" in mission.get_attribute("rel")
+            reuters = page.get_by_role("link", name="Read Reuters report by Steve Gorman")
+            assert reuters.get_attribute("href") == "https://www.reuters.com/science/nasas-22-year-old-swift-satellite-telescope-falls-orbit-fiery-finale-2026-11-04/"
+            assert "noopener" in reuters.get_attribute("rel") and "noreferrer" in reuters.get_attribute("rel")
             # Exercise local-only input and composition, not just mood navigation.
             page.locator("#activity input").fill("A person who listens before speaking")
             page.get_by_role("button", name="Reflect locally").click()

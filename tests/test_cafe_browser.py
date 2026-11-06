@@ -82,31 +82,41 @@ def main():
             page.locator('[data-mood="cafe"]').click()
             assert not page.locator("#keepsakeLine").inner_text().strip()
             page.locator("#join").click()
-            assert page.locator("#dialogueChoices").count() == 1
-            # Escape exits without a reply and restores focus.
+            assert page.locator("#join").get_attribute("aria-controls") == "dialogueChoices"
+            assert page.locator("#join").get_attribute("aria-expanded") == "true"
+            assert page.locator("#dialogueChoices").is_visible()
+            assert page.locator("#dialogueChoices").get_attribute("role") == "group"
+            # Escape exits without a reply, hides the controlled group, and restores focus.
             page.locator("#dialogueInput").focus()
             page.keyboard.press("Escape")
-            assert page.locator("#dialogueChoices").count() == 0
+            assert page.locator("#dialogueChoices").is_hidden()
+            assert page.locator("#dialogueChoices button").count() == 0
+            assert page.locator("#join").get_attribute("aria-expanded") == "false"
             assert page.locator("#join").evaluate("(el) => document.activeElement === el")
             # Replacing a clicked response must focus the replacement input.
             page.locator("#join").click()
             page.get_by_role("button", name="Answer", exact=True).click()
+            assert page.locator("#join").get_attribute("aria-expanded") == "true"
+            assert page.locator("#dialogueChoices").is_visible()
             assert page.locator("#dialogueInput").evaluate("(el) => document.activeElement === el")
             # Mood switching must discard an unfinished local conversation,
             # remove its temporary controls, and put focus on the new heading.
             page.locator("#join").click()
             page.locator("#dialogueInput").fill("Unfinished private thought")
             page.locator('[data-mood="party"]').click()
-            assert page.locator("#dialogueChoices").count() == 0
+            assert page.locator("#dialogueChoices").is_hidden()
+            assert page.locator("#join").get_attribute("aria-expanded") == "false"
             assert page.locator("#headline").evaluate("(el) => document.activeElement === el")
             assert page.locator("#chat .bubble").count() == 1
             assert "Welcome. You can talk" in page.locator("#chat").inner_text()
             assert "Unfinished private thought" not in page.locator("#chat").inner_text()
             page.locator("#join").click()
-            assert page.locator("#dialogueChoices").count() == 1
+            assert page.locator("#dialogueChoices").is_visible()
+            assert page.locator("#join").get_attribute("aria-expanded") == "true"
             assert "What have you been wondering" in page.locator("#chat").inner_text()
             page.locator("#quiet").click()
-            assert page.locator("#dialogueChoices").count() == 0
+            assert page.locator("#dialogueChoices").is_hidden()
+            assert page.locator("#join").get_attribute("aria-expanded") == "false"
             page.locator("#leave").click()
             assert "Nothing saved or sent" in page.locator("#keepsakeLine").inner_text()
             assert not errors, errors

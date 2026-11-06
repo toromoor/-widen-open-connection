@@ -95,6 +95,16 @@ function finishDialogue(text){
   clearDialogueChoices();dialogueBubble('muse',text+' This was a scripted, local-only conversation. Nothing was sent or stored.');
   if(focusWasInChoices)$('join').focus();
 }
+// The choices container is persistent across turns. Register one handler once;
+// adding a new handler every time its children are rebuilt causes duplicate Escape exits.
+$('dialogueChoices').addEventListener('keydown',event=>{
+  if(event.key!=='Escape'||$('dialogueChoices').hidden)return;
+  event.preventDefault();
+  conversationTurn=0;
+  clearDialogueChoices();
+  dialogueBubble('muse','You can leave the question unanswered. The table remains open. ☕');
+  $('join').focus();
+});
 function dialogueChoices(restoreKeyboardFocus=false){
   clearDialogueChoices();const box=$('dialogueChoices');box.replaceChildren();box.className='interactive';box.hidden=false;
   box.setAttribute('role','group');box.setAttribute('aria-label','Local conversation options');
@@ -108,16 +118,8 @@ function dialogueChoices(restoreKeyboardFocus=false){
   [['Answer', 'answer'],['Ask something else','deflect'],['Stay silent','silence']].forEach(([name,choice])=>{
     box.append(activityButton(name,()=>replyDialogue(choice,input.value.trim())));
   });
-  // Escape is a non-submitting exit from the scripted conversation.
-  // Keep this local to the choices so other page controls remain unaffected.
-  box.addEventListener('keydown',event=>{
-    if(event.key!=='Escape')return;
-    event.preventDefault();
-    conversationTurn=0;
-    clearDialogueChoices();
-    dialogueBubble('muse','You can leave the question unanswered. The table remains open. ☕');
-    $('join').focus();
-  });
+  // Escape handling is attached once to the persistent group below.
+  // Re-rendering choices must not accumulate duplicate key handlers.
   // Restore focus whenever a reply replaces the active controls.
   if(restoreKeyboardFocus)input.focus();
 }

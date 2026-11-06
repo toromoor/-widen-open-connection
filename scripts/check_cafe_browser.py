@@ -20,6 +20,11 @@ def check(browser, width, height, name):
     page.on("request", lambda req: external_requests.append(req.url) if not req.url.startswith("file:") else None)
     page.goto(HTML.as_uri(), wait_until="load")
     assert "WIDEN" in page.title()
+    page.get_by_role("link", name="Skip to experience").focus()
+    page.keyboard.press("Enter")
+    assert page.locator("#experience").evaluate("(el) => document.activeElement === el")
+    assert page.get_by_role("region", name="Experience panels").count() == 1
+    assert page.locator("#experience").evaluate("(el) => getComputedStyle(el).outlineStyle") == "solid"
     assert page.locator("[data-mood]").count() == 5
     assert page.get_by_text("No real participants, accounts, messages, or AI agents are connected.").count() == 0 or "not a live room" in page.locator("aside").inner_text()
     assert page.locator("#keepsakeLine").inner_text() == ""
@@ -64,7 +69,7 @@ def check(browser, width, height, name):
     # Other moods also open an interaction.
     page.locator("[data-mood='curiosity']").click()
     page.get_by_role("button", name="Try the nameless challenge").click()
-    source_card = page.locator("#activity details.source-card")
+    source_card = page.locator("#activity details.source-card:not(.source-followup)")
     assert source_card.count() == 1
     assert source_card.locator("summary").inner_text() == "One real thread · NASA APOD · 6 Nov 2026"
     assert not source_card.evaluate("(el) => el.open")
@@ -76,6 +81,19 @@ def check(browser, width, height, name):
     assert nasa.get_attribute("href") == "https://science.nasa.gov/image-article/apod-2026-november-6-a-farewell-to-swift/"
     assert "noopener" in nasa.get_attribute("rel")
     assert "noreferrer" in nasa.get_attribute("rel")
+    followup = page.locator("#activity details.source-followup")
+    assert followup.count() == 1
+    assert not followup.evaluate("(el) => el.open")
+    assert followup.locator("summary").inner_text() == "Compare the reporting · NASA + Reuters"
+    followup.locator("summary").click()
+    assert followup.evaluate("(el) => el.open")
+    assert "not two independent tracking measurements" in followup.inner_text()
+    mission = page.get_by_role("link", name="Read NASA’s mission update: Swift re-entry confirmation")
+    assert mission.get_attribute("href") == "https://science.nasa.gov/blogs/swift/2026/11/02/nasas-swift-observatory-to-re-enter-atmosphere/"
+    assert "noopener" in mission.get_attribute("rel") and "noreferrer" in mission.get_attribute("rel")
+    reuters = page.get_by_role("link", name="Read Reuters report by Steve Gorman")
+    assert reuters.get_attribute("href") == "https://www.reuters.com/science/nasas-22-year-old-swift-satellite-telescope-falls-orbit-fiery-finale-2026-11-04/"
+    assert "noopener" in reuters.get_attribute("rel") and "noreferrer" in reuters.get_attribute("rel")
     page.locator("[data-mood='cozy']").click()
     page.get_by_role("button", name="Let the room be quiet").click()
     assert "Nothing to complete" in page.locator("#activity").inner_text()

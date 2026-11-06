@@ -30,7 +30,7 @@ def check(browser, width, height, name):
     mood_backgrounds = {}
     for mood in ("cafe", "curiosity", "cozy", "fire", "party"):
         page.locator(f"[data-mood='{mood}']").click()
-        assert page.locator("body").get_attribute("data-mood") == mood
+        assert page.locator("body").get_attribute("data-active-mood") == mood
         mood_visuals[mood] = page.locator("#visual").evaluate("(el) => getComputedStyle(el).backgroundImage")
         mood_backgrounds[mood] = page.evaluate("getComputedStyle(document.body).backgroundImage")
         page.screenshot(path=str(ARTIFACTS / f"mood-{mood}-{name}.png"), full_page=True)

@@ -125,6 +125,21 @@ def main():
             page.locator("#quiet").click()
             assert page.locator("#dialogueChoices").is_hidden()
             assert page.locator("#join").get_attribute("aria-expanded") == "false"
+            # Rebuilding the persistent choices group across turns must not stack Escape handlers.
+            page.locator("#join").click()
+            page.locator("#dialogueInput").fill("First thought")
+            page.get_by_role("button", name="Answer", exact=True).click()
+            page.locator("#dialogueInput").fill("Second thought")
+            page.get_by_role("button", name="Answer", exact=True).click()
+            assert page.locator("#dialogueChoices").is_visible()
+            before_escape = page.locator("#chat .bubble").count()
+            page.locator("#dialogueInput").focus()
+            page.keyboard.press("Escape")
+            after_escape = page.locator("#chat .bubble").count()
+            assert after_escape == before_escape + 1, f"Escape added {after_escape - before_escape} exit messages; expected exactly one"
+            assert page.locator("#dialogueChoices").is_hidden()
+            assert page.locator("#join").get_attribute("aria-expanded") == "false"
+            assert page.locator("#join").evaluate("(el) => document.activeElement === el")
             page.locator("#leave").click()
             assert "Nothing saved or sent" in page.locator("#keepsakeLine").inner_text()
             assert not errors, errors

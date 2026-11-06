@@ -160,7 +160,7 @@ def main():
             assert not errors, errors
             assert not outbound, outbound
             assert page.evaluate("localStorage.length") == 0
-            print(f"PASS exact checkout Chromium: {width}x{height}, five moods, keyboard Escape, dialogue, keepsake, offline")
+            print(f"PASS exact checkout Chromium: {width}x{height}, six moods, keyboard Escape, dialogue, keepsake, offline")
             context.close()
         browser.close()
     

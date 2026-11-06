@@ -24,6 +24,20 @@ def check(browser, width, height, name):
     assert page.get_by_text("No real participants, accounts, messages, or AI agents are connected.").count() == 0 or "not a live room" in page.locator("aside").inner_text()
     assert page.locator("#keepsakeLine").inner_text() == ""
 
+    # Each mood changes the atmosphere as well as the activity.
+    ARTIFACTS.mkdir(exist_ok=True)
+    mood_visuals = {}
+    mood_backgrounds = {}
+    for mood in ("cafe", "curiosity", "cozy", "fire", "party"):
+        page.locator(f"[data-mood='{mood}']").click()
+        assert page.locator("body").get_attribute("data-mood") == mood
+        mood_visuals[mood] = page.locator("#visual").evaluate("(el) => getComputedStyle(el).backgroundImage")
+        mood_backgrounds[mood] = page.evaluate("getComputedStyle(document.body).backgroundImage")
+        page.screenshot(path=str(ARTIFACTS / f"mood-{mood}-{name}.png"), full_page=True)
+    assert len(set(mood_visuals.values())) == 5, f"mood hero art is not distinct: {mood_visuals}"
+    assert len(set(mood_backgrounds.values())) == 5, f"mood atmospheres are not distinct: {mood_backgrounds}"
+    page.locator("[data-mood='cafe']").click()
+
     # Café: choose a question. This interaction must not send/store the answer.
     page.locator("#explore").click()  # initial label is "Explore this mood"
     page.get_by_role("button", name="What surprised you lately?").click()

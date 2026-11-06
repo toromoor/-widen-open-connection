@@ -45,8 +45,16 @@ def main():
             # The one official source is opt-in, attributed and not auto-fetched.
             page.locator('[data-mood="curiosity"]').click()
             page.locator("#explore").click()
-            nasa = page.get_by_role("link", name="NASA Astronomy Picture of the Day (official NASA page)")
-            assert nasa.get_attribute("href") == "https://apod.nasa.gov/apod/astropix.html"
+            source_card = page.locator("#activity details.source-card")
+            assert source_card.count() == 1
+            assert source_card.locator("summary").inner_text() == "One real thread · NASA APOD · 6 Nov 2026"
+            assert not source_card.evaluate("(el) => el.open")
+            source_card.locator("summary").click()
+            assert source_card.evaluate("(el) => el.open")
+            assert source_card.get_by_role("heading", name="A Farewell to Swift").is_visible()
+            assert "Archive sample checked 6 November 2026" in source_card.inner_text()
+            nasa = page.get_by_role("link", name="Read NASA’s original APOD entry: A Farewell to Swift")
+            assert nasa.get_attribute("href") == "https://science.nasa.gov/image-article/apod-2026-november-6-a-farewell-to-swift/"
             assert "noopener" in nasa.get_attribute("rel")
             assert "noreferrer" in nasa.get_attribute("rel")
             # Exercise local-only input and composition, not just mood navigation.

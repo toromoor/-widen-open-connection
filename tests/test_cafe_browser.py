@@ -69,7 +69,11 @@ def main():
             assert reuters.get_attribute("href") == "https://www.reuters.com/science/nasas-22-year-old-swift-satellite-telescope-falls-orbit-fiery-finale-2026-11-04/"
             for link in (nasa_mission, nasa_apod, reuters):
                 assert "noopener" in link.get_attribute("rel") and "noreferrer" in link.get_attribute("rel")
+            event_question = story.locator(".event-question")
+            assert event_question.get_attribute("role") == "status"
+            assert event_question.get_attribute("aria-live") == "polite"
             page.get_by_role("button", name="Carry this question into the café").click()
+            assert "For your visit receipt" in event_question.inner_text()
             page.locator("#leave").click()
             assert "What remains when an instrument goes quiet?" in page.locator("#keepsakeLine").inner_text()
             # Exercise local-only input and composition, not just mood navigation.

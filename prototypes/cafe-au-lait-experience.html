@@ -41,8 +41,29 @@ body[data-active-mood] .mood[aria-pressed="true"],body[data-active-mood] .action
   }
   body[data-active-mood] .panel,
   body[data-active-mood] .status,
-  body[data-active-mood] .visual { border-color: CanvasText; }
+  body[data-active-mood] .visual,
+  body[data-active-mood] .keepsake .receipt,
+  body[data-active-mood] .event-story,
+  body[data-active-mood] .event-story .event-question,
+  body[data-active-mood] .source-card,
+  body[data-active-mood] .event-story .source-card {
+    background: Canvas;
+    color: CanvasText;
+    border: 1px solid CanvasText;
+    border-color: CanvasText;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
   body[data-active-mood] .visual { background: Canvas; color: CanvasText; }
+  body[data-active-mood] .event-story .event-kicker,
+  body[data-active-mood] .event-story p,
+  body[data-active-mood] .source-card summary,
+  body[data-active-mood] .source-card p,
+  body[data-active-mood] .source-meta dt,
+  body[data-active-mood] .source-meta dd,
+  body[data-active-mood] .unknown-field .known,
+  body[data-active-mood] .bubble.visitor { color: CanvasText; }
+  body[data-active-mood] .bubble.visitor { background: Canvas; border: 1px solid CanvasText; }
   .mood:not([aria-pressed="true"]), .action.secondary {
     background: ButtonFace;
     color: ButtonText;

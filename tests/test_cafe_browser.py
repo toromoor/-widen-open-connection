@@ -79,6 +79,14 @@ def main():
             assert nasa_apod.get_attribute("href") == "https://science.nasa.gov/image-article/apod-2026-november-6-a-farewell-to-swift/"
             reuters = page.get_by_role("link", name="Reuters · Steve Gorman · 4 Nov 2026, updated 5 Nov")
             assert reuters.get_attribute("href") == "https://www.reuters.com/science/nasas-22-year-old-swift-satellite-telescope-falls-orbit-fiery-finale-2026-11-04/"
+            role_notes = ((nasa_mission, "missionRoleNote"), (nasa_apod, "apodRoleNote"), (reuters, "reutersRoleNote"))
+            for link, note_id in role_notes:
+                assert link.get_attribute("aria-describedby") == note_id
+                assert page.locator(f"#{note_id}").is_visible()
+            assert "U.S. Space Force confirmed" in page.locator("#missionRoleNote").inner_text()
+            assert "Retrospective image and mission context" in page.locator("#apodRoleNote").inner_text()
+            assert "not a separate re-entry confirmation" in page.locator("#apodRoleNote").inner_text()
+            assert "same U.S. Space Force confirmation" in page.locator("#reutersRoleNote").inner_text()
             for link in (nasa_mission, nasa_apod, reuters):
                 assert "noopener" in link.get_attribute("rel") and "noreferrer" in link.get_attribute("rel")
             event_question = story.locator(".event-question")

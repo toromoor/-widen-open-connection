@@ -181,8 +181,11 @@ def main():
             page.locator("#join").click()
             page.locator("#dialogueInput").fill("First thought")
             page.get_by_role("button", name="Answer", exact=True).click()
-            page.locator("#dialogueInput").fill("Second thought")
-            page.get_by_role("button", name="Answer", exact=True).click()
+            redirect = "Could we turn to the question behind this?"
+            page.locator("#dialogueInput").fill(redirect)
+            page.get_by_role("button", name="Ask something else").click()
+            assert redirect in page.locator("#chat .bubble.visitor").nth(1).inner_text()
+            assert page.locator("#chat .bubble.visitor").count() == 2
             assert page.locator("#dialogueChoices").is_visible()
             before_escape = page.locator("#chat .bubble").count()
             page.locator("#dialogueInput").focus()

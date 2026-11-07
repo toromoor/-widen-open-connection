@@ -134,9 +134,20 @@ def main():
             page.locator('[data-mood="curiosity"]').click()
             page.locator("#explore").click()
             # Exercise local-only input and composition, not just mood navigation.
-            page.locator("#activity input").fill("A person who listens before speaking")
+            curiosity_input = page.locator("#activity input")
+            curiosity_text = "A person who listens before speaking"
+            assert curiosity_input.get_attribute("maxlength") == "180"
+            assert page.locator("#activity [role='status']").get_attribute("aria-live") == "polite"
+            curiosity_input.fill(curiosity_text)
             page.get_by_role("button", name="Reflect locally").click()
-            assert "Your words stay in this browser" in page.locator("#activity").inner_text()
+            curiosity_result = page.locator("#activity [role='status']")
+            assert curiosity_text in curiosity_result.inner_text()
+            assert "Your words stay in this browser" in curiosity_result.inner_text()
+            hostile_description = "<img src=x onerror=alert(1)>"
+            curiosity_input.fill(hostile_description)
+            page.get_by_role("button", name="Reflect locally").click()
+            assert hostile_description in curiosity_result.inner_text()
+            assert page.locator("#activity img").count() == 0
             page.locator('[data-mood="party"]').click()
             page.locator("#explore").click()
             page.get_by_label("Theme").select_option("Unfinished Stories")

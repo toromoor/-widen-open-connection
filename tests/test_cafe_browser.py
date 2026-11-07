@@ -46,7 +46,14 @@ def main():
             cafe_status = page.locator("#activity [role=status]")
             assert cafe_status.get_attribute("aria-live") == "polite"
             page.get_by_role("button", name="What surprised you lately?").click()
-            assert "Your question:" in cafe_status.inner_text()
+            prompt_question = "What surprised you lately?"
+            assert "Choose Carry my question" in cafe_status.inner_text()
+            page.locator("#leave").click()
+            assert "Take one open question into your day" in page.locator("#keepsakeLine").inner_text()
+            assert prompt_question not in page.locator("#keepsakeLine").inner_text()
+            page.get_by_role("button", name="Carry my question").click()
+            page.locator("#leave").click()
+            assert prompt_question in page.locator("#keepsakeLine").inner_text()
             cafe_question = "What changes when we listen?"
             assert page.locator("#cafeQuestion").get_attribute("maxlength") == "180"
             page.locator("#cafeQuestion").fill(cafe_question)

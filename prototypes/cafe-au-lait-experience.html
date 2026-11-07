@@ -122,7 +122,7 @@ const input=document.createElement('input');input.type='text';input.id='cafeQues
 const note=document.createElement('p');note.id='cafeQuestionNote';note.className='note';note.textContent='Up to 180 characters. Kept only in this page; nothing is saved or sent.';
 input.addEventListener('input',()=>{cafeKeep='';p.textContent='Your edit is not on the receipt yet. Choose Carry my question to include it.';});
 if(cafeKeep){input.value=cafeKeep;p.textContent='For your visit receipt: “'+cafeKeep+'” You can edit it and carry again.';}
-prompts.forEach(q=>a.append(activityButton(q,()=>{input.value=q;cafeKeep=q;p.textContent='Your question: “'+q+'” — keep it, change it, or leave it here.';})));
+prompts.forEach(q=>a.append(activityButton(q,()=>{input.value=q;cafeKeep='';p.textContent='Prompt added to your draft. Choose Carry my question to include it in your keepsake.';})));
 const carry=activityButton('Carry my question',()=>{const q=input.value.trim();if(!q){p.textContent='Write a question first, choose a prompt, or leave it blank.';input.focus();return;}cafeKeep=q;p.textContent='For your visit receipt: “'+q+'” Nothing is saved or sent.';});
 a.append(p,label,input,note,carry);
 }

@@ -47,7 +47,14 @@ def check(browser, width, height, name):
     # Café: choose a prompt or author a question, then carry it into a local keepsake.
     page.locator("#explore").click()  # initial label is "Explore this mood"
     page.get_by_role("button", name="What surprised you lately?").click()
-    assert "Your question" in page.locator("#activity").inner_text()
+    prompt_question = "What surprised you lately?"
+    assert "Choose Carry my question" in page.locator("#activity").inner_text()
+    page.locator("#leave").click()
+    assert "Take one open question into your day" in page.locator("#keepsakeLine").inner_text()
+    assert prompt_question not in page.locator("#keepsakeLine").inner_text()
+    page.get_by_role("button", name="Carry my question").click()
+    page.locator("#leave").click()
+    assert prompt_question in page.locator("#keepsakeLine").inner_text()
     cafe_question = "What changes when we listen?"
     assert page.locator("#cafeQuestion").get_attribute("maxlength") == "180"
     page.locator("#cafeQuestion").fill(cafe_question)

@@ -28,6 +28,45 @@ body[data-active-mood] .visual{background:var(--mood-visual)}
 body[data-active-mood] .label,body[data-active-mood] .status,body[data-active-mood] .bubble strong,body[data-active-mood] a{color:var(--mood-accent)}
 body[data-active-mood] .status{border-color:var(--mood-edge)}
 body[data-active-mood] .mood[aria-pressed="true"],body[data-active-mood] .action:not(.secondary){background:var(--mood-accent);border-color:var(--mood-accent);color:var(--mood-ink)}
+
+@media (forced-colors: active) {
+  body { background: Canvas; color: CanvasText; }
+  .panel, .visual, .status, .mood, .bubble, .interactive, .disclosure,
+  .receipt, details.source-card, .event-story, .event-question {
+    background: Canvas;
+    color: CanvasText;
+    border: 1px solid CanvasText;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+  body[data-active-mood] .panel,
+  body[data-active-mood] .status,
+  body[data-active-mood] .visual { border-color: CanvasText; }
+  body[data-active-mood] .visual { background: Canvas; color: CanvasText; }
+  .mood:not([aria-pressed="true"]), .action.secondary {
+    background: ButtonFace;
+    color: ButtonText;
+    border: 1px solid ButtonText;
+  }
+  body[data-active-mood] .mood[aria-pressed="true"],
+  body[data-active-mood] .action:not(.secondary) {
+    background: Highlight;
+    color: HighlightText;
+    border-color: Highlight;
+  }
+  body[data-active-mood] .label,
+  body[data-active-mood] .status,
+  body[data-active-mood] .bubble strong,
+  body[data-active-mood] .note,
+  body[data-active-mood] .copy,
+  body[data-active-mood] .eyebrow,
+  body[data-active-mood] .footer { color: CanvasText; }
+  body[data-active-mood] a, a { color: LinkText; text-decoration: underline; }
+  .skip:focus { background: Highlight; color: HighlightText; }
+  button:focus-visible, a:focus-visible, input:focus-visible,
+  select:focus-visible, summary:focus-visible, #experience:focus,
+  #headline:focus, #activity:focus { outline-color: Highlight; }
+}
 </style></head><body><a class="skip" href="#experience">Skip to experience</a><main class="wrap"><header><div class="brand">WIDEN <span aria-hidden="true">✳</span></div><div class="status">EXPERIENCE LAB · LOCAL ONLY</div></header>
 <div class="eyebrow">A small doorway into a much bigger world</div><h1>Come curious.<br><em>Leave freely.</em></h1><p class="lead">Pick a mood. Follow a thread. Challenge a claim. Or simply stay for the atmosphere. No algorithm begging you to keep scrolling.</p>
 <p class="note" id="visitNotice">This visit is local and temporary. Changing moods clears unfinished activity and any finished keepsake; make a new one whenever you wish. Nothing is saved or sent. Six experimental moods are available; Relaxing is not yet built.</p><nav class="moods" aria-label="Choose your mood"><button class="mood" data-mood="cafe" aria-pressed="true">☕ Café au lait</button><button class="mood" data-mood="curiosity" aria-pressed="false">🪐 Curiosity</button><button class="mood" data-mood="events" aria-pressed="false">🛰️ Current events</button><button class="mood" data-mood="cozy" aria-pressed="false">🕯️ Cozy</button><button class="mood" data-mood="fire" aria-pressed="false">🔥 Hair on fire</button><button class="mood" data-mood="party" aria-pressed="false">🪩 Party</button></nav>

@@ -179,6 +179,55 @@ def check(browser, width, height, name):
     print(f"PASS: {name} ({width}x{height}): moods, activities, claim, keepsake, 3-turn dialogue, silence, offline and layout")
 
 
+
+def check_forced_colors(browser):
+    context = browser.new_context(
+        viewport={"width": 390, "height": 844},
+        forced_colors="active",
+        reduced_motion="reduce",
+    )
+    page = context.new_page()
+    external_requests = []
+    page.on("request", lambda req: external_requests.append(req.url) if not req.url.startswith("file:") else None)
+    page.goto(HTML.as_uri(), wait_until="load")
+    assert page.evaluate("matchMedia('(forced-colors: active)').matches")
+    page.locator("[data-mood='events']").focus()
+    page.keyboard.press("Enter")
+    assert page.locator("#headline").evaluate("(el) => document.activeElement === el")
+    assert page.locator("#headline").evaluate("(el) => getComputedStyle(el).outlineStyle") == "solid"
+    page.locator("#explore").click()
+    page.locator("details.source-card summary").click()
+    page.locator("#leave").click()
+    metrics = page.evaluate("""() => {
+        const style = (selector) => {
+            const css = getComputedStyle(document.querySelector(selector));
+            return {borderStyle: css.borderTopStyle, borderWidth: css.borderTopWidth,
+                    background: css.backgroundColor, color: css.color};
+        };
+        return {
+            panel: style(".panel"),
+            visual: style(".visual"),
+            mood: style(".mood[aria-pressed='true']"),
+            secondary: style("#verify"),
+            source: style("details.source-card"),
+            link: style("details.source-card a"),
+            receipt: style(".receipt"),
+            linkDecoration: getComputedStyle(document.querySelector("details.source-card a")).textDecorationLine
+        };
+    }""")
+    for name in ("panel", "visual", "mood", "secondary", "source", "receipt"):
+        metric = metrics[name]
+        assert metric["borderStyle"] == "solid" and metric["borderWidth"] != "0px", f"forced-colors {name} boundary missing: {metric}"
+        assert metric["background"] != "rgba(0, 0, 0, 0)", f"forced-colors {name} background missing: {metric}"
+    assert "underline" in metrics["linkDecoration"], metrics
+    assert metrics["link"]["color"] != "rgba(0, 0, 0, 0)", metrics
+    assert not external_requests, external_requests
+    page.screenshot(path=str(ARTIFACTS / "cafe-forced-colors.png"), full_page=True)
+    context.close()
+    print("PASS: forced-colors (390x844): selected mood, panel boundaries, source links, focus and keepsake")
+
+
+
 if __name__ == "__main__":
     assert HTML.exists(), f"Missing prototype: {HTML}"
     with sync_playwright() as playwright:
@@ -186,5 +235,6 @@ if __name__ == "__main__":
         try:
             check(browser, 390, 844, "mobile")
             check(browser, 1280, 900, "desktop")
+            check_forced_colors(browser)
         finally:
             browser.close()

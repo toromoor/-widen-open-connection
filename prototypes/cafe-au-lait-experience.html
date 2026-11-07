@@ -211,7 +211,7 @@ function replyDialogue(choice,input){
     if(field){field.focus();field.placeholder='Or choose another question or silence';}
     return;
   }
-  dialogueBubble('visitor',choice==='deflect'?'Could we take another direction?':input);
+  dialogueBubble('visitor',choice==='deflect'?(input||'Could we take another direction?'):input);
   if(conversationTurn===1){
     dialogueBubble('muse',choice==='deflect'?'Then here is a gentler question: what was one small good thing today?':'You put a thought on the table. What part of it would you like to explore, without having to settle it?');
     conversationTurn=2;dialogueChoices(restoreKeyboardFocus);

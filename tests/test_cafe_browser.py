@@ -52,6 +52,12 @@ def main():
             page.locator("#explore").click()
             story = page.locator("#activity .event-story")
             assert story.count() == 1
+            assert story.get_attribute("aria-labelledby") == "eventStoryTitle"
+            assert page.get_by_role("article", name="Swift’s final descent").count() == 1
+            footer = page.locator(".footer").inner_text()
+            assert "Some mood prompts are illustrative or fictional" in footer
+            assert "Current Events is a dated archive snapshot" in footer
+            assert "No source is fetched automatically" in footer
             assert "ONE STORY · ARCHIVE SNAPSHOT · 6 NOV 2026" in story.inner_text()
             assert "Swift’s final descent" in story.inner_text()
             assert "do not provide a confirmed debris-recovery account" in story.inner_text()

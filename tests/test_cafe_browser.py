@@ -214,12 +214,14 @@ def main():
                 mood: style(".mood[aria-pressed='true']"),
                 secondary: style("#verify"),
                 source: style("details.source-card"),
+                "event-story": style(".event-story"),
+                "event-question": style(".event-question"),
                 link: style("details.source-card a"),
                 receipt: style(".receipt"),
                 linkDecoration: getComputedStyle(document.querySelector("details.source-card a")).textDecorationLine
             };
         }""")
-        for name in ["panel", "visual", "mood", "secondary", "source", "receipt"]:
+        for name in ["panel", "visual", "mood", "secondary", "source", "event-story", "event-question", "receipt"]:
             metric = forced_metrics[name]
             assert metric["borderStyle"] == "solid" and metric["borderWidth"] != "0px", f"forced-colors {name} boundary missing: {metric}"
             assert metric["background"] != "rgba(0, 0, 0, 0)", f"forced-colors {name} background missing: {metric}"

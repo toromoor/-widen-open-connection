@@ -20,6 +20,7 @@ def check(browser, width, height, name):
     page.on("request", lambda req: external_requests.append(req.url) if not req.url.startswith("file:") else None)
     page.goto(HTML.as_uri(), wait_until="load")
     assert "WIDEN" in page.title()
+    assert page.locator("#visitNotice").inner_text() == "This visit is local and temporary. Changing moods clears unfinished activity and any finished keepsake; make a new one whenever you wish. Nothing is saved or sent. All six experimental moods are available in this local prototype."
     page.get_by_role("link", name="Skip to experience").focus()
     page.keyboard.press("Enter")
     assert page.locator("#experience").evaluate("(el) => document.activeElement === el")

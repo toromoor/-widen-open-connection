@@ -181,6 +181,53 @@ def main():
             assert page.evaluate("localStorage.length") == 0
             print(f"PASS exact checkout Chromium: {width}x{height}, six moods, keyboard Escape, dialogue, keepsake, offline")
             context.close()
+
+        # Forced-colors mode: preserve boundaries, selected state, links and focus.
+        forced_context = browser.new_context(
+            viewport={"width": 390, "height": 844},
+            reduced_motion="reduce",
+            forced_colors="active",
+        )
+        forced_page = forced_context.new_page()
+        forced_outbound = []
+        forced_page.on("request", lambda req: forced_outbound.append(req.url) if not req.url.startswith("file:") else None)
+        forced_page.goto(page_path.as_uri())
+        assert forced_page.evaluate("matchMedia('(forced-colors: active)').matches")
+        forced_page.locator('[data-mood="events"]').focus()
+        forced_page.keyboard.press("Enter")
+        assert forced_page.locator("#headline").evaluate("(el) => document.activeElement === el")
+        assert forced_page.locator("#headline").evaluate("(el) => getComputedStyle(el).outlineStyle") == "solid"
+        assert forced_page.locator("#headline").evaluate("(el) => getComputedStyle(el).outlineColor") != "rgba(0, 0, 0, 0)"
+        forced_page.locator("#explore").click()
+        forced_page.locator("details.source-card summary").click()
+        forced_page.locator("#leave").click()
+        forced_metrics = forced_page.evaluate("""() => {
+            const style = (selector) => {
+                const el = document.querySelector(selector);
+                const css = getComputedStyle(el);
+                return {borderStyle: css.borderTopStyle, borderWidth: css.borderTopWidth,
+                        background: css.backgroundColor, color: css.color};
+            };
+            return {
+                panel: style(".panel"),
+                visual: style(".visual"),
+                mood: style(".mood[aria-pressed='true']"),
+                secondary: style("#verify"),
+                source: style("details.source-card"),
+                link: style("details.source-card a"),
+                receipt: style(".receipt"),
+                linkDecoration: getComputedStyle(document.querySelector("details.source-card a")).textDecorationLine
+            };
+        }""")
+        for name in ["panel", "visual", "mood", "secondary", "source", "receipt"]:
+            metric = forced_metrics[name]
+            assert metric["borderStyle"] == "solid" and metric["borderWidth"] != "0px", f"forced-colors {name} boundary missing: {metric}"
+            assert metric["background"] != "rgba(0, 0, 0, 0)", f"forced-colors {name} background missing: {metric}"
+        assert "underline" in forced_metrics["linkDecoration"], forced_metrics
+        assert forced_metrics["link"]["color"] != "rgba(0, 0, 0, 0)", forced_metrics
+        assert not forced_outbound, forced_outbound
+        forced_context.close()
+        print("PASS forced-colors: selected mood, panel boundaries, source links, visible focus and keepsake")
         browser.close()
     
 

@@ -168,6 +168,14 @@ def main():
             page.locator("#quiet").click()
             assert page.locator("#dialogueChoices").is_hidden()
             assert page.locator("#join").get_attribute("aria-expanded") == "false"
+            # The explicit Stay silent choice must not invent a visitor utterance.
+            page.locator("#join").click()
+            page.get_by_role("button", name="Stay silent", exact=True).click()
+            assert page.locator("#dialogueChoices").is_hidden()
+            assert page.locator("#join").get_attribute("aria-expanded") == "false"
+            assert page.locator("#chat .bubble.visitor").count() == 0
+            assert "Silence is welcome" in page.locator("#chat").inner_text()
+            assert page.locator("#join").evaluate("(el) => document.activeElement === el")
             # Rebuilding the persistent choices group across turns must not stack Escape handlers.
             page.locator("#join").click()
             page.locator("#dialogueInput").fill("First thought")

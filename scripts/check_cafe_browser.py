@@ -172,12 +172,13 @@ def check(browser, width, height, name):
     page.get_by_role("button", name="Answer", exact=True).focus()
     page.keyboard.press("Enter")
     assert page.locator("#dialogueInput").evaluate("(el) => document.activeElement === el")
+    before_silence = page.locator("#chat .visitor").count()
     page.get_by_role("button", name="Stay silent").focus()
     page.keyboard.press("Enter")
     assert page.locator("#dialogueChoices").is_hidden()
     assert page.locator("#join").get_attribute("aria-expanded") == "false"
     assert page.locator("#join").evaluate("(el) => document.activeElement === el")
-    assert page.locator("#chat .visitor").count() == 0
+    assert page.locator("#chat .visitor").count() == before_silence
 
     # Narrow screens should not force horizontal scrolling.
     overflow = page.evaluate("document.documentElement.scrollWidth - window.innerWidth")

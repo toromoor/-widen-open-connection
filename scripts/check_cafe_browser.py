@@ -44,10 +44,30 @@ def check(browser, width, height, name):
     assert len(set(mood_backgrounds.values())) == 6, f"mood atmospheres are not distinct: {mood_backgrounds}"
     page.locator("[data-mood='cafe']").click()
 
-    # Café: choose a question. This interaction must not send/store the answer.
+    # Café: choose a prompt or author a question, then carry it into a local keepsake.
     page.locator("#explore").click()  # initial label is "Explore this mood"
     page.get_by_role("button", name="What surprised you lately?").click()
     assert "Your question" in page.locator("#activity").inner_text()
+    cafe_question = "What changes when we listen?"
+    assert page.locator("#cafeQuestion").get_attribute("maxlength") == "180"
+    page.locator("#cafeQuestion").fill(cafe_question)
+    page.get_by_role("button", name="Carry my question").click()
+    assert cafe_question in page.locator("#activity").inner_text()
+    page.get_by_role("button", name="Make my keepsake").click()
+    assert cafe_question in page.locator("#keepsakeLine").inner_text()
+    # Visitor text is untrusted data: it must remain text, never become markup.
+    payload = "<img src=x onerror=alert(1)>"
+    page.locator("#cafeQuestion").fill(payload)
+    page.get_by_role("button", name="Carry my question").click()
+    assert payload in page.locator("#activity").inner_text()
+    assert page.locator("#activity img").count() == 0
+    page.get_by_role("button", name="Make my keepsake").click()
+    assert payload in page.locator("#keepsakeLine").inner_text()
+    page.locator("[data-mood='cozy']").click()
+    assert page.locator("#keepsakeLine").inner_text() == ""
+    page.locator("[data-mood='cafe']").click()
+    page.locator("#explore").click()
+    assert page.locator("#cafeQuestion").input_value() == ""
 
     # Claim transparency: mark five distinct unknown fields, never fabricate sources.
     page.locator("[data-mood='fire']").click()

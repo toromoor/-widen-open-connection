@@ -201,9 +201,9 @@ function replyDialogue(choice,input){
   // This covers mouse, touch, assistive technology, and keyboard activation alike.
   const restoreKeyboardFocus=true;
   if(choice==='silence'){
-    dialogueBubble('visitor','I choose silence.');
+    // Do not invent a visitor utterance for a choice to remain silent.
     conversationTurn=0;
-    finishDialogue('A quiet table is a complete visit. There is no need to reply. ☕');
+    finishDialogue('Silence is welcome. The table remains open. ☕');
     return;
   }
   if(choice==='answer'&&!input){

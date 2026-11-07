@@ -1,0 +1,35 @@
+name: Café au Lait browser smoke test
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "prototypes/cafe-au-lait-experience.html"
+      - "scripts/check_cafe_browser.py"
+      - ".github/workflows/cafe-browser.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Playwright
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Exercise Café experience in Chromium, mobile and desktop
+        run: python scripts/check_cafe_browser.py
+      - name: Keep screenshots for visual inspection
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cafe-browser-screenshots
+          path: artifacts/*.png
+          retention-days: 7
+          if-no-files-found: ignore

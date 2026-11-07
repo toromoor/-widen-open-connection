@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>WIDEN — Café au Lait / Experience Lab</title>
+<style>
+:root{font-family:ui-sans-serif,system-ui,sans-serif;color:#fff4df;background:#15121e}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 15% 5%,#654157 0,transparent 42%),radial-gradient(ellipse at 95% 80%,#1c5862 0,transparent 45%),#15121e}button,a{font:inherit}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #ffe0a2;outline-offset:4px}#experience:focus{outline:3px solid #ffe0a2;outline-offset:6px;border-radius:26px}#headline:focus,#activity:focus{outline:3px solid var(--mood-accent,#ffe0a2);outline-offset:5px;border-radius:8px}.skip{position:absolute;top:-100px;left:12px;z-index:10;background:#ffe0a2;color:#211b28;padding:12px;border-radius:10px}.skip:focus{top:12px}button{cursor:pointer}a{color:#ffe0a2}.wrap{max-width:1050px;margin:auto;padding:24px 18px 60px}header{display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-weight:900;letter-spacing:.17em;font-size:1.3rem}.status{font-size:.7rem;letter-spacing:.1em;border:1px solid #e6c99270;border-radius:30px;padding:8px 12px;color:#ffdc9c}.eyebrow{text-transform:uppercase;letter-spacing:.22em;font-size:.73rem;color:#f8cfa3;margin-top:60px}h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(3rem,10vw,6.6rem);line-height:.98;margin:14px 0 20px}h1 em{color:#ffc883}p.lead{max-width:600px;line-height:1.65;color:#e8d8d0}.moods{display:flex;flex-wrap:wrap;gap:10px;margin:32px 0}.mood{border:1px solid #ffffff36;border-radius:30px;padding:12px 17px;background:#ffffff0c;color:#fff0e0}.mood[aria-pressed=true]{background:#f8d3a2;color:#2e2333;border-color:#f8d3a2;font-weight:700}.stage{display:grid;grid-template-columns:1.3fr .8fr;gap:18px}.panel{border:1px solid #ffffff25;border-radius:26px;background:#ffffff0e;backdrop-filter:blur(8px);padding:24px}.visual{min-height:190px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:5.5rem;background:radial-gradient(circle at 50% 50%,#d8a76a99,transparent 62%),linear-gradient(125deg,#543e58,#27394a);margin-bottom:20px}.label{color:#eec89c;text-transform:uppercase;letter-spacing:.14em;font-size:.7rem}h2{font-family:Georgia,serif;font-size:2rem;font-weight:400;margin:10px 0}.copy{color:#e5d7d0;line-height:1.65}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}.action{background:#ffcf92;color:#28212d;border:0;border-radius:12px;padding:12px 15px;font-weight:750}.secondary{background:#ffffff18;color:#fff4df;border:1px solid #ffffff30}.note{font-size:.82rem;color:#c9bdc6;line-height:1.6}.chat{display:grid;gap:14px;margin-top:22px}.bubble{padding:14px 16px;background:#ffffff13;border-radius:16px;line-height:1.55}.bubble strong{color:#ffcf92}.bubble.visitor{background:#e8c999;color:#2e2333}.bubble.visitor strong{color:#2e2333}.hidden{display:none!important}.interactive{margin-top:18px;padding:16px;border:1px dashed #f8cfa37a;border-radius:15px;background:#ffffff0b;line-height:1.65}.interactive[hidden]{display:none}.interactive button{margin:5px 7px 5px 0}.interactive p{margin:8px 0}.disclosure{margin-top:14px;padding:14px;border-left:3px solid #f4bf7c;background:#ffffff0b;line-height:1.6}.footer{margin-top:40px;color:#c7b9c5;font-size:.8rem;line-height:1.6}@media(max-width:380px){header{flex-wrap:wrap}.status{max-width:100%;overflow-wrap:anywhere}.brand{font-size:1.1rem}.wrap{padding-left:14px;padding-right:14px}h1{overflow-wrap:anywhere}}@media(max-width:720px){.stage{grid-template-columns:1fr}.eyebrow{margin-top:45px}.panel{padding:19px}.visual{min-height:150px}h1{font-size:3.6rem}}@media(prefers-reduced-motion:no-preference){.panel{transition:transform .2s}.panel:hover{transform:translateY(-2px)}}
+.keepsake{margin-top:18px;background:linear-gradient(130deg,#30221c,#241b21);border-color:#f3c38e55}.keepsake .receipt{margin-top:16px;padding:17px;max-width:590px;border:1px dashed #e8ad7a;border-radius:12px;background:#efcca517;line-height:1.7}.keepsake .receipt:empty{display:none}.local-select{display:block;width:100%;margin:6px 0 12px;padding:11px;border-radius:10px;border:1px solid #ffffff70;background:#211b28;color:#fff4df;font:inherit}.composer-label{display:block;font-size:.88rem;margin-top:9px}.unknown-field{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #ffffff22}.unknown-field button{flex-shrink:0}.unknown-field .known{font-size:.78rem;color:#ffcf92}.keepsake h2{font-size:1.8rem}
+.source-card{margin:16px 0;padding:15px;border:1px solid #e8c99980;border-radius:15px;background:linear-gradient(135deg,#31243b,#1e2734)}
+.source-card summary{cursor:pointer;color:#ffcf92;font-weight:750;line-height:1.5}
+.source-card h3{font-family:Georgia,serif;font-size:1.35rem;font-weight:400;margin:14px 0 8px}
+.source-card p{color:#e5d7d0;line-height:1.6}
+.source-meta{display:grid;grid-template-columns:minmax(100px,.32fr) 1fr;gap:7px 12px;margin:12px 0;font-size:.82rem}
+.source-meta dt{color:#eec89c}
+.source-meta dd{margin:0;color:#fff4df}
+.source-card a{display:inline-block;margin:4px 0}
+.source-card .source-note{font-size:.78rem;color:#c9bdc6}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:420px){.source-meta{grid-template-columns:1fr;gap:2px}.source-meta dd{margin-bottom:7px}}
+@media(max-width:520px){.unknown-field{flex-direction:column;align-items:flex-start;gap:6px}.unknown-field button{max-width:100%;white-space:normal;text-align:left}}
+.event-story{margin:14px 0;padding:18px;border:1px solid var(--mood-edge);border-radius:18px;background:linear-gradient(145deg,#ffffff12,#00000018);line-height:1.65}.event-story .event-kicker{margin:0 0 10px;color:var(--mood-accent);font-size:.72rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.event-story h3{font-family:Georgia,serif;font-size:clamp(1.45rem,5vw,2rem);font-weight:400;line-height:1.15;margin:8px 0 12px}.event-story p{color:#e5d7d0}.event-story .event-question{padding:12px 14px;border-left:3px solid var(--mood-accent);background:#ffffff0b;color:#fff4df}.event-story .source-card{margin:18px 0 8px}
+
+/* Each mood has its own atmosphere, not merely a different headline. */
+body[data-active-mood="cafe"]{--mood-accent:#ffd09a;--mood-ink:#302032;--mood-edge:#f0bd8b66;--mood-visual:radial-gradient(circle at 50% 46%,#f6d39c99 0 10%,transparent 55%),radial-gradient(circle at 52% 54%,#a56b4d80 0 28%,transparent 29%),linear-gradient(125deg,#593c55,#273b4b);background:radial-gradient(ellipse at 12% 8%,#70465a 0,transparent 42%),radial-gradient(ellipse at 95% 82%,#28616a 0,transparent 45%),#15121e}
+body[data-active-mood="curiosity"]{--mood-accent:#bde7ff;--mood-ink:#172038;--mood-edge:#9bd8ff70;--mood-visual:radial-gradient(circle at 16% 23%,#e7f8ff 0 1px,transparent 2px),radial-gradient(circle at 77% 31%,#e7f8ff 0 1px,transparent 2px),radial-gradient(circle at 58% 76%,#e7f8ff 0 1px,transparent 2px),radial-gradient(circle at 50% 48%,#536eae99,transparent 62%),linear-gradient(125deg,#202448,#12394b);background:radial-gradient(ellipse at 78% 8%,#365b93 0,transparent 42%),radial-gradient(ellipse at 8% 90%,#274c69 0,transparent 45%),#0d1224}
+body[data-active-mood="events"]{--mood-accent:#b8eee3;--mood-ink:#142c2d;--mood-edge:#8bd8c780;--mood-visual:radial-gradient(circle at 50% 44%,#ffd28b 0 5%,#f2a45a55 16%,transparent 48%),radial-gradient(circle at 50% 50%,#4e9b9a88,transparent 68%),linear-gradient(130deg,#173c4b,#1d2838);background:radial-gradient(ellipse at 14% 8%,#276a72 0,transparent 42%),radial-gradient(ellipse at 92% 84%,#8b5434 0,transparent 44%),#101b29}
+body[data-active-mood="cozy"]{--mood-accent:#f2d99d;--mood-ink:#2b261a;--mood-edge:#d8c58b70;--mood-visual:radial-gradient(circle at 50% 42%,#f7d18bba 0 8%,#bd875b55 24%,transparent 58%),linear-gradient(135deg,#344b3b,#182b28);background:radial-gradient(ellipse at 18% 8%,#65734b 0,transparent 40%),radial-gradient(ellipse at 90% 80%,#6a5130 0,transparent 44%),#14211d}
+body[data-active-mood="fire"]{--mood-accent:#ffc09a;--mood-ink:#351b1b;--mood-edge:#ff9a6a80;--mood-visual:repeating-linear-gradient(145deg,#ffb15a16 0 9px,transparent 9px 22px),radial-gradient(circle at 50% 48%,#ff743d99,transparent 58%),linear-gradient(130deg,#4b202d,#241421);background:radial-gradient(ellipse at 15% 8%,#8a3b3c 0,transparent 42%),radial-gradient(ellipse at 90% 85%,#743b24 0,transparent 45%),#1e111a}
+body[data-active-mood="party"]{--mood-accent:#ffc2f0;--mood-ink:#291a39;--mood-edge:#e7a2ff80;--mood-visual:radial-gradient(circle at 18% 25%,#ff9bd1 0 4px,transparent 5px),radial-gradient(circle at 77% 30%,#8ee8df 0 5px,transparent 6px),radial-gradient(circle at 61% 76%,#ffd36d 0 4px,transparent 5px),radial-gradient(circle at 50% 50%,#7e4e9b99,transparent 60%),linear-gradient(125deg,#48264f,#174c55);background:radial-gradient(ellipse at 15% 8%,#7a3f82 0,transparent 42%),radial-gradient(ellipse at 92% 82%,#176d70 0,transparent 45%),#171126}
+body[data-active-mood] .panel{border-color:var(--mood-edge)}
+body[data-active-mood] .visual{background:var(--mood-visual)}
+body[data-active-mood] .label,body[data-active-mood] .status,body[data-active-mood] .bubble strong,body[data-active-mood] a{color:var(--mood-accent)}
+body[data-active-mood] .status{border-color:var(--mood-edge)}
+body[data-active-mood] .mood[aria-pressed="true"],body[data-active-mood] .action:not(.secondary){background:var(--mood-accent);border-color:var(--mood-accent);color:var(--mood-ink)}
+
+@media (forced-colors: active) {
+  body { background: Canvas; color: CanvasText; }
+  .panel, .visual, .status, .mood, .bubble, .interactive, .disclosure,
+  .receipt, details.source-card, .event-story, .event-question {
+    background: Canvas;
+    color: CanvasText;
+    border: 1px solid CanvasText;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+  body[data-active-mood] .panel,
+  body[data-active-mood] .status,
+  body[data-active-mood] .visual,
+  body[data-active-mood] .keepsake .receipt,
+  body[data-active-mood] .event-story,
+  body[data-active-mood] .event-story .event-question,
+  body[data-active-mood] .source-card,
+  body[data-active-mood] .event-story .source-card {
+    background: Canvas;
+    color: CanvasText;
+    border: 1px solid CanvasText;
+    border-color: CanvasText;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+  body[data-active-mood] .visual { background: Canvas; color: CanvasText; }
+  body[data-active-mood] .event-story .event-kicker,
+  body[data-active-mood] .event-story p,
+  body[data-active-mood] .source-card summary,
+  body[data-active-mood] .source-card p,
+  body[data-active-mood] .source-meta dt,
+  body[data-active-mood] .source-meta dd,
+  body[data-active-mood] .unknown-field .known,
+  body[data-active-mood] .bubble.visitor { color: CanvasText; }
+  body[data-active-mood] .bubble.visitor { background: Canvas; border: 1px solid CanvasText; }
+  .mood:not([aria-pressed="true"]), .action.secondary {
+    background: ButtonFace;
+    color: ButtonText;
+    border: 1px solid ButtonText;
+  }
+  body[data-active-mood] .mood[aria-pressed="true"],
+  body[data-active-mood] .action:not(.secondary) {
+    background: Highlight;
+    color: HighlightText;
+    border-color: Highlight;
+  }
+  body[data-active-mood] .label,
+  body[data-active-mood] .status,
+  body[data-active-mood] .bubble strong,
+  body[data-active-mood] .note,
+  body[data-active-mood] .copy,
+  body[data-active-mood] .eyebrow,
+  body[data-active-mood] .footer { color: CanvasText; }
+  body[data-active-mood] a, a { color: LinkText; text-decoration: underline; }
+  .skip:focus { background: Highlight; color: HighlightText; }
+  button:focus-visible, a:focus-visible, input:focus-visible,
+  select:focus-visible, summary:focus-visible, #experience:focus,
+  #headline:focus, #activity:focus { outline-color: Highlight; }
+}
+</style></head><body><a class="skip" href="#experience">Skip to experience</a><main class="wrap"><header><div class="brand">WIDEN <span aria-hidden="true">✳</span></div><div class="status">EXPERIENCE LAB · LOCAL ONLY</div></header>
+<div class="eyebrow">A small doorway into a much bigger world</div><h1>Come curious.<br><em>Leave freely.</em></h1><p class="lead">Pick a mood. Follow a thread. Challenge a claim. Or simply stay for the atmosphere. No algorithm begging you to keep scrolling.</p>
+<p class="note" id="visitNotice">This visit is local and temporary. Changing moods clears unfinished activity and any finished keepsake; make a new one whenever you wish. Nothing is saved or sent. All six experimental moods are available in this local prototype.</p><nav class="moods" aria-label="Choose your mood"><button class="mood" data-mood="cafe" aria-pressed="true">☕ Café au lait</button><button class="mood" data-mood="curiosity" aria-pressed="false">🪐 Curiosity</button><button class="mood" data-mood="events" aria-pressed="false">🛰️ Current events</button><button class="mood" data-mood="cozy" aria-pressed="false">🕯️ Cozy</button><button class="mood" data-mood="fire" aria-pressed="false">🔥 Hair on fire</button><button class="mood" data-mood="party" aria-pressed="false">🪩 Party</button></nav>
+<section class="stage" id="experience" tabindex="-1" aria-label="Experience panels"><section class="panel" aria-labelledby="headline"><div class="visual" id="visual" aria-hidden="true">☕</div><div class="label" id="kind">A TABLE FOR WONDERING</div><h2 id="headline" tabindex="-1">Coffee, conversation, and an open question.</h2><p class="copy" id="description">Imagine meeting someone who sees the same world differently. What would you ask before telling them what you think?</p><div class="actions"><button class="action" id="explore" aria-controls="activity" aria-expanded="false">Explore this mood</button><button class="action secondary" id="verify">Check the claim</button></div><div class="interactive" id="activity" hidden tabindex="-1" role="region" aria-label="Selected mood activity"></div><div class="disclosure hidden" id="evidence" role="status" aria-live="polite"></div></section>
+<aside class="panel"><div class="label">THE CAFÉ · SIMULATED PREVIEW</div><h2>A seat is open.</h2><p class="note">No real participants, accounts, messages, or AI agents are connected. This is an interaction rehearsal, not a live room.</p><div class="chat" id="chat" role="log" aria-label="Scripted local conversation" aria-live="polite" aria-relevant="additions" aria-atomic="false"><div class="bubble"><strong>Muse · sample dialogue</strong><div>Welcome. You can talk, wander, or say nothing at all.</div></div></div><div id="dialogueChoices" class="interactive" hidden role="group" aria-label="Local conversation options"></div><div class="actions"><button class="action secondary" id="join" aria-controls="dialogueChoices" aria-expanded="false">Try a conversation</button><button class="action secondary" id="quiet">Choose silence</button></div><p class="note">All messages below are locally scripted examples. Nothing is sent or stored.</p></aside></section>
+<section class="panel keepsake" aria-labelledby="keepsakeTitle"><div class="label">A COMPLETE VISIT · NO ACCOUNT NEEDED</div><h2 id="keepsakeTitle">Leave with a little something.</h2><p class="note">A small café receipt from the mood you explored. Created in this page only; not saved or sent.</p><button class="action" id="leave">Make my keepsake</button><div class="receipt" id="keepsakeLine" role="status" aria-live="polite"></div></section>
+<p class="footer">This is a local prototype, not a live news feed. Some mood prompts are illustrative or fictional. Current Events is a dated archive snapshot with an opt-in source trail; read each source’s publication date and the limits stated beside it. No source is fetched automatically. WIDEN’s public posting remains OFF.</p></main>
+<script>
+'use strict';
+const moods={
+cafe:{icon:'☕',kind:'A TABLE FOR WONDERING',headline:'Coffee, conversation, and an open question.',description:'Imagine meeting someone who sees the same world differently. What would you ask before telling them what you think?',next:'What if the most interesting answer is the question nobody thought to ask?',claim:'This is a creative prompt, not a factual news claim. No external source is implied.'},
+curiosity:{icon:'🪐',kind:'THE UNEXPECTED DOOR',headline:'What would a nameless world feel like?',description:'Without names, how might we recognize one another? A playful thought experiment about memory, attention, and identity.',next:'Try describing a friend without using a name, profession, or relationship label.',claim:'Speculative thought experiment. No evidence is offered that telepathy or new human abilities would emerge.'},
+events:{icon:'🛰️',kind:'ONE EVENT · THREE QUESTIONS',headline:'A spacecraft is gone. Its data is not.',description:'A dated encounter with one event: what is confirmed, where the account comes from, and what the linked reports do not settle. One story, not a stream.',next:'The spacecraft is gone. The measurements remain.',claim:'Archive snapshot dated 6 November 2026. NASA reports Swift re-entered over North Sumatra on 4 November at 7:39 a.m. EST. The linked sources do not provide a confirmed debris-recovery account.'},
+cozy:{icon:'🕯️',kind:'A MOMENT TO LINGER',headline:'A room with no demands.',description:'A quiet invitation: notice one detail around you that you usually overlook. You do not have to share it.',next:'A cup cools. Light shifts. The room is allowed to be quiet.',claim:'Reflective exercise, not a sourced factual claim.'},
+fire:{icon:'🔥',kind:'THE CLAIM CLINIC',headline:'“Everyone is talking about it.” Are they?',description:'A dramatic headline is not evidence. Ask: who measured “everyone,” over what period, and against which baseline?',next:'Look for the original study, its sample size, its date, and whether the headline changed the meaning.',claim:'This is a fictional example of a misleading claim. It is NOT a real report or a verified current event.'},
+party:{icon:'🪩',kind:'THE PLAYFUL DETOUR',headline:'An invitation to delightful nonsense.',description:'Invent a new holiday in fifteen seconds. No ranking, no winning, no forced participation.',next:'The Festival of Lost Socks: everyone wears two different stories.',claim:'Creative fiction, not a factual assertion.'}
+};
+let current='cafe', explored=false;let cafeKeep='';let holidayKeep='';let eventKeep='';document.body.dataset.activeMood=current;
+const activity={cafe:['Ask an open question','A question to carry away'],curiosity:['Try the nameless challenge','An experiment to try'],events:['Open one story','A question to carry away'],cozy:['Let the room be quiet','Stay as long as you like'],fire:['Inspect the headline','What the claim leaves out'],party:['Invent a holiday','A tiny celebration']};
+const $=id=>document.getElementById(id);
+function show(){document.body.dataset.activeMood=current;const m=moods[current];$('activity').hidden=true;$('activity').replaceChildren();$('explore').setAttribute('aria-expanded','false');$('visual').textContent=m.icon;$('kind').textContent=m.kind;$('headline').textContent=explored?m.next:m.headline;$('description').textContent=m.description;$('evidence').classList.add('hidden');$('explore').textContent=explored?'Hide this activity':activity[current][0];$('verify').textContent=current==='fire'?'Inspect provenance':'What is this based on?';document.querySelectorAll('[data-mood]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mood===current)));}
+document.querySelectorAll('[data-mood]').forEach(b=>b.addEventListener('click',()=>{if(current===b.dataset.mood)return;current=b.dataset.mood;explored=false;cafeKeep='';holidayKeep='';eventKeep='';$('keepsakeLine').textContent='';conversationTurn=0;clearDialogueChoices();$('chat').replaceChildren();dialogueBubble('muse','Welcome. You can talk, wander, or say nothing at all.');show();$('headline').focus();}));
+// This is a locally scripted interaction: no network, storage, or participant messaging.
+function activityButton(label,fn){const b=document.createElement('button');b.type='button';b.className='action secondary';b.textContent=label;b.addEventListener('click',fn);return b;}
+function renderActivity(){const a=$('activity');a.replaceChildren();a.hidden=false;$('explore').setAttribute('aria-expanded','true');
+if(current==='cafe'){
+const p=document.createElement('p');p.setAttribute('role','status');p.setAttribute('aria-live','polite');p.textContent='Choose a prompt or bring a question of your own. Nothing is submitted.';
+const prompts=['What surprised you lately?','What do you wish people asked?','What are you unsure about?'];
+const label=document.createElement('label');label.className='composer-label';label.htmlFor='cafeQuestion';label.textContent='Or bring your own question (optional)';
+const input=document.createElement('input');input.type='text';input.id='cafeQuestion';input.maxLength=180;input.autocomplete='off';input.spellcheck=false;input.placeholder='What would you like to ask?';input.setAttribute('aria-describedby','cafeQuestionNote');input.style.cssText='width:100%;padding:12px;margin:8px 0;border-radius:10px;background:#211b28;color:#fff4df;border:1px solid #ffffff70;font:inherit';
+const note=document.createElement('p');note.id='cafeQuestionNote';note.className='note';note.textContent='Up to 180 characters. Kept only in this page; nothing is saved or sent.';
+input.addEventListener('input',()=>{cafeKeep='';});
+prompts.forEach(q=>a.append(activityButton(q,()=>{input.value=q;cafeKeep=q;p.textContent='Your question: “'+q+'” — keep it, change it, or leave it here.';})));
+const carry=activityButton('Carry my question',()=>{const q=input.value.trim();if(!q){p.textContent='Write a question first, choose a prompt, or leave it blank.';input.focus();return;}cafeKeep=q;p.textContent='For your visit receipt: “'+q+'” Nothing is saved or sent.';});
+a.append(p,label,input,note,carry);
+}
+if(current==='curiosity'){
+const p=document.createElement('p');p.textContent='A person arrives. Describe them without a name, job, or family label.';const input=document.createElement('input');input.setAttribute('aria-label','Private description for the nameless challenge');input.maxLength=180;input.placeholder='A voice like…';input.style.cssText='width:100%;padding:12px;border-radius:10px;background:#211b28;color:#fff4df;border:1px solid #ffffff60;font:inherit';input.autocomplete='off';input.spellcheck=false;const result=document.createElement('p');result.setAttribute('role','status');result.setAttribute('aria-live','polite');a.append(p,input,activityButton('Reflect locally',()=>{result.textContent=input.value.trim()?'Notice which details you chose. Could another person recognize them? Your words stay in this browser and are not transmitted.':'You can also leave the description empty. Silence is a valid answer.';}),result);
+}
+if(current==='events'){
+const story=document.createElement('article');story.className='event-story';story.setAttribute('aria-labelledby','eventStoryTitle');
+const stamp=document.createElement('p');stamp.className='event-kicker';stamp.textContent='ONE STORY · ARCHIVE SNAPSHOT · 6 NOV 2026';
+const title=document.createElement('h3');title.id='eventStoryTitle';title.textContent='Swift’s final descent';
+const lead=document.createElement('p');lead.textContent='NASA’s Neil Gehrels Swift Observatory re-entered Earth’s atmosphere on 4 November at 7:39 a.m. EST over North Sumatra, Indonesia, after nearly 22 years in orbit.';
+const confirmed=document.createElement('p');confirmed.textContent='What is established: NASA’s mission update says the U.S. Space Force confirmed the re-entry time and region. Swift’s spacecraft is gone; the archive of observations remains.';
+const unresolved=document.createElement('p');unresolved.textContent='What is not settled here: NASA expected most of the spacecraft to burn up, while allowing that some components may have survived. The linked reports do not provide a confirmed debris-recovery account.';
+const trail=document.createElement('details');trail.className='source-card';
+const trailSummary=document.createElement('summary');trailSummary.textContent='Open the source trail · NASA + Reuters';
+const trailNote=document.createElement('p');trailNote.className='source-note';trailNote.textContent='Two publishers, three links. NASA’s mission update and Reuters both report the U.S. Space Force confirmation; they are distinct editorial accounts, not two independent tracking measurements. NASA’s APOD adds retrospective image and mission context, not a separate re-entry confirmation.';
+const newTabNote=document.createElement('span');newTabNote.id='externalLinkNote';newTabNote.className='sr-only';newTabNote.textContent='Opens in a new tab.';
+const addSourceLink=(label,href,noteId,noteText)=>{const p=document.createElement('p');const link=document.createElement('a');link.href=href;link.target='_blank';link.rel='noopener noreferrer';link.textContent=label;link.setAttribute('aria-describedby',noteId+' externalLinkNote');const note=document.createElement('span');note.id=noteId;note.className='source-note';note.textContent='Source role: '+noteText;p.append(link,note);return p;};
+const apodLink=addSourceLink('NASA APOD · “A Farewell to Swift” · 6 Nov 2026','https://science.nasa.gov/image-article/apod-2026-november-6-a-farewell-to-swift/','apodRoleNote','Retrospective image and mission context; not a separate re-entry confirmation.');const apodCredit=document.createElement('p');apodCredit.className='source-note';apodCredit.textContent='APOD contributors: Cecilia Chirenti, Robert Nemiroff, Jerry Bonnell, and Keighley Rockcliffe.';
+trail.append(trailSummary,trailNote,newTabNote,
+ addSourceLink('NASA mission update · Alise Fisher · 2 Nov 2026, updated 4 Nov','https://science.nasa.gov/blogs/swift/2026/11/02/nasas-swift-observatory-to-re-enter-atmosphere/','missionRoleNote','Official mission update; NASA says the U.S. Space Force confirmed the re-entry time and region.'),
+ apodLink,apodCredit,
+ addSourceLink('Reuters · Steve Gorman · 4 Nov 2026, updated 5 Nov','https://www.reuters.com/science/nasas-22-year-old-swift-satellite-telescope-falls-orbit-fiery-finale-2026-11-04/','reutersRoleNote','Separate newsroom report; it cites the same U.S. Space Force confirmation.'));
+const question=document.createElement('p');question.className='event-question';question.setAttribute('role','status');question.setAttribute('aria-live','polite');question.textContent='A question to carry: What remains when an instrument goes quiet?';
+const carry=activityButton('Carry this question into the café',()=>{eventKeep='What remains when an instrument goes quiet?';question.textContent='For your visit receipt: “'+eventKeep+'” Nothing is saved or sent.';});
+story.append(stamp,title,lead,confirmed,unresolved,trail,question,carry);a.append(story);
+}
+if(current==='cozy'){const p=document.createElement('p');p.setAttribute('role','status');p.setAttribute('aria-live','polite');p.textContent='Nothing to complete. No countdown, score, or next step.';a.append(p,activityButton('Let the room settle',()=>{p.textContent='The room is quiet. You may stay here without doing anything.';}));}
+if(current==='fire'){const p=document.createElement('p');p.textContent='Fictional headline: “Everyone is talking about it.” Nothing about its origin is verified. Mark each missing field UNKNOWN, rather than guessing.';a.append(p);const fields=[['Publisher','No publisher is identified.'],['Publication date','No date was supplied.'],['Population or sample','“Everyone” is not a defined sample.'],['Method','No measurement or method is provided.'],['What would disprove it?','No testable definition has been provided.']];let marked=0;const count=document.createElement('p');count.setAttribute('role','status');count.textContent='0 of 5 missing fields identified.';fields.forEach(([name,reason])=>{const row=document.createElement('div');row.className='unknown-field';const desc=document.createElement('span');desc.textContent=name+' — '+reason;const mark=activityButton('Mark UNKNOWN',()=>{if(mark.getAttribute('aria-pressed')==='true')return;mark.setAttribute('aria-pressed','true');mark.textContent='UNKNOWN';mark.setAttribute('aria-label',name+': UNKNOWN');marked++;count.textContent=marked===fields.length?'Complete: all five missing fields are visibly UNKNOWN. Being honest about uncertainty is the result.':marked+' of 5 missing fields identified.';});mark.setAttribute('aria-label','Mark '+name+' as unknown');mark.setAttribute('aria-pressed','false');row.append(desc,mark);a.append(row);});a.append(count);}
+if(current==='party'){const p=document.createElement('p');p.textContent='Invent your own holiday: pick one theme, one ritual, and one rule. No scores, no winners.';a.append(p);const picker=(name,choices)=>{const label=document.createElement('label');label.className='composer-label';label.textContent=name;const s=document.createElement('select');s.className='local-select';s.setAttribute('aria-label',name);choices.forEach(c=>{const option=document.createElement('option');option.value=c;option.textContent=c;s.append(option);});label.append(s);a.append(label);return s;};const theme=picker('Theme',['Lost Socks','Unfinished Stories','Tiny Triumphs']);const ritual=picker('Ritual',['wear mismatched socks','leave a story without an ending','celebrate finding your keys']);const rule=picker('One rule',['participation is optional','no ranking','everyone may leave freely']);const output=document.createElement('p');output.setAttribute('role','status');a.append(activityButton('Invent my holiday',()=>{holidayKeep='The Day of '+theme.value+': '+ritual.value+'; '+rule.value+'.';output.textContent=holidayKeep+' Make a keepsake below if you want to take it with you.';}),output);}
+}
+$('explore').addEventListener('click',()=>{explored=!explored;show();if(explored){renderActivity();$('activity').focus();}else{$('explore').focus();}});
+// Escape closes the temporary mood activity and returns focus to its opener.
+$('activity').addEventListener('keydown',event=>{if(event.key!=='Escape'||!explored)return;event.preventDefault();explored=false;show();$('explore').focus();});
+$('verify').addEventListener('click',()=>{$('evidence').textContent='PROVENANCE CHECK · '+moods[current].claim+' Before treating any future discovery as fact, WIDEN must show its real source and uncertainty.';$('evidence').classList.remove('hidden');});
+function sample(message){const d=document.createElement('div');d.className='bubble';const strong=document.createElement('strong');strong.textContent='Muse · scripted example';const t=document.createElement('div');t.textContent=message;d.append(strong,t);$('chat').replaceChildren(d);}
+// A bounded local-only scripted conversation. No messages are sent or stored.
+let conversationTurn=0;
+function dialogueBubble(who,line){
+  const d=document.createElement('div');d.className='bubble'+(who==='visitor'?' visitor':'');
+  const whoLabel=document.createElement('strong');
+  whoLabel.textContent=who==='visitor'?'Visitor · local response':'Muse · scripted example';
+  const message=document.createElement('div');message.textContent=line;
+  d.append(whoLabel,message);$('chat').append(d);
+}
+function clearDialogueChoices(){
+  const c=$('dialogueChoices');
+  if(c){c.hidden=true;c.replaceChildren();}
+  $('join').setAttribute('aria-expanded','false');
+}
+function finishDialogue(text){
+  const focusWasInChoices=!!document.activeElement?.closest('#dialogueChoices');
+  clearDialogueChoices();dialogueBubble('muse',text+' This was a scripted, local-only conversation. Nothing was sent or stored.');
+  if(focusWasInChoices)$('join').focus();
+}
+// The choices container is persistent across turns. Register one handler once;
+// adding a new handler every time its children are rebuilt causes duplicate Escape exits.
+$('dialogueChoices').addEventListener('keydown',event=>{
+  if(event.key!=='Escape'||$('dialogueChoices').hidden)return;
+  event.preventDefault();
+  conversationTurn=0;
+  clearDialogueChoices();
+  dialogueBubble('muse','You can leave the question unanswered. The table remains open. ☕');
+  $('join').focus();
+});
+function dialogueChoices(restoreKeyboardFocus=false){
+  clearDialogueChoices();const box=$('dialogueChoices');box.replaceChildren();box.className='interactive';box.hidden=false;
+  box.setAttribute('role','group');box.setAttribute('aria-label','Local conversation options');
+  $('join').setAttribute('aria-expanded','true');
+  const label=document.createElement('label');label.textContent='Your thought (optional, stays here):';
+  label.setAttribute('for','dialogueInput');
+  const input=document.createElement('input');input.id='dialogueInput';input.maxLength=160;
+  input.autocomplete='off';input.spellcheck=false;
+  input.style.cssText='width:100%;padding:12px;margin:8px 0;border-radius:10px;background:#211b28;color:#fff4df;border:1px solid #ffffff70;font:inherit';
+  box.append(label,input);
+  [['Answer', 'answer'],['Ask something else','deflect'],['Stay silent','silence']].forEach(([name,choice])=>{
+    box.append(activityButton(name,()=>replyDialogue(choice,input.value.trim())));
+  });
+  // Escape handling is attached once to the persistent group below.
+  // Re-rendering choices must not accumulate duplicate key handlers.
+  // Restore focus whenever a reply replaces the active controls.
+  if(restoreKeyboardFocus)input.focus();
+}
+function replyDialogue(choice,input){
+  if(!conversationTurn)return;
+  // The clicked choice is removed on reply; always move focus to the replacement input.
+  // This covers mouse, touch, assistive technology, and keyboard activation alike.
+  const restoreKeyboardFocus=true;
+  if(choice==='silence'){
+    // Do not invent a visitor utterance for a choice to remain silent.
+    conversationTurn=0;
+    finishDialogue('Silence is welcome. The table remains open. ☕');
+    return;
+  }
+  if(choice==='answer'&&!input){
+    const field=$('dialogueInput');
+    if(field){field.focus();field.placeholder='Or choose another question or silence';}
+    return;
+  }
+  dialogueBubble('visitor',choice==='deflect'?(input||'Could we take another direction?'):input);
+  if(conversationTurn===1){
+    dialogueBubble('muse',choice==='deflect'?'Then here is a gentler question: what was one small good thing today?':'You put a thought on the table. What part of it would you like to explore, without having to settle it?');
+    conversationTurn=2;dialogueChoices(restoreKeyboardFocus);
+  }else if(conversationTurn===2){
+    dialogueBubble('muse',choice==='deflect'?'We can leave the question open. What would you like to take with you?':'A question may be worth keeping unfinished. What would you take away: the question, the quiet, or nothing?');
+    conversationTurn=3;dialogueChoices(restoreKeyboardFocus);
+  }else{
+    conversationTurn=0;finishDialogue('Take what is useful and leave the rest. You can start again whenever you want.');
+  }
+}
+$('join').addEventListener('click',()=>{
+  $('chat').replaceChildren();conversationTurn=1;
+  dialogueBubble('muse','What have you been wondering about lately? There is no pressure to answer.');
+  dialogueChoices(true);
+});
+$('quiet').addEventListener('click',()=>{
+  // Removing the active conversation controls must not strand keyboard focus.
+  const focusWasInChoices=!!document.activeElement?.closest('#dialogueChoices');
+  conversationTurn=0;clearDialogueChoices();$('chat').replaceChildren();
+  dialogueBubble('muse','Then we can simply enjoy the quiet. No reply is required. ☕');
+  if(focusWasInChoices)$('quiet').focus();
+});
+const takeaway={cafe:'Take one open question into your day. You do not owe anyone an answer.',curiosity:'Notice a detail you might otherwise miss. There is no right observation.',events:'What remains when an instrument goes quiet?',cozy:'One quiet moment is enough. Nothing needs to be completed.',fire:'When evidence is missing, UNKNOWN is a useful answer.',party:'Invent a celebration that belongs to no algorithm.'};
+$('leave').addEventListener('click',()=>{$('keepsakeLine').textContent='WIDEN CAFÉ RECEIPT · '+(current==='party'&&holidayKeep?holidayKeep:current==='events'&&eventKeep?eventKeep:current==='cafe'&&cafeKeep?cafeKeep:takeaway[current])+' · Yours to remember, copy, or leave here. Nothing saved or sent.';});
+</script></body></html>

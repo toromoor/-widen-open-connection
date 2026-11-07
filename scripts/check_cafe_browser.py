@@ -128,7 +128,10 @@ def check(browser, width, height, name):
     assert page.locator("#dialogueChoices").get_attribute("role") == "group"
     page.locator("#dialogueInput").fill("What does listening mean?")
     page.get_by_role("button", name="Answer", exact=True).click()
+    redirect = "Could we talk about the question behind the question?"
+    page.locator("#dialogueInput").fill(redirect)
     page.get_by_role("button", name="Ask something else").click()
+    assert redirect in page.locator("#chat .visitor").nth(1).inner_text()
     page.locator("#dialogueInput").fill("The question.")
     page.get_by_role("button", name="Answer", exact=True).click()
     assert page.locator("#dialogueChoices").is_hidden()

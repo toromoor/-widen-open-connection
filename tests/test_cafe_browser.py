@@ -26,9 +26,14 @@ def main():
                 page.locator(f'[data-mood="{mood}"]').click()
                 assert page.locator(f'[data-mood="{mood}"]').get_attribute("aria-pressed") == "true"
                 assert page.locator("#headline").evaluate("(el) => document.activeElement === el")
+                assert page.locator("#headline").evaluate("(el) => getComputedStyle(el).outlineStyle") == "solid", f"focused mood heading has no visible focus indicator: {mood}"
+                assert page.locator("#headline").evaluate("(el) => getComputedStyle(el).outlineWidth") == "3px"
                 page.locator("#explore").click()
                 assert page.locator("#explore").get_attribute("aria-expanded") == "true"
                 assert page.locator("#activity").is_visible()
+                assert page.locator("#activity").evaluate("(el) => document.activeElement === el")
+                assert page.locator("#activity").evaluate("(el) => getComputedStyle(el).outlineStyle") == "solid", f"focused activity region has no visible focus indicator: {mood}"
+                assert page.locator("#activity").evaluate("(el) => getComputedStyle(el).outlineWidth") == "3px"
                 page.locator("#activity").focus()
                 page.keyboard.press("Escape")
                 assert page.locator("#explore").get_attribute("aria-expanded") == "false"

@@ -47,6 +47,25 @@ def main():
             assert cafe_status.get_attribute("aria-live") == "polite"
             page.get_by_role("button", name="What surprised you lately?").click()
             assert "Your question:" in cafe_status.inner_text()
+            cafe_question = "What changes when we listen?"
+            assert page.locator("#cafeQuestion").get_attribute("maxlength") == "180"
+            page.locator("#cafeQuestion").fill(cafe_question)
+            page.get_by_role("button", name="Carry my question").click()
+            assert cafe_question in cafe_status.inner_text()
+            page.locator("#leave").click()
+            assert cafe_question in page.locator("#keepsakeLine").inner_text()
+            payload = "<img src=x onerror=alert(1)>"
+            page.locator("#cafeQuestion").fill(payload)
+            page.get_by_role("button", name="Carry my question").click()
+            assert payload in cafe_status.inner_text()
+            assert page.locator("#activity img").count() == 0
+            page.locator("#leave").click()
+            assert payload in page.locator("#keepsakeLine").inner_text()
+            page.locator('[data-mood="cozy"]').click()
+            assert page.locator("#keepsakeLine").inner_text() == ""
+            page.locator('[data-mood="cafe"]').click()
+            page.locator("#explore").click()
+            assert page.locator("#cafeQuestion").input_value() == ""
             page.locator('[data-mood="cozy"]').click()
             page.locator("#explore").click()
             cozy_status = page.locator("#activity [role=status]")

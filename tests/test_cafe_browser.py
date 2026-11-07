@@ -14,6 +14,7 @@ def main():
             page.on("pageerror", lambda exc: errors.append(str(exc)))
             page.goto(page_path.as_uri())
             assert page.title().startswith("WIDEN"), page.title()
+            assert page.locator("#visitNotice").inner_text() == "This visit is local and temporary. Changing moods clears unfinished activity and any finished keepsake; make a new one whenever you wish. Nothing is saved or sent. All six experimental moods are available in this local prototype."
             page.get_by_role("link", name="Skip to experience").focus()
             page.keyboard.press("Enter")
             assert page.locator("#experience").evaluate("(el) => document.activeElement === el")

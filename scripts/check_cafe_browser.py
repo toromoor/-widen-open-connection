@@ -55,6 +55,19 @@ def check(browser, width, height, name):
     assert cafe_question in page.locator("#activity").inner_text()
     page.get_by_role("button", name="Make my keepsake").click()
     assert cafe_question in page.locator("#keepsakeLine").inner_text()
+    page.locator("#explore").click()
+    page.locator("#explore").click()
+    assert page.locator("#cafeQuestion").input_value() == cafe_question
+    assert "For your visit receipt" in page.locator("#activity [role=status]").inner_text()
+    edited_question = "What changes when we listen twice?"
+    page.locator("#cafeQuestion").fill(edited_question)
+    assert "not on the receipt yet" in page.locator("#activity [role=status]").inner_text()
+    page.locator("#leave").click()
+    assert cafe_question not in page.locator("#keepsakeLine").inner_text()
+    assert edited_question not in page.locator("#keepsakeLine").inner_text()
+    page.get_by_role("button", name="Carry my question").click()
+    page.locator("#leave").click()
+    assert edited_question in page.locator("#keepsakeLine").inner_text()
     # Visitor text is untrusted data: it must remain text, never become markup.
     payload = "<img src=x onerror=alert(1)>"
     page.locator("#cafeQuestion").fill(payload)
@@ -82,10 +95,27 @@ def check(browser, width, height, name):
     # Party: a holiday from user selections, then a voluntary keepsake.
     page.locator("[data-mood='party']").click()
     page.get_by_role("button", name="Invent a holiday").click()
+    page.get_by_label("Theme").select_option("Unfinished Stories")
+    page.get_by_label("Ritual").select_option("leave a story without an ending")
+    page.get_by_label("One rule").select_option("no ranking")
     page.get_by_role("button", name="Invent my holiday").click()
-    assert "The Day of" in page.locator("#activity").inner_text()
+    assert "The Day of Unfinished Stories" in page.locator("#activity").inner_text()
     page.get_by_role("button", name="Make my keepsake").click()
-    assert "The Day of" in page.locator("#keepsakeLine").inner_text()
+    assert "The Day of Unfinished Stories" in page.locator("#keepsakeLine").inner_text()
+    page.locator("#explore").click()
+    page.locator("#explore").click()
+    assert page.get_by_label("Theme").input_value() == "Unfinished Stories"
+    assert page.get_by_label("Ritual").input_value() == "leave a story without an ending"
+    assert page.get_by_label("One rule").input_value() == "no ranking"
+    assert "For your visit receipt" in page.locator("#activity [role=status]").inner_text()
+    page.get_by_label("Theme").select_option("Tiny Triumphs")
+    assert "choices changed" in page.locator("#activity [role=status]").inner_text()
+    page.locator("#leave").click()
+    assert "The Day of Unfinished Stories" not in page.locator("#keepsakeLine").inner_text()
+    page.get_by_role("button", name="Invent my holiday").click()
+    assert "The Day of Tiny Triumphs" in page.locator("#activity").inner_text()
+    page.locator("#leave").click()
+    assert "The Day of Tiny Triumphs" in page.locator("#keepsakeLine").inner_text()
 
     # Curiosity is a thought experiment, not a news container.
     page.locator("[data-mood='curiosity']").click()

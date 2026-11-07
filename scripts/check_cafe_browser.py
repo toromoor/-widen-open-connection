@@ -98,7 +98,8 @@ def check(browser, width, height, name):
     assert reuters.get_attribute("href") == "https://www.reuters.com/science/nasas-22-year-old-swift-satellite-telescope-falls-orbit-fiery-finale-2026-11-04/"
     role_notes = ((nasa_mission, "missionRoleNote"), (nasa_apod, "apodRoleNote"), (reuters, "reutersRoleNote"))
     for link, note_id in role_notes:
-        assert link.get_attribute("aria-describedby") == note_id
+        assert link.get_attribute("aria-describedby") == f"{note_id} externalLinkNote"
+        assert page.locator("#externalLinkNote").inner_text() == "Opens in a new tab."
         assert page.locator(f"#{note_id}").is_visible()
     assert "U.S. Space Force confirmed" in page.locator("#missionRoleNote").inner_text()
     assert "Retrospective image and mission context" in page.locator("#apodRoleNote").inner_text()

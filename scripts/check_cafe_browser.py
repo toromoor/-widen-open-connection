@@ -141,7 +141,9 @@ def check(browser, width, height, name):
     page.get_by_role("button", name="Stay silent").click()
     assert page.locator("#dialogueChoices").is_hidden()
     assert page.locator("#join").get_attribute("aria-expanded") == "false"
-    assert "quiet table" in page.locator("#chat").inner_text()
+    assert "Silence is welcome" in page.locator("#chat").inner_text()
+    assert page.locator("#chat .visitor").count() == 0
+    assert page.locator("#join").evaluate("(el) => document.activeElement === el")
     page.get_by_role("button", name="Choose silence").click()
     assert "No reply is required" in page.locator("#chat").inner_text()
 
@@ -175,6 +177,7 @@ def check(browser, width, height, name):
     assert page.locator("#dialogueChoices").is_hidden()
     assert page.locator("#join").get_attribute("aria-expanded") == "false"
     assert page.locator("#join").evaluate("(el) => document.activeElement === el")
+    assert page.locator("#chat .visitor").count() == 0
 
     # Narrow screens should not force horizontal scrolling.
     overflow = page.evaluate("document.documentElement.scrollWidth - window.innerWidth")

@@ -132,7 +132,6 @@ def check(browser, width, height, name):
     assert "A SURVIVING COPY · 3 NOVEMBER 1992" in artifact.inner_text()
     assert "not a transcript of the page as first published in 1991" in artifact.inner_text()
     assert "The WorldWideWeb (W3) is a wide-area hypermedia information retrieval initiative" in artifact.locator("blockquote").inner_text()
-    assert "not proof of the exact first wording" in artifact.inner_text()
     assert page.locator("#activity details.artifact-sources").count() == 1
     w3c = page.get_by_role("link", name="W3C archive copy · 3 Nov 1992")
     cern_record = page.get_by_role("link", name="CERN historical record · what survives")
@@ -145,6 +144,7 @@ def check(browser, width, height, name):
         assert "noopener" in link.get_attribute("rel") and "noreferrer" in link.get_attribute("rel")
     page.locator("details.artifact-back summary").click()
     assert page.locator("details.artifact-back").evaluate("(el) => el.open")
+    assert "not proof of the exact first wording" in page.locator("details.artifact-back").inner_text()
     assert "no screenshots of that original page exist" in page.locator("details.artifact-back").inner_text()
     access = page.get_by_role("button", name="Look through the access lens")
     discovery = page.get_by_role("button", name="Look through the discovery lens")

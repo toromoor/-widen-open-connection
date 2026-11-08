@@ -100,6 +100,9 @@ def check(browser, width, height, name):
     page.get_by_role("button", name="Open the evidence desk").click()
     fire_case = page.locator("#activity .fire-case")
     assert fire_case.count() == 1
+    assert origin.locator(".fire-choices").get_attribute("role") == "group"
+    assert origin.locator(".fire-feedback").get_attribute("aria-live") == "polite"
+    assert page.locator("#fireProgress").get_attribute("aria-live") == "polite"
     assert "FICTIONAL PRACTICE CASE" in fire_case.inner_text()
     assert "not a real event" in fire_case.inner_text().lower()
     assert "score" not in fire_case.inner_text().lower()
@@ -114,7 +117,7 @@ def check(browser, width, height, name):
     assert page.locator("#fireCarry").is_disabled()
     measure.get_by_role("button", name="Choose reading: It is an undefined reach claim").click()
     measure.get_by_role("button", name="Compare this clue").click()
-    echo.get_by_role("button", name="Leave this clue open").click()
+    echo.get_by_role("button", name="Choose reading: Leave this clue open").click()
     echo.get_by_role("button", name="Compare this clue").click()
     assert "You left this clue open" in echo.locator(".fire-feedback").inner_text()
     assert "3 of 3 clues compared" in page.locator("#fireProgress").inner_text()

@@ -161,6 +161,8 @@ def main():
             assert "A SURVIVING COPY · 3 NOVEMBER 1992" in artifact.inner_text()
             assert "not a transcript of the page as first published in 1991" in artifact.inner_text()
             assert "The WorldWideWeb (W3) is a wide-area hypermedia information retrieval initiative" in artifact.locator("blockquote").inner_text()
+            page.locator("details.artifact-sources summary").click()
+            assert page.locator("details.artifact-sources").evaluate("(el) => el.open")
             w3c = page.get_by_role("link", name="W3C archive copy · 3 Nov 1992")
             cern_record = page.get_by_role("link", name="CERN historical record · what survives")
             cern_history = page.get_by_role("link", name="CERN · where the web was born")

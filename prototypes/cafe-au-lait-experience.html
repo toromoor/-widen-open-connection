@@ -312,8 +312,8 @@ if(current==='fire'){
    const button=activityButton('Choose reading: '+choice,()=>{
     fireReadings[clue.key]=choice;fireReviewed[clue.key]=false;fireVerdict='';fireKeep='';$('keepsakeLine').textContent='';
     group.querySelectorAll('button').forEach(other=>other.setAttribute('aria-pressed',String(other===button)));
-    progress.textContent='Your reading stays in this page only. Compare the clue when you are ready.';
-    feedback.textContent='Your reading: '+choice+'. You can compare it with the cautious reading below.';
+    updateProgress();
+    feedback.textContent='Your reading: '+choice+'. It stays in this page only. Compare it with the cautious reading below.';
     verdict.textContent='Your reading changed. Compare the clue and build the cautious reading again before carrying it.';
     carry.disabled=true;
    });

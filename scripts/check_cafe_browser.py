@@ -128,6 +128,18 @@ def check(browser, width, height, name):
     page.get_by_role("button", name="Carry this cautious reading").click()
     page.locator("#leave").click()
     assert "UNVERIFIED — NOT DISPROVED" in page.locator("#keepsakeLine").inner_text()
+    # A changed clue invalidates the old carried reading and receipt.
+    origin.get_by_role("button", name="Choose reading: It proves the claim is false").click()
+    assert page.locator("#keepsakeLine").inner_text() == ""
+    assert page.locator("#fireCarry").is_disabled()
+    assert "Your reading changed" in page.locator("#fireVerdict").inner_text()
+    assert "2 of 3 clues compared" in page.locator("#fireProgress").inner_text()
+    origin.get_by_role("button", name="Compare this clue").click()
+    page.get_by_role("button", name="Build a cautious reading").click()
+    assert "UNVERIFIED — NOT DISPROVED" in page.locator("#fireVerdict").inner_text()
+    page.get_by_role("button", name="Carry this cautious reading").click()
+    page.locator("#leave").click()
+    assert "UNVERIFIED — NOT DISPROVED" in page.locator("#keepsakeLine").inner_text()
     source = page.locator("details.fire-source")
     source.locator("summary").click()
     dig = page.get_by_role("link", name="Digital Inquiry Group · About Civic Online Reasoning")

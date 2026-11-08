@@ -256,21 +256,50 @@ def main():
             assert "The Day of Tiny Triumphs" in page.locator("#keepsakeLine").inner_text()
             page.locator('[data-mood="fire"]').click()
             page.locator("#explore").click()
-            for field in ["Publisher", "Publication date", "Population or sample", "Method", "What would disprove it?"]:
-                page.get_by_role("button", name=f"Mark {field} as unknown").click()
-                assert page.get_by_role("button", name=f"{field}: UNKNOWN").get_attribute("aria-pressed") == "true"
-            assert "all five missing fields" in page.locator("#activity [role=status]").inner_text()
+            fire_case = page.locator("#activity .fire-case")
+            assert fire_case.count() == 1
+            assert "FICTIONAL PRACTICE CASE" in fire_case.inner_text()
+            assert "not a real event" in fire_case.inner_text().lower()
+            assert "score" not in fire_case.inner_text().lower()
+            clues = page.locator("#activity .fire-clue")
+            assert clues.count() == 3
+            origin, measure, echo = clues.nth(0), clues.nth(1), clues.nth(2)
+            origin.get_by_role("button", name="Choose reading: It identifies the original publisher").click()
+            assert origin.get_by_role("button", name="Choose reading: It identifies the original publisher").get_attribute("aria-pressed") == "true"
+            origin.get_by_role("button", name="Compare this clue").click()
+            assert "only that a screenshot exists" in origin.locator(".fire-feedback").inner_text()
+            page.get_by_role("button", name="Build a cautious reading").click()
+            assert "INCOMPLETE REVIEW" in page.locator("#fireVerdict").inner_text()
+            assert page.locator("#fireCarry").is_disabled()
+            measure.get_by_role("button", name="Choose reading: It is an undefined reach claim").click()
+            measure.get_by_role("button", name="Compare this clue").click()
+            assert "cannot be measured" in measure.locator(".fire-feedback").inner_text()
+            echo.get_by_role("button", name="Choose reading: Leave this clue open").click()
+            echo.get_by_role("button", name="Compare this clue").click()
+            assert "You left this clue open" in echo.locator(".fire-feedback").inner_text()
+            assert "Repetition is not independence" in echo.locator(".fire-feedback").inner_text()
+            assert "3 of 3 clues compared" in page.locator("#fireProgress").inner_text()
+            page.get_by_role("button", name="Build a cautious reading").click()
+            verdict = page.locator("#fireVerdict")
+            assert "UNVERIFIED — NOT DISPROVED" in verdict.inner_text()
+            assert "not proof that the claim is false" in verdict.inner_text()
+            assert page.locator("#fireCarry").is_enabled()
+            # The final reading is not placed in the keepsake until the explicit carry action.
+            page.locator("#leave").click()
+            assert "UNVERIFIED — NOT DISPROVED" not in page.locator("#keepsakeLine").inner_text()
+            page.get_by_role("button", name="Carry this cautious reading").click()
+            page.locator("#leave").click()
+            assert "UNVERIFIED — NOT DISPROVED" in page.locator("#keepsakeLine").inner_text()
+            source = page.locator("details.fire-source")
+            source.locator("summary").click()
+            dig = page.get_by_role("link", name="Digital Inquiry Group · About Civic Online Reasoning")
+            assert dig.get_attribute("href") == "https://cor.inquirygroup.org/about/"
+            assert dig.get_attribute("target") == "_blank"
+            assert "noopener" in dig.get_attribute("rel") and "noreferrer" in dig.get_attribute("rel")
+            assert dig.get_attribute("aria-describedby") == "fireSourceRoleNote fireNewTabNote"
+            assert "research basis" in page.locator("#fireSourceRoleNote").inner_text()
             page.locator("#verify").click()
-            assert "fictional example" in page.locator("#evidence").inner_text().lower()
-            # Regression: re-opening the same mood starts with fresh UNKNOWN controls.
-            # Clicking the already-selected mood is intentionally a no-op; close and reopen.
-            page.locator("#explore").click()
-            assert page.locator("#explore").get_attribute("aria-expanded") == "false"
-            page.locator("#explore").click()
-            assert page.locator("#explore").get_attribute("aria-expanded") == "true"
-            unknown = page.get_by_role("button", name="Mark Publisher as unknown")
-            unknown.click()
-            assert page.get_by_role("button", name="Publisher: UNKNOWN").get_attribute("aria-pressed") == "true"
+            assert "fictional training case" in page.locator("#evidence").inner_text().lower()
             # Regression: switching moods clears the finished keepsake, as the notice promises.
             page.locator("#leave").click()
             assert page.locator("#keepsakeLine").inner_text().strip()
@@ -453,6 +482,32 @@ def main():
             assert metric["background"] != "rgba(0, 0, 0, 0)", f"forced-colors artifact {name} background missing: {metric}"
         assert "underline" in artifact_metrics["linkDecoration"], artifact_metrics
         assert artifact_metrics["link"]["color"] != "rgba(0, 0, 0, 0)", artifact_metrics
+
+        forced_page.locator('[data-mood="fire"]').click()
+        forced_page.locator("#explore").click()
+        forced_page.locator("details.fire-source summary").click()
+        forced_page.locator(".fire-clue").first.get_by_role("button", name="Choose reading: It shows only that a screenshot exists").click()
+        fire_metrics = forced_page.evaluate("""() => {
+            const style = (selector) => {
+                const el = document.querySelector(selector);
+                const css = getComputedStyle(el);
+                return {borderStyle: css.borderTopStyle, borderWidth: css.borderTopWidth,
+                        background: css.backgroundColor, color: css.color};
+            };
+            return {
+                caseFile: style(".fire-case"), clue: style(".fire-clue"),
+                choice: style(".fire-choice[aria-pressed='true']"),
+                verdict: style(".fire-verdict"), source: style(".fire-source"),
+                link: style(".fire-source a"),
+                linkDecoration: getComputedStyle(document.querySelector(".fire-source a")).textDecorationLine
+            };
+        }""")
+        for name in ["caseFile", "clue", "choice", "verdict", "source"]:
+            metric = fire_metrics[name]
+            assert metric["borderStyle"] == "solid" and metric["borderWidth"] != "0px", f"forced-colors Hair on Fire {name} boundary missing: {metric}"
+            assert metric["background"] != "rgba(0, 0, 0, 0)", f"forced-colors Hair on Fire {name} background missing: {metric}"
+        assert "underline" in fire_metrics["linkDecoration"], fire_metrics
+        assert fire_metrics["link"]["color"] != "rgba(0, 0, 0, 0)", fire_metrics
         assert not forced_outbound, forced_outbound
         forced_context.close()
         print("PASS forced-colors: selected mood, panel boundaries, source links, visible focus and keepsake")

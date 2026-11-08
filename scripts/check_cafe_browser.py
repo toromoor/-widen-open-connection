@@ -95,15 +95,45 @@ def check(browser, width, height, name):
     page.locator("#explore").click()
     assert page.locator("#cafeQuestion").input_value() == ""
 
-    # Claim transparency: mark five distinct unknown fields, never fabricate sources.
+    # Hair on Fire is an evidence desk, not a five-checkbox form or a truth score.
     page.locator("[data-mood='fire']").click()
-    page.get_by_role("button", name="Inspect the headline").click()
-    assert page.locator(".unknown-field button[aria-pressed='false']").count() == 5
-    for _ in range(5):
-        page.locator(".unknown-field button[aria-pressed='false']").first.click()
-    assert "all five missing fields" in page.locator("#activity").inner_text()
+    page.get_by_role("button", name="Open the evidence desk").click()
+    fire_case = page.locator("#activity .fire-case")
+    assert fire_case.count() == 1
+    assert "FICTIONAL PRACTICE CASE" in fire_case.inner_text()
+    assert "not a real event" in fire_case.inner_text().lower()
+    assert "score" not in fire_case.inner_text().lower()
+    clues = page.locator("#activity .fire-clue")
+    assert clues.count() == 3
+    origin, measure, echo = clues.nth(0), clues.nth(1), clues.nth(2)
+    origin.get_by_role("button", name="Choose reading: It shows only that a screenshot exists").click()
+    origin.get_by_role("button", name="Compare this clue").click()
+    assert "does not identify who created it" in origin.locator(".fire-feedback").inner_text()
+    page.get_by_role("button", name="Build a cautious reading").click()
+    assert "INCOMPLETE REVIEW" in page.locator("#fireVerdict").inner_text()
+    assert page.locator("#fireCarry").is_disabled()
+    measure.get_by_role("button", name="Choose reading: It is an undefined reach claim").click()
+    measure.get_by_role("button", name="Compare this clue").click()
+    echo.get_by_role("button", name="Leave this clue open").click()
+    echo.get_by_role("button", name="Compare this clue").click()
+    assert "You left this clue open" in echo.locator(".fire-feedback").inner_text()
+    assert "3 of 3 clues compared" in page.locator("#fireProgress").inner_text()
+    page.get_by_role("button", name="Build a cautious reading").click()
+    assert "UNVERIFIED — NOT DISPROVED" in page.locator("#fireVerdict").inner_text()
+    page.locator("#leave").click()
+    assert "UNVERIFIED — NOT DISPROVED" not in page.locator("#keepsakeLine").inner_text()
+    page.get_by_role("button", name="Carry this cautious reading").click()
+    page.locator("#leave").click()
+    assert "UNVERIFIED — NOT DISPROVED" in page.locator("#keepsakeLine").inner_text()
+    source = page.locator("details.fire-source")
+    source.locator("summary").click()
+    dig = page.get_by_role("link", name="Digital Inquiry Group · About Civic Online Reasoning")
+    assert dig.get_attribute("href") == "https://cor.inquirygroup.org/about/"
+    assert dig.get_attribute("target") == "_blank"
+    assert "noopener" in dig.get_attribute("rel") and "noreferrer" in dig.get_attribute("rel")
+    assert dig.get_attribute("aria-describedby") == "fireSourceRoleNote fireNewTabNote"
     page.get_by_role("button", name="Inspect provenance").click()
-    assert "fictional" in page.locator("#evidence").inner_text().lower()
+    assert "fictional training case" in page.locator("#evidence").inner_text().lower()
 
     # Party: a holiday from user selections, then a voluntary keepsake.
     page.locator("[data-mood='party']").click()
@@ -409,6 +439,31 @@ def check_forced_colors(browser):
         assert metric["background"] != "rgba(0, 0, 0, 0)", f"forced-colors {name} background missing: {metric}"
     assert "underline" in metrics["linkDecoration"], metrics
     assert metrics["link"]["color"] != "rgba(0, 0, 0, 0)", metrics
+
+    page.locator("[data-mood='fire']").click()
+    page.locator("#explore").click()
+    page.locator("details.fire-source summary").click()
+    page.locator(".fire-clue").first.get_by_role("button", name="Choose reading: It shows only that a screenshot exists").click()
+    fire_metrics = page.evaluate("""() => {
+        const style = (selector) => {
+            const css = getComputedStyle(document.querySelector(selector));
+            return {borderStyle: css.borderTopStyle, borderWidth: css.borderTopWidth,
+                    background: css.backgroundColor, color: css.color};
+        };
+        return {
+            caseFile: style(".fire-case"), clue: style(".fire-clue"),
+            choice: style(".fire-choice[aria-pressed='true']"),
+            verdict: style(".fire-verdict"), source: style(".fire-source"),
+            link: style(".fire-source a"),
+            linkDecoration: getComputedStyle(document.querySelector(".fire-source a")).textDecorationLine
+        };
+    }""")
+    for name in ("caseFile", "clue", "choice", "verdict", "source"):
+        metric = fire_metrics[name]
+        assert metric["borderStyle"] == "solid" and metric["borderWidth"] != "0px", f"forced-colors Hair on Fire {name} boundary missing: {metric}"
+        assert metric["background"] != "rgba(0, 0, 0, 0)", f"forced-colors Hair on Fire {name} background missing: {metric}"
+    assert "underline" in fire_metrics["linkDecoration"], fire_metrics
+    assert fire_metrics["link"]["color"] != "rgba(0, 0, 0, 0)", fire_metrics
     assert not external_requests, external_requests
     page.screenshot(path=str(ARTIFACTS / "cafe-forced-colors.png"), full_page=True)
     context.close()

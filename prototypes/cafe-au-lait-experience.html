@@ -126,6 +126,33 @@ body[data-active-mood] .mood[aria-pressed="true"],body[data-active-mood] .action
   select:focus-visible, summary:focus-visible, #experience:focus,
   #headline:focus, #activity:focus { outline-color: Highlight; }
 }
+
+
+.fire-case{margin:14px 0;padding:18px;border:1px solid #ff9a6a80;border-radius:18px;background:linear-gradient(145deg,#4b202d,#281724);line-height:1.65}
+.fire-case .fire-stamp,.fire-clue .fire-kicker{margin:0 0 9px;color:#ffc09a;font-size:.7rem;font-weight:850;letter-spacing:.16em;text-transform:uppercase}
+.fire-case h3,.fire-clue h3{margin:8px 0 12px;font:400 clamp(1.4rem,5vw,1.9rem)/1.15 Georgia,serif}
+.fire-case p,.fire-clue p{color:#f0dfd7}
+.fire-case .fire-case-note{font-size:.82rem;color:#e0c6bc}
+.fire-clue{margin:12px 0;padding:16px;border:1px solid #ffb38a70;border-radius:15px;background:#ffffff0b;line-height:1.6}
+.fire-clue .fire-evidence{padding:12px 14px;border-left:3px solid #ff9a6a;background:#ffffff0b}
+.fire-clue .fire-prompt{font-weight:750}
+.fire-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.fire-choice{width:100%;min-height:46px;margin:0!important;text-align:left;white-space:normal}
+.fire-choice[aria-pressed="true"]{background:#ffc09a;color:#351b1b;border-color:#ffc09a;font-weight:850}
+.fire-feedback,.fire-progress{padding:10px 12px;border-left:3px solid #ffc09a;background:#ffffff0b;color:#fff4df;line-height:1.55}
+.fire-verdict{margin:14px 0;padding:16px;border:1px solid #ffb38a;border-radius:14px;background:#311d26;color:#fff1e7;line-height:1.65;font-weight:700}
+.fire-source{margin:16px 0;padding:14px;border:1px solid #ffb38a80;border-radius:14px;background:#2b1b27;line-height:1.6}
+.fire-source summary{cursor:pointer;color:#ffc09a;font-weight:800}
+.fire-source p{color:#f0dfd7}
+.fire-source a{display:inline-block;margin:6px 0}
+@media(max-width:520px){.fire-choices{grid-template-columns:1fr}}
+@media(forced-colors:active){
+ .fire-case,.fire-clue,.fire-feedback,.fire-progress,.fire-verdict,.fire-source{background:Canvas;color:CanvasText;border:1px solid CanvasText;box-shadow:none}
+ .fire-case p,.fire-clue p,.fire-source summary,.fire-source p{color:CanvasText}
+ .fire-choice{background:ButtonFace;color:ButtonText;border:1px solid ButtonText}
+ .fire-choice[aria-pressed="true"]{background:Highlight;color:HighlightText;border-color:Highlight}
+ .fire-source a{color:LinkText;text-decoration:underline}
+}
 </style></head><body><a class="skip" href="#experience">Skip to experience</a><main class="wrap"><header><div class="brand">WIDEN <span aria-hidden="true">✳</span></div><div class="status">EXPERIENCE LAB · LOCAL ONLY</div></header>
 <div class="eyebrow">A small doorway into a much bigger world</div><h1>Come curious.<br><em>Leave freely.</em></h1><p class="lead">Pick a mood. Follow a thread. Challenge a claim. Or simply stay for the atmosphere. No algorithm begging you to keep scrolling.</p>
 <p class="note" id="visitNotice">This visit is local and temporary. Changing moods clears the current conversation, unfinished activity, and any finished keepsake; make a new one whenever you wish. Nothing is saved or sent. All six experimental moods are available in this local prototype.</p><nav class="moods" aria-label="Choose your mood"><button class="mood" data-mood="cafe" aria-pressed="true">☕ Café au lait</button><button class="mood" data-mood="curiosity" aria-pressed="false">🗝️ Curiosity</button><button class="mood" data-mood="events" aria-pressed="false">🛰️ Current events</button><button class="mood" data-mood="cozy" aria-pressed="false">🕯️ Cozy</button><button class="mood" data-mood="fire" aria-pressed="false">🔥 Hair on fire</button><button class="mood" data-mood="party" aria-pressed="false">🪩 Party</button></nav>
@@ -140,14 +167,14 @@ cafe:{icon:'☕',kind:'A TABLE FOR WONDERING',headline:'Coffee, conversation, an
 curiosity:{icon:'🗝️',kind:'THE OBJECT ON THE TABLE',headline:'A page from the early web. What did it leave out?',description:'One preserved page, one sentence, three ways to look. The archive is real; your interpretation is yours.',next:'A later copy survives. The original wording stays unknown.',claim:'This object is the W3C history archive copy dated 3 November 1992, not the original 1991 page. CERN says the original page changed daily and no screenshots were made; this copy cannot establish the exact first wording.'},
 events:{icon:'🛰️',kind:'ONE EVENT · THREE QUESTIONS',headline:'A spacecraft is gone. Its data is not.',description:'A dated encounter with one event: what is confirmed, where the account comes from, and what the linked reports do not settle. One story, not a stream.',next:'The spacecraft is gone. The measurements remain.',claim:'Archive snapshot dated 8 November 2026. NASA reports Swift re-entered over North Sumatra on 4 November at 7:39 a.m. EST. The linked sources do not provide a confirmed debris-recovery account.'},
 cozy:{icon:'🕯️',kind:'A MOMENT TO LINGER',headline:'A room with no demands.',description:'A quiet invitation: notice one detail around you that you usually overlook. You do not have to share it.',next:'A cup cools. Light shifts. The room is allowed to be quiet.',claim:'Reflective exercise, not a sourced factual claim.'},
-fire:{icon:'🔥',kind:'THE CLAIM CLINIC',headline:'“Everyone is talking about it.” Are they?',description:'A dramatic headline is not evidence. Ask: who measured “everyone,” over what period, and against which baseline?',next:'Look for the original study, its sample size, its date, and whether the headline changed the meaning.',claim:'This is a fictional example of a misleading claim. It is NOT a real report or a verified current event.'},
+fire mood copy,
 party:{icon:'🪩',kind:'THE PLAYFUL DETOUR',headline:'An invitation to delightful nonsense.',description:'Invent a new holiday in fifteen seconds. No ranking, no winning, no forced participation.',next:'The Festival of Lost Socks: everyone wears two different stories.',claim:'Creative fiction, not a factual assertion.'}
 };
-let current='cafe', explored=false;let cafeKeep='';let curiosityKeep='',curiosityDraft='',curiosityLens='';let holidayKeep='';let holidayDraft={theme:'Lost Socks',ritual:'wear mismatched socks',rule:'participation is optional'};let eventKeep='';document.body.dataset.activeMood=current;
-const activity={cafe:['Ask an open question','A question to carry away'],curiosity:['Examine the object','A question to carry away'],events:['Open one story','A question to carry away'],cozy:['Let the room be quiet','Stay as long as you like'],fire:['Inspect the headline','What the claim leaves out'],party:['Invent a holiday','A tiny celebration']};
+let current='cafe', explored=false;let cafeKeep='';let curiosityKeep='',curiosityDraft='',curiosityLens='';let holidayKeep='';let holidayDraft={theme:'Lost Socks',ritual:'wear mismatched socks',rule:'participation is optional'};let eventKeep='';let fireKeep='',fireReadings={origin:'',measure:'',echo:''},fireReviewed={origin:false,measure:false,echo:false},fireVerdict='';document.body.dataset.activeMood=current;
+const activity={cafe:['Ask an open question','A question to carry away'],curiosity:['Examine the object','A question to carry away'],events:['Open one story','A question to carry away'],cozy:['Let the room be quiet','Stay as long as you like'],fire:['Open the evidence desk','A cautious reading'],party:['Invent a holiday','A tiny celebration']};
 const $=id=>document.getElementById(id);
 function show(){document.body.dataset.activeMood=current;const m=moods[current];$('cafeConversation').hidden=current!=='cafe';$('experience').classList.toggle('single-room',current!=='cafe');$('activity').hidden=true;$('activity').replaceChildren();$('explore').setAttribute('aria-expanded','false');$('visual').textContent=m.icon;$('kind').textContent=m.kind;$('headline').textContent=explored?m.next:m.headline;$('description').textContent=m.description;$('evidence').classList.add('hidden');$('explore').textContent=explored?'Hide this activity':activity[current][0];$('verify').textContent=current==='fire'?'Inspect provenance':'What is this based on?';document.querySelectorAll('[data-mood]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mood===current)));}
-document.querySelectorAll('[data-mood]').forEach(b=>b.addEventListener('click',()=>{if(current===b.dataset.mood)return;current=b.dataset.mood;explored=false;cafeKeep='';curiosityKeep='';curiosityDraft='';curiosityLens='';holidayKeep='';holidayDraft={theme:'Lost Socks',ritual:'wear mismatched socks',rule:'participation is optional'};eventKeep='';$('keepsakeLine').textContent='';conversationTurn=0;clearDialogueChoices();$('chat').replaceChildren();dialogueBubble('muse','Welcome. You can talk, wander, or say nothing at all.');show();$('headline').focus();}));
+document.querySelectorAll('[data-mood]').forEach(b=>b.addEventListener('click',()=>{if(current===b.dataset.mood)return;current=b.dataset.mood;explored=false;cafeKeep='';curiosityKeep='';curiosityDraft='';curiosityLens='';holidayKeep='';holidayDraft={theme:'Lost Socks',ritual:'wear mismatched socks',rule:'participation is optional'};eventKeep='';fireKeep='';fireReadings={origin:'',measure:'',echo:''};fireReviewed={origin:false,measure:false,echo:false};fireVerdict='';$('keepsakeLine').textContent='';conversationTurn=0;clearDialogueChoices();$('chat').replaceChildren();dialogueBubble('muse','Welcome. You can talk, wander, or say nothing at all.');show();$('headline').focus();}));
 // This is a locally scripted interaction: no network, storage, or participant messaging.
 function activityButton(label,fn){const b=document.createElement('button');b.type='button';b.className='action secondary';b.textContent=label;b.addEventListener('click',fn);return b;}
 function renderActivity(){const a=$('activity');a.replaceChildren();a.hidden=false;$('explore').setAttribute('aria-expanded','true');
@@ -259,7 +286,72 @@ const carry=activityButton('Carry this question into the café',()=>{eventKeep='
 story.append(stamp,title,lead,confirmed,unresolved,modelling,trail,question,carry);a.append(story);
 }
 if(current==='cozy'){const p=document.createElement('p');p.setAttribute('role','status');p.setAttribute('aria-live','polite');p.textContent='Nothing to complete. No countdown, score, or next step.';a.append(p,activityButton('Let the room settle',()=>{p.textContent='The room is quiet. You may stay here without doing anything.';}));}
-if(current==='fire'){const p=document.createElement('p');p.textContent='Fictional headline: “Everyone is talking about it.” Nothing about its origin is verified. Mark each missing field UNKNOWN, rather than guessing.';a.append(p);const fields=[['Publisher','No publisher is identified.'],['Publication date','No date was supplied.'],['Population or sample','“Everyone” is not a defined sample.'],['Method','No measurement or method is provided.'],['What would disprove it?','No testable definition has been provided.']];let marked=0;const count=document.createElement('p');count.setAttribute('role','status');count.textContent='0 of 5 missing fields identified.';fields.forEach(([name,reason])=>{const row=document.createElement('div');row.className='unknown-field';const desc=document.createElement('span');desc.textContent=name+' — '+reason;const mark=activityButton('Mark UNKNOWN',()=>{if(mark.getAttribute('aria-pressed')==='true')return;mark.setAttribute('aria-pressed','true');mark.textContent='UNKNOWN';mark.setAttribute('aria-label',name+': UNKNOWN');marked++;count.textContent=marked===fields.length?'Complete: all five missing fields are visibly UNKNOWN. Being honest about uncertainty is the result.':marked+' of 5 missing fields identified.';});mark.setAttribute('aria-label','Mark '+name+' as unknown');mark.setAttribute('aria-pressed','false');row.append(desc,mark);a.append(row);});a.append(count);}
+if(current==='fire'){
+ const caseFile=document.createElement('section');caseFile.className='fire-case';caseFile.setAttribute('aria-labelledby','fireCaseTitle');
+ const stamp=document.createElement('p');stamp.className='fire-stamp';stamp.textContent='FICTIONAL PRACTICE CASE · NOT A REAL EVENT';
+ const title=document.createElement('h3');title.id='fireCaseTitle';title.textContent='Everyone is talking about it.';
+ const summary=document.createElement('p');summary.textContent='A cropped screenshot claims a citywide trend. Three reposts echo it. No original link is attached.';
+ const boundary=document.createElement('p');boundary.className='fire-case-note';boundary.textContent='This example is invented. It describes no real city, group, or event. The task is to inspect what the material can support—not to guess whether a real claim is true.';
+ caseFile.append(stamp,title,summary,boundary);a.append(caseFile);
+ const clues=[
+  {key:'origin',number:'01 · ORIGIN',title:'Where did it begin?',evidence:'The only artifact is a cropped screenshot with no account name, byline, date, or original URL.',choices:['It identifies the original publisher','It shows only that a screenshot exists','It proves the claim is false','Leave this clue open'],cautious:'It establishes only that a screenshot exists. It does not identify who created it or whether the claim is true.'},
+  {key:'measure',number:'02 · MEASURE',title:'What does “everyone” mean?',evidence:'The caption names no population, place, time window, count, or sampling method.',choices:['It is a representative count','It is an undefined reach claim','It proves citywide consensus','Leave this clue open'],cautious:'“Everyone” is an undefined reach claim. Without a defined group, time window, and method, it cannot be measured.'},
+  {key:'echo',number:'03 · CORROBORATION',title:'Are the echoes independent?',evidence:'Three posts repeat the same screenshot and link to one another. None links to a primary source or independent report.',choices:['Three independent confirmations','One claim repeated three times','A representative sample','Leave this clue open'],cautious:'Repetition is not independence. These posts trace back to one screenshot, so they do not provide three separate confirmations.'}
+ ];
+ const progress=document.createElement('p');progress.id='fireProgress';progress.className='fire-progress';progress.setAttribute('role','status');progress.setAttribute('aria-live','polite');progress.setAttribute('aria-atomic','true');
+ const reviewedCount=()=>Object.values(fireReviewed).filter(Boolean).length;
+ const updateProgress=()=>{const n=reviewedCount();progress.textContent=n+' of 3 clues compared. You can stop here or leave any clue open.';};
+ clues.forEach(clue=>{
+  const card=document.createElement('section');card.className='fire-clue';card.setAttribute('aria-labelledby','fire-'+clue.key+'-title');
+  const kicker=document.createElement('p');kicker.className='fire-kicker';kicker.textContent=clue.number;
+  const heading=document.createElement('h3');heading.id='fire-'+clue.key+'-title';heading.textContent=clue.title;
+  const evidence=document.createElement('p');evidence.className='fire-evidence';evidence.textContent=clue.evidence;
+  const prompt=document.createElement('p');prompt.className='fire-prompt';prompt.textContent='What can this clue establish? Choose a reading, or leave it open.';
+  const group=document.createElement('div');group.className='fire-choices';group.setAttribute('role','group');group.setAttribute('aria-label',clue.title+' readings');
+  clue.choices.forEach(choice=>{
+   const button=activityButton('Choose reading: '+choice,()=>{
+    fireReadings[clue.key]=choice;fireReviewed[clue.key]=false;fireVerdict='';fireKeep='';$('keepsakeLine').textContent='';
+    group.querySelectorAll('button').forEach(other=>other.setAttribute('aria-pressed',String(other===button)));
+    progress.textContent='Your reading stays in this page only. Compare the clue when you are ready.';
+    feedback.textContent='Your reading: '+choice+'. You can compare it with the cautious reading below.';
+    verdict.textContent='Your reading changed. Compare the clue and build the cautious reading again before carrying it.';
+    carry.disabled=true;
+   });
+   button.className='action secondary fire-choice';button.setAttribute('aria-label','Choose reading: '+choice);button.setAttribute('aria-pressed',String(fireReadings[clue.key]===choice));group.append(button);
+  });
+  const compare=activityButton('Compare this clue',()=>{
+   fireReviewed[clue.key]=true;
+   const chosen=fireReadings[clue.key]||'You left your reading open';
+   feedback.textContent=chosen+'. What this clue can establish: '+clue.cautious;
+   updateProgress();
+  });
+  const feedback=document.createElement('p');feedback.className='fire-feedback';feedback.id='fire-'+clue.key+'-feedback';feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');feedback.setAttribute('aria-atomic','true');
+  if(fireReviewed[clue.key])feedback.textContent=(fireReadings[clue.key]||'You left your reading open')+'. What this clue can establish: '+clue.cautious;
+  card.append(kicker,heading,evidence,prompt,group,compare,feedback);a.append(card);
+ });
+ updateProgress();
+ const build=activityButton('Build a cautious reading',()=>{
+  const n=reviewedCount();
+  if(n!==3){fireVerdict='';verdict.textContent='INCOMPLETE REVIEW — '+n+' of 3 clues compared. The unexamined parts stay open; no verdict yet.';carry.disabled=true;return;}
+  fireVerdict='UNVERIFIED — NOT DISPROVED. This fictional material does not establish the headline. It lacks a traceable origin, a defined measure, and independent corroboration. That is not proof that the claim is false; this evidence cannot tell us either way.';
+  verdict.textContent=fireVerdict;carry.disabled=false;
+ });
+ const verdict=document.createElement('p');verdict.id='fireVerdict';verdict.className='fire-verdict';verdict.setAttribute('role','status');verdict.setAttribute('aria-live','polite');verdict.setAttribute('aria-atomic','true');
+ if(fireVerdict){verdict.textContent=fireVerdict;}
+ const carry=activityButton('Carry this cautious reading',()=>{
+  if(!fireVerdict){verdict.textContent='Compare all three clues and build a cautious reading before carrying it.';return;}
+  fireKeep=fireVerdict;verdict.textContent='For your visit receipt: '+fireKeep+' Nothing is saved or sent.';
+ });
+ carry.id='fireCarry';carry.disabled=!fireVerdict;
+ a.append(progress,build,verdict,carry);
+ const source=document.createElement('details');source.className='fire-source';
+ const sourceSummary=document.createElement('summary');sourceSummary.textContent='A real method to take away · Digital Inquiry Group';
+ const sourceNote=document.createElement('p');sourceNote.textContent='Digital Inquiry Group’s Civic Online Reasoning curriculum draws on research with professional fact-checkers. Its three recurring questions are: Who is behind the information? What is the evidence? What do other sources say? This method guides investigation; it does not decide truth by itself.';
+ const newTab=document.createElement('span');newTab.id='fireNewTabNote';newTab.className='sr-only';newTab.textContent='Opens in a new tab.';
+ const link=document.createElement('a');link.href='https://cor.inquirygroup.org/about/';link.target='_blank';link.rel='noopener noreferrer';link.textContent='Digital Inquiry Group · About Civic Online Reasoning';link.setAttribute('aria-describedby','fireSourceRoleNote fireNewTabNote');
+ const roleNote=document.createElement('p');roleNote.id='fireSourceRoleNote';roleNote.className='fire-source-note';roleNote.textContent='Source role: the group describes the research basis and three questions used in its Civic Online Reasoning approach.';
+ source.append(sourceSummary,sourceNote,link,roleNote,newTab);a.append(source);
+}
 if(current==='party'){const p=document.createElement('p');p.textContent='Invent your own holiday: pick one theme, one ritual, and one rule. No scores, no winners.';a.append(p);const picker=(name,choices,selected)=>{const label=document.createElement('label');label.className='composer-label';label.textContent=name;const s=document.createElement('select');s.className='local-select';s.setAttribute('aria-label',name);choices.forEach(c=>{const option=document.createElement('option');option.value=c;option.textContent=c;s.append(option);});if(choices.includes(selected))s.value=selected;label.append(s);a.append(label);return s;};const theme=picker('Theme',['Lost Socks','Unfinished Stories','Tiny Triumphs'],holidayDraft.theme);const ritual=picker('Ritual',['wear mismatched socks','leave a story without an ending','celebrate finding your keys'],holidayDraft.ritual);const rule=picker('One rule',['participation is optional','no ranking','everyone may leave freely'],holidayDraft.rule);const output=document.createElement('p');output.setAttribute('role','status');output.setAttribute('aria-live','polite');output.textContent=holidayKeep?'For your visit receipt: '+holidayKeep:'Choose a theme, ritual, and rule, then invent your holiday.';const updateDraft=()=>{holidayDraft={theme:theme.value,ritual:ritual.value,rule:rule.value};if(holidayKeep){holidayKeep='';output.textContent='Your choices changed. Invent your holiday again to update your receipt.';}else{output.textContent='Your choices changed. Invent your holiday when you are ready.';}};[theme,ritual,rule].forEach(select=>select.addEventListener('change',updateDraft));a.append(activityButton('Invent my holiday',()=>{holidayDraft={theme:theme.value,ritual:ritual.value,rule:rule.value};holidayKeep='The Day of '+theme.value+': '+ritual.value+'; '+rule.value+'.';output.textContent=holidayKeep+' Make a keepsake below if you want to take it with you.';}),output);}
 }
 $('explore').addEventListener('click',()=>{explored=!explored;show();if(explored){renderActivity();$('activity').focus();}else{$('explore').focus();}});
@@ -363,6 +455,6 @@ $('quiet').addEventListener('click',()=>{
   dialogueBubble('muse','Then we can simply enjoy the quiet. No reply is required. ☕');
   if(focusWasInChoices)$('quiet').focus();
 });
-const takeaway={cafe:'Take one open question into your day. You do not owe anyone an answer.',curiosity:'A page can outlive its first wording. Ask what the archive can prove—and what it cannot.',events:'What remains when an instrument goes quiet?',cozy:'One quiet moment is enough. Nothing needs to be completed.',fire:'When evidence is missing, UNKNOWN is a useful answer.',party:'Invent a celebration that belongs to no algorithm.'};
-$('leave').addEventListener('click',()=>{$('keepsakeLine').textContent='WIDEN CAFÉ RECEIPT · '+(current==='party'&&holidayKeep?holidayKeep:current==='events'&&eventKeep?eventKeep:current==='cafe'&&cafeKeep?cafeKeep:current==='curiosity'&&curiosityKeep?curiosityKeep:takeaway[current])+' · Yours to remember, copy, or leave here. Nothing saved or sent.';});
+const takeaway={cafe:'Take one open question into your day. You do not owe anyone an answer.',curiosity:'A page can outlive its first wording. Ask what the archive can prove—and what it cannot.',events:'What remains when an instrument goes quiet?',cozy:'One quiet moment is enough. Nothing needs to be completed.',fire:'UNVERIFIED is not the same as false. Ask what the evidence can actually establish.',party:'Invent a celebration that belongs to no algorithm.'};
+$('leave').addEventListener('click',()=>{$('keepsakeLine').textContent='WIDEN CAFÉ RECEIPT · '+(current==='party'&&holidayKeep?holidayKeep:current==='events'&&eventKeep?eventKeep:current==='cafe'&&cafeKeep?cafeKeep:current==='curiosity'&&curiosityKeep?curiosityKeep:current==='fire'&&fireKeep?fireKeep:takeaway[current])+' · Yours to remember, copy, or leave here. Nothing saved or sent.';});
 </script></body></html>

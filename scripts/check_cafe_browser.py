@@ -194,7 +194,14 @@ def check(browser, width, height, name):
     assert page.locator("#join").get_attribute("aria-expanded") == "true"
     assert page.locator("#dialogueChoices").is_visible()
     assert page.locator("#dialogueChoices").get_attribute("role") == "group"
+    page.get_by_role("button", name="Answer", exact=True).click()
+    assert page.locator("#dialogueInput").get_attribute("aria-invalid") == "true"
+    assert "Add a thought before choosing Answer" in page.locator("#dialogueInputStatus").inner_text()
+    assert page.locator("#dialogueInput").get_attribute("aria-describedby") == "dialogueInputHint dialogueInputStatus"
+    assert page.locator("#dialogueInput").evaluate("(el) => document.activeElement === el")
     page.locator("#dialogueInput").fill("What does listening mean?")
+    assert page.locator("#dialogueInput").get_attribute("aria-invalid") is None
+    assert page.locator("#dialogueInputStatus").inner_text() == ""
     page.get_by_role("button", name="Answer", exact=True).click()
     redirect = "Could we talk about the question behind the question?"
     page.locator("#dialogueInput").fill(redirect)

@@ -196,8 +196,14 @@ function dialogueChoices(restoreKeyboardFocus=false){
   label.setAttribute('for','dialogueInput');
   const input=document.createElement('input');input.id='dialogueInput';input.maxLength=160;
   input.autocomplete='off';input.spellcheck=false;
+  input.setAttribute('aria-describedby','dialogueInputHint dialogueInputStatus');
   input.style.cssText='width:100%;padding:12px;margin:8px 0;border-radius:10px;background:#211b28;color:#fff4df;border:1px solid #ffffff70;font:inherit';
-  box.append(label,input);
+  const hint=document.createElement('p');hint.id='dialogueInputHint';hint.className='note';
+  hint.textContent='Optional. Add a thought only if you choose Answer; asking something else or staying silent needs no text.';
+  const validation=document.createElement('p');validation.id='dialogueInputStatus';validation.className='note';
+  validation.setAttribute('role','status');validation.setAttribute('aria-live','polite');validation.setAttribute('aria-atomic','true');
+  input.addEventListener('input',()=>{if(validation.textContent){validation.textContent='';input.removeAttribute('aria-invalid');}});
+  box.append(label,input,hint,validation);
   [['Answer', 'answer'],['Ask something else','deflect'],['Stay silent','silence']].forEach(([name,choice])=>{
     box.append(activityButton(name,()=>replyDialogue(choice,input.value.trim())));
   });
@@ -219,9 +225,13 @@ function replyDialogue(choice,input){
   }
   if(choice==='answer'&&!input){
     const field=$('dialogueInput');
-    if(field){field.focus();field.placeholder='Or choose another question or silence';}
+    const status=$('dialogueInputStatus');
+    if(status)status.textContent='Add a thought before choosing Answer. You can also ask something else or stay silent.';
+    if(field){field.setAttribute('aria-invalid','true');field.focus();}
     return;
   }
+  const field=$('dialogueInput');
+  if(field)field.removeAttribute('aria-invalid');
   dialogueBubble('visitor',choice==='deflect'?(input||'Could we take another direction?'):input);
   if(conversationTurn===1){
     dialogueBubble('muse',choice==='deflect'?'Then here is a gentler question: what was one small good thing today?':'You put a thought on the table. What part of it would you like to explore, without having to settle it?');

@@ -215,8 +215,16 @@ def main():
             # Replacing a clicked response must focus the replacement input.
             page.locator("#join").click()
             page.get_by_role("button", name="Answer", exact=True).click()
+            assert page.locator("#dialogueInput").get_attribute("aria-invalid") == "true"
+            assert "Add a thought before choosing Answer" in page.locator("#dialogueInputStatus").inner_text()
+            assert page.locator("#dialogueInput").get_attribute("aria-describedby") == "dialogueInputHint dialogueInputStatus"
             assert page.locator("#join").get_attribute("aria-expanded") == "true"
             assert page.locator("#dialogueChoices").is_visible()
+            assert page.locator("#dialogueInput").evaluate("(el) => document.activeElement === el")
+            page.locator("#dialogueInput").fill("A small thought")
+            assert page.locator("#dialogueInput").get_attribute("aria-invalid") is None
+            assert page.locator("#dialogueInputStatus").inner_text() == ""
+            page.get_by_role("button", name="Answer", exact=True).click()
             assert page.locator("#dialogueInput").evaluate("(el) => document.activeElement === el")
             # Mood switching must discard an unfinished local conversation,
             # remove its temporary controls, and put focus on the new heading.

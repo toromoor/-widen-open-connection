@@ -112,12 +112,12 @@ def main():
             trail.locator("summary").click()
             assert trail.evaluate("(el) => el.open")
             assert "not two independent tracking measurements" in trail.inner_text()
-    assert "thermospheric density" in story.inner_text()
-    assert "not a second observation" in story.inner_text()
+            assert "thermospheric density" in story.inner_text()
+            assert "not a second observation" in story.inner_text()
             assert "Cecilia Chirenti, Robert Nemiroff, Jerry Bonnell, and Keighley Rockcliffe" in trail.inner_text()
             nasa_mission = page.get_by_role("link", name="NASA mission update · Alise Fisher · 2 Nov 2026, updated 4 Nov")
             swift_archive = page.get_by_role("link", name="NASA Swift Archive · public observation data")
-    ccmc = page.get_by_role("link", name="NASA CCMC · Swift re-entry modelling challenge + public data · updated 8 Nov 2026")
+            ccmc = page.get_by_role("link", name="NASA CCMC · Swift re-entry modelling challenge + public data · updated 8 Nov 2026")
             assert swift_archive.get_attribute("href") == "https://swift.gsfc.nasa.gov/archive/"
             assert nasa_mission.get_attribute("href") == "https://science.nasa.gov/blogs/swift/2026/11/02/nasas-swift-observatory-to-re-enter-atmosphere/"
             nasa_apod = page.get_by_role("link", name="NASA APOD · “A Farewell to Swift” · 6 Nov 2026")
@@ -131,9 +131,9 @@ def main():
                 assert page.locator(f"#{note_id}").is_visible()
             assert "U.S. Space Force confirmed" in page.locator("#missionRoleNote").inner_text()
             assert "public search and retrieval routes" in page.locator("#archiveRoleNote").inner_text()
-    assert ccmc.get_attribute("href") == "https://ccmc.gsfc.nasa.gov/swift-challenge/index.php"
-    assert "thermospheric-density uncertainty" in page.locator("#ccmcRoleNote").inner_text()
-    assert "not an independent observation" in page.locator("#ccmcRoleNote").inner_text()
+            assert ccmc.get_attribute("href") == "https://ccmc.gsfc.nasa.gov/swift-challenge/index.php"
+            assert "thermospheric-density uncertainty" in page.locator("#ccmcRoleNote").inner_text()
+            assert "not an independent observation" in page.locator("#ccmcRoleNote").inner_text()
             assert "not re-entry tracking" in page.locator("#archiveRoleNote").inner_text()
             assert "Two publishers, five links" in trail.inner_text()
             assert "Retrospective image and mission context" in page.locator("#apodRoleNote").inner_text()

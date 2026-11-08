@@ -124,30 +124,72 @@ def check(browser, width, height, name):
     page.locator("#leave").click()
     assert "The Day of Tiny Triumphs" in page.locator("#keepsakeLine").inner_text()
 
-    # Curiosity is a thought experiment, not a news container.
+    # Curiosity is a source-grounded object encounter, not a questionnaire.
     page.locator("[data-mood='curiosity']").click()
-    page.get_by_role("button", name="Try the nameless challenge").click()
-    assert page.locator("#activity details.source-card").count() == 0
-    curiosity_input = page.locator("#activity input")
-    assert page.get_by_label("Your description (optional)").count() == 1
-    assert curiosity_input.get_attribute("id") == "curiosityDescription"
-    assert curiosity_input.get_attribute("aria-describedby") == "curiosityDescriptionNote"
-    assert page.locator("#curiosityDescriptionNote").is_visible()
-    assert "non-identifying" in page.locator("#curiosityDescriptionNote").inner_text()
-    assert "nothing is saved or sent" in page.locator("#curiosityDescriptionNote").inner_text()
-    curiosity_text = "A voice like rain on a window"
-    assert curiosity_input.get_attribute("maxlength") == "180"
-    assert page.locator("#activity [role='status']").get_attribute("aria-live") == "polite"
-    curiosity_input.fill(curiosity_text)
-    page.get_by_role("button", name="Reflect locally").click()
-    curiosity_result = page.locator("#activity [role='status']")
-    assert curiosity_text in curiosity_result.inner_text()
-    assert "Your words stay in this browser" in curiosity_result.inner_text()
-    hostile_description = "<img src=x onerror=alert(1)>"
-    curiosity_input.fill(hostile_description)
-    page.get_by_role("button", name="Reflect locally").click()
-    assert hostile_description in curiosity_result.inner_text()
+    page.get_by_role("button", name="Examine the object").click()
+    artifact = page.locator("#activity .artifact-card")
+    assert artifact.count() == 1
+    assert "A SURVIVING COPY · 3 NOVEMBER 1992" in artifact.inner_text()
+    assert "not a transcript of the page as first published in 1991" in artifact.inner_text()
+    assert "The WorldWideWeb (W3) is a wide-area hypermedia information retrieval initiative" in artifact.locator("blockquote").inner_text()
+    assert "not proof of the exact first wording" in artifact.inner_text()
+    assert page.locator("#activity details.artifact-sources").count() == 1
+    w3c = page.get_by_role("link", name="W3C archive copy · 3 Nov 1992")
+    cern_record = page.get_by_role("link", name="CERN historical record · what survives")
+    cern_history = page.get_by_role("link", name="CERN · where the web was born")
+    assert w3c.get_attribute("href") == "https://www.w3.org/History/19921103-hypertext/hypertext/WWW/TheProject.html"
+    assert cern_record.get_attribute("href") == "https://cds.cern.ch/record/1997535"
+    assert cern_history.get_attribute("href") == "https://home.cern/science/computing/the-birth-of-the-web/where-web-was-born/"
+    for link, note_id in [(w3c, "curiosityW3cRole"), (cern_record, "curiosityCernRecordRole"), (cern_history, "curiosityCernHistoryRole")]:
+        assert link.get_attribute("aria-describedby") == f"{note_id} curiosityExternalLinkNote"
+        assert "noopener" in link.get_attribute("rel") and "noreferrer" in link.get_attribute("rel")
+    page.locator("details.artifact-back summary").click()
+    assert page.locator("details.artifact-back").evaluate("(el) => el.open")
+    assert "no screenshots of that original page exist" in page.locator("details.artifact-back").inner_text()
+    access = page.get_by_role("button", name="Look through the access lens")
+    discovery = page.get_by_role("button", name="Look through the discovery lens")
+    stewardship = page.get_by_role("button", name="Look through the stewardship lens")
+    for lens, prompt in [(access, "Who is included in universal access"), (discovery, "Who or what makes it discoverable"), (stewardship, "Who keeps a link alive")]:
+        lens.click()
+        assert lens.get_attribute("aria-pressed") == "true"
+        assert prompt in page.locator("#curiosityLensResult").inner_text()
+    access.click()
+    curiosity_input = page.locator("#curiosityQuestion")
+    assert page.get_by_label("Your question (optional)").count() == 1
+    assert curiosity_input.get_attribute("maxlength") == "240"
+    assert curiosity_input.get_attribute("aria-describedby") == "curiosityQuestionNote"
+    assert page.locator("#curiosityQuestionNote").is_visible()
+    assert "nothing is saved, sent, or shown to another visitor" in page.locator("#curiosityQuestionNote").inner_text()
+    assert page.locator("#curiosityQuestionResult").get_attribute("aria-live") == "polite"
+    page.get_by_role("button", name="Carry my question").click()
+    assert "Write a question first" in page.locator("#curiosityQuestionResult").inner_text()
+    assert curiosity_input.evaluate("(el) => document.activeElement === el")
+    hostile_question = "<img src=x onerror=alert(1)>"
+    curiosity_input.fill(hostile_question)
+    page.get_by_role("button", name="Carry my question").click()
+    assert hostile_question in page.locator("#curiosityQuestionResult").inner_text()
+    assert "Access lens" in page.locator("#curiosityQuestionResult").inner_text()
     assert page.locator("#activity img").count() == 0
+    page.locator("#leave").click()
+    assert hostile_question in page.locator("#keepsakeLine").inner_text()
+    curiosity_input.fill("An edited question that is not carried yet")
+    assert "not on the receipt yet" in page.locator("#curiosityQuestionResult").inner_text()
+    page.locator("#leave").click()
+    assert "An edited question" not in page.locator("#keepsakeLine").inner_text()
+    assert hostile_question not in page.locator("#keepsakeLine").inner_text()
+    page.get_by_role("button", name="Carry my question").click()
+    assert "An edited question that is not carried yet" in page.locator("#curiosityQuestionResult").inner_text()
+    page.locator("#explore").click()
+    page.locator("#explore").click()
+    assert page.locator("#curiosityQuestion").input_value() == "An edited question that is not carried yet"
+    assert page.get_by_role("button", name="Look through the access lens").get_attribute("aria-pressed") == "true"
+    assert "For your visit receipt" in page.locator("#curiosityQuestionResult").inner_text()
+    page.locator("[data-mood='party']").click()
+    assert page.locator("#keepsakeLine").inner_text() == ""
+    page.locator("[data-mood='curiosity']").click()
+    page.get_by_role("button", name="Examine the object").click()
+    assert page.locator("#curiosityQuestion").input_value() == ""
+    assert page.get_by_role("button", name="Look through the access lens").get_attribute("aria-pressed") == "false"
 
     # Current Events is one dated story with an inspectable source trail, not a feed.
     page.locator("[data-mood='events']").click()

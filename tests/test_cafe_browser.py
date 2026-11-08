@@ -153,30 +153,72 @@ def main():
             assert "For your visit receipt" in event_question.inner_text()
             page.locator("#leave").click()
             assert "What remains when an instrument goes quiet?" in page.locator("#keepsakeLine").inner_text()
-            # Curiosity remains a separate local thought experiment.
+            # Curiosity is a source-grounded object encounter with a voluntary keepsake.
             page.locator('[data-mood="curiosity"]').click()
             page.locator("#explore").click()
-            # Exercise local-only input and composition, not just mood navigation.
-            curiosity_input = page.locator("#activity input")
-            assert page.get_by_label("Your description (optional)").count() == 1
-            assert curiosity_input.get_attribute("id") == "curiosityDescription"
-            assert curiosity_input.get_attribute("aria-describedby") == "curiosityDescriptionNote"
-            assert page.locator("#curiosityDescriptionNote").is_visible()
-            assert "non-identifying" in page.locator("#curiosityDescriptionNote").inner_text()
-            assert "nothing is saved or sent" in page.locator("#curiosityDescriptionNote").inner_text()
-            curiosity_text = "A person who listens before speaking"
-            assert curiosity_input.get_attribute("maxlength") == "180"
-            assert page.locator("#activity [role='status']").get_attribute("aria-live") == "polite"
-            curiosity_input.fill(curiosity_text)
-            page.get_by_role("button", name="Reflect locally").click()
-            curiosity_result = page.locator("#activity [role='status']")
-            assert curiosity_text in curiosity_result.inner_text()
-            assert "Your words stay in this browser" in curiosity_result.inner_text()
-            hostile_description = "<img src=x onerror=alert(1)>"
-            curiosity_input.fill(hostile_description)
-            page.get_by_role("button", name="Reflect locally").click()
-            assert hostile_description in curiosity_result.inner_text()
+            artifact = page.locator("#activity .artifact-card")
+            assert artifact.count() == 1
+            assert "A SURVIVING COPY · 3 NOVEMBER 1992" in artifact.inner_text()
+            assert "not a transcript of the page as first published in 1991" in artifact.inner_text()
+            assert "The WorldWideWeb (W3) is a wide-area hypermedia information retrieval initiative" in artifact.locator("blockquote").inner_text()
+            assert "not proof of the exact first wording" in artifact.inner_text()
+            w3c = page.get_by_role("link", name="W3C archive copy · 3 Nov 1992")
+            cern_record = page.get_by_role("link", name="CERN historical record · what survives")
+            cern_history = page.get_by_role("link", name="CERN · where the web was born")
+            assert w3c.get_attribute("href") == "https://www.w3.org/History/19921103-hypertext/hypertext/WWW/TheProject.html"
+            assert cern_record.get_attribute("href") == "https://cds.cern.ch/record/1997535"
+            assert cern_history.get_attribute("href") == "https://home.cern/science/computing/the-birth-of-the-web/where-web-was-born/"
+            for link, note_id in [(w3c, "curiosityW3cRole"), (cern_record, "curiosityCernRecordRole"), (cern_history, "curiosityCernHistoryRole")]:
+                assert link.get_attribute("aria-describedby") == f"{note_id} curiosityExternalLinkNote"
+                assert "noopener" in link.get_attribute("rel") and "noreferrer" in link.get_attribute("rel")
+            page.locator("details.artifact-back summary").click()
+            assert page.locator("details.artifact-back").evaluate("(el) => el.open")
+            assert "no screenshots of that original page exist" in page.locator("details.artifact-back").inner_text()
+            access = page.get_by_role("button", name="Look through the access lens")
+            discovery = page.get_by_role("button", name="Look through the discovery lens")
+            stewardship = page.get_by_role("button", name="Look through the stewardship lens")
+            for lens, prompt in [(access, "Who is included in universal access"), (discovery, "Who or what makes it discoverable"), (stewardship, "Who keeps a link alive")]:
+                lens.click()
+                assert lens.get_attribute("aria-pressed") == "true"
+                assert prompt in page.locator("#curiosityLensResult").inner_text()
+            access.click()
+            curiosity_input = page.locator("#curiosityQuestion")
+            assert page.get_by_label("Your question (optional)").count() == 1
+            assert curiosity_input.get_attribute("maxlength") == "240"
+            assert curiosity_input.get_attribute("aria-describedby") == "curiosityQuestionNote"
+            assert page.locator("#curiosityQuestionNote").is_visible()
+            assert "nothing is saved, sent, or shown to another visitor" in page.locator("#curiosityQuestionNote").inner_text()
+            assert page.locator("#curiosityQuestionResult").get_attribute("aria-live") == "polite"
+            page.get_by_role("button", name="Carry my question").click()
+            assert "Write a question first" in page.locator("#curiosityQuestionResult").inner_text()
+            assert curiosity_input.evaluate("(el) => document.activeElement === el")
+            hostile_question = "<img src=x onerror=alert(1)>"
+            curiosity_input.fill(hostile_question)
+            page.get_by_role("button", name="Carry my question").click()
+            assert hostile_question in page.locator("#curiosityQuestionResult").inner_text()
+            assert "Access lens" in page.locator("#curiosityQuestionResult").inner_text()
             assert page.locator("#activity img").count() == 0
+            page.locator("#leave").click()
+            assert hostile_question in page.locator("#keepsakeLine").inner_text()
+            curiosity_input.fill("An edited question that is not carried yet")
+            assert "not on the receipt yet" in page.locator("#curiosityQuestionResult").inner_text()
+            page.locator("#leave").click()
+            assert "An edited question" not in page.locator("#keepsakeLine").inner_text()
+            assert hostile_question not in page.locator("#keepsakeLine").inner_text()
+            page.get_by_role("button", name="Carry my question").click()
+            assert "An edited question that is not carried yet" in page.locator("#curiosityQuestionResult").inner_text()
+            page.locator("#explore").click()
+            page.locator("#explore").click()
+            assert page.locator("#curiosityQuestion").input_value() == "An edited question that is not carried yet"
+            assert page.get_by_role("button", name="Look through the access lens").get_attribute("aria-pressed") == "true"
+            assert "For your visit receipt" in page.locator("#curiosityQuestionResult").inner_text()
+            page.locator('[data-mood="party"]').click()
+            assert page.locator("#keepsakeLine").inner_text() == ""
+            page.locator('[data-mood="curiosity"]').click()
+            page.locator("#explore").click()
+            assert page.locator("#curiosityQuestion").input_value() == ""
+            assert page.get_by_role("button", name="Look through the access lens").get_attribute("aria-pressed") == "false"
+
             page.locator('[data-mood="party"]').click()
             page.locator("#explore").click()
             page.get_by_label("Theme").select_option("Unfinished Stories")
@@ -361,6 +403,32 @@ def main():
             assert metric["background"] != "rgba(0, 0, 0, 0)", f"forced-colors {name} background missing: {metric}"
         assert "underline" in forced_metrics["linkDecoration"], forced_metrics
         assert forced_metrics["link"]["color"] != "rgba(0, 0, 0, 0)", forced_metrics
+
+        forced_page.locator('[data-mood="curiosity"]').click()
+        forced_page.locator("#explore").click()
+        forced_page.get_by_role("button", name="Look through the access lens").click()
+        forced_page.locator("details.artifact-back summary").click()
+        artifact_metrics = forced_page.evaluate("""() => {
+            const style = (selector) => {
+                const el = document.querySelector(selector);
+                const css = getComputedStyle(el);
+                return {borderStyle: css.borderTopStyle, borderWidth: css.borderTopWidth,
+                        background: css.backgroundColor, color: css.color};
+            };
+            return {
+                card: style(".artifact-card"), quote: style(".artifact-quote"),
+                lens: style(".artifact-lens[aria-pressed='true']"),
+                back: style("details.artifact-back"), question: style(".artifact-question"),
+                link: style("details.artifact-sources a"),
+                linkDecoration: getComputedStyle(document.querySelector("details.artifact-sources a")).textDecorationLine
+            };
+        }""")
+        for name in ["card", "quote", "lens", "back", "question"]:
+            metric = artifact_metrics[name]
+            assert metric["borderStyle"] == "solid" and metric["borderWidth"] != "0px", f"forced-colors artifact {name} boundary missing: {metric}"
+            assert metric["background"] != "rgba(0, 0, 0, 0)", f"forced-colors artifact {name} background missing: {metric}"
+        assert "underline" in artifact_metrics["linkDecoration"], artifact_metrics
+        assert artifact_metrics["link"]["color"] != "rgba(0, 0, 0, 0)", artifact_metrics
         assert not forced_outbound, forced_outbound
         forced_context.close()
         print("PASS forced-colors: selected mood, panel boundaries, source links, visible focus and keepsake")

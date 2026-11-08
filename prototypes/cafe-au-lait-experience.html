@@ -17,6 +17,25 @@
 @media(max-width:520px){.unknown-field{flex-direction:column;align-items:flex-start;gap:6px}.unknown-field button{max-width:100%;white-space:normal;text-align:left}}
 .event-story{margin:14px 0;padding:18px;border:1px solid var(--mood-edge);border-radius:18px;background:linear-gradient(145deg,#ffffff12,#00000018);line-height:1.65}.event-story .event-kicker{margin:0 0 10px;color:var(--mood-accent);font-size:.72rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.event-story h3{font-family:Georgia,serif;font-size:clamp(1.45rem,5vw,2rem);font-weight:400;line-height:1.15;margin:8px 0 12px}.event-story p{color:#e5d7d0}.event-story .event-question{padding:12px 14px;border-left:3px solid var(--mood-accent);background:#ffffff0b;color:#fff4df}.event-story .source-card{margin:18px 0 8px}
 
+
+.artifact-card{margin:14px 0;padding:18px;border:1px solid #e7c99a;border-radius:18px;background:#f1e5cc;color:#29231e;box-shadow:0 12px 30px #0003}
+.artifact-card .artifact-kicker{margin:0 0 8px;color:#765538;font-size:.7rem;font-weight:850;letter-spacing:.16em;text-transform:uppercase}
+.artifact-card h3{margin:8px 0 12px;color:#29231e;font:400 clamp(1.45rem,5vw,2rem)/1.12 Georgia,serif}
+.artifact-card .artifact-meta,.artifact-card .artifact-note{color:#655644;font-size:.82rem;line-height:1.55}
+.artifact-quote{margin:16px 0;padding:16px;border-left:4px solid #9b7046;border-radius:0 12px 12px 0;background:#fff8e9;color:#29231e;font:400 clamp(1.12rem,3.5vw,1.42rem)/1.5 Georgia,serif}
+.artifact-lenses{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+.artifact-lens{min-height:58px;padding:10px;border:1px solid #8d7459;border-radius:12px;background:#fff8e9;color:#29231e;font:700 .9rem/1.35 ui-sans-serif,system-ui,sans-serif;text-align:left}
+.artifact-lens[aria-pressed="true"]{background:#29231e;color:#fff1d5;border-color:#29231e}
+.artifact-lens-result{min-height:3.2em;padding:10px 12px;border-left:3px solid #9b7046;background:#fff8e9;color:#29231e;line-height:1.55}
+.artifact-back,.artifact-sources{margin-top:12px;padding:12px;border:1px solid #9b866b;border-radius:12px;background:#f8eedb;color:#29231e}
+.artifact-back summary,.artifact-sources summary{cursor:pointer;font-weight:750;color:#4b3827}
+.artifact-back p,.artifact-sources p{color:#514332;line-height:1.55}
+.artifact-question{margin-top:14px;padding:14px;border:1px dashed #9b7046;border-radius:12px;background:#fff8e9;color:#29231e}
+.artifact-question label{display:block;margin:8px 0;font-weight:750}
+.artifact-question textarea{width:100%;min-height:90px;padding:12px;border:1px solid #8d7459;border-radius:10px;background:#fff;color:#29231e;font:inherit;resize:vertical}
+.artifact-question .artifact-note{margin:7px 0}
+@media(max-width:560px){.artifact-lenses{grid-template-columns:1fr}.artifact-lens{min-height:48px}}
+
 /* Each mood has its own atmosphere, not merely a different headline. */
 body[data-active-mood="cafe"]{--mood-accent:#ffd09a;--mood-ink:#302032;--mood-edge:#f0bd8b66;--mood-visual:radial-gradient(circle at 50% 46%,#f6d39c99 0 10%,transparent 55%),radial-gradient(circle at 52% 54%,#a56b4d80 0 28%,transparent 29%),linear-gradient(125deg,#593c55,#273b4b);background:radial-gradient(ellipse at 12% 8%,#70465a 0,transparent 42%),radial-gradient(ellipse at 95% 82%,#28616a 0,transparent 45%),#15121e}
 body[data-active-mood="curiosity"]{--mood-accent:#bde7ff;--mood-ink:#172038;--mood-edge:#9bd8ff70;--mood-visual:radial-gradient(circle at 16% 23%,#e7f8ff 0 1px,transparent 2px),radial-gradient(circle at 77% 31%,#e7f8ff 0 1px,transparent 2px),radial-gradient(circle at 58% 76%,#e7f8ff 0 1px,transparent 2px),radial-gradient(circle at 50% 48%,#536eae99,transparent 62%),linear-gradient(125deg,#202448,#12394b);background:radial-gradient(ellipse at 78% 8%,#365b93 0,transparent 42%),radial-gradient(ellipse at 8% 90%,#274c69 0,transparent 45%),#0d1224}
@@ -33,7 +52,7 @@ body[data-active-mood] .mood[aria-pressed="true"],body[data-active-mood] .action
 @media (forced-colors: active) {
   body { background: Canvas; color: CanvasText; }
   .panel, .visual, .status, .mood, .bubble, .interactive, .disclosure,
-  .receipt, details.source-card, .event-story, .event-question {
+  .receipt, details.source-card, .event-story, .event-question, .artifact-card, .artifact-quote, .artifact-lens, .artifact-lens-result, .artifact-back, .artifact-sources, .artifact-question {
     background: Canvas;
     color: CanvasText;
     border: 1px solid CanvasText;
@@ -47,7 +66,14 @@ body[data-active-mood] .mood[aria-pressed="true"],body[data-active-mood] .action
   body[data-active-mood] .event-story,
   body[data-active-mood] .event-story .event-question,
   body[data-active-mood] .source-card,
-  body[data-active-mood] .event-story .source-card {
+  body[data-active-mood] .event-story .source-card,
+  body[data-active-mood] .artifact-card,
+  body[data-active-mood] .artifact-quote,
+  body[data-active-mood] .artifact-lens,
+  body[data-active-mood] .artifact-lens-result,
+  body[data-active-mood] .artifact-back,
+  body[data-active-mood] .artifact-sources,
+  body[data-active-mood] .artifact-question {
     background: Canvas;
     color: CanvasText;
     border: 1px solid CanvasText;
@@ -57,6 +83,11 @@ body[data-active-mood] .mood[aria-pressed="true"],body[data-active-mood] .action
   }
   body[data-active-mood] .visual { background: Canvas; color: CanvasText; }
   body[data-active-mood] .event-story .event-kicker,
+  body[data-active-mood] .artifact-card .artifact-kicker,
+  body[data-active-mood] .artifact-card .artifact-meta,
+  body[data-active-mood] .artifact-card .artifact-note,
+  body[data-active-mood] .artifact-back p,
+  body[data-active-mood] .artifact-sources p,
   body[data-active-mood] .event-story p,
   body[data-active-mood] .source-card summary,
   body[data-active-mood] .source-card p,
@@ -65,13 +96,14 @@ body[data-active-mood] .mood[aria-pressed="true"],body[data-active-mood] .action
   body[data-active-mood] .unknown-field .known,
   body[data-active-mood] .bubble.visitor { color: CanvasText; }
   body[data-active-mood] .bubble.visitor { background: Canvas; border: 1px solid CanvasText; }
-  .mood:not([aria-pressed="true"]), .action.secondary {
+  .mood:not([aria-pressed="true"]), .action.secondary, .artifact-lens {
     background: ButtonFace;
     color: ButtonText;
     border: 1px solid ButtonText;
   }
   body[data-active-mood] .mood[aria-pressed="true"],
-  body[data-active-mood] .action:not(.secondary) {
+  body[data-active-mood] .action:not(.secondary),
+  body[data-active-mood] .artifact-lens[aria-pressed="true"] {
     background: Highlight;
     color: HighlightText;
     border-color: Highlight;
@@ -84,6 +116,8 @@ body[data-active-mood] .mood[aria-pressed="true"],body[data-active-mood] .action
   body[data-active-mood] .eyebrow,
   body[data-active-mood] .footer { color: CanvasText; }
   body[data-active-mood] a, a { color: LinkText; text-decoration: underline; }
+   .artifact-card h3, .artifact-quote, .artifact-lens-result, .artifact-back summary, .artifact-sources summary { color: CanvasText; }
+   .artifact-question textarea { background: Field; color: FieldText; border-color: FieldText; }
   .skip:focus { background: Highlight; color: HighlightText; }
   button:focus-visible, a:focus-visible, input:focus-visible,
   select:focus-visible, summary:focus-visible, #experience:focus,
@@ -100,17 +134,17 @@ body[data-active-mood] .mood[aria-pressed="true"],body[data-active-mood] .action
 'use strict';
 const moods={
 cafe:{icon:'☕',kind:'A TABLE FOR WONDERING',headline:'Coffee, conversation, and an open question.',description:'Imagine meeting someone who sees the same world differently. What would you ask before telling them what you think?',next:'What if the most interesting answer is the question nobody thought to ask?',claim:'This is a creative prompt, not a factual news claim. No external source is implied.'},
-curiosity:{icon:'🪐',kind:'THE UNEXPECTED DOOR',headline:'What would a nameless world feel like?',description:'Without names, how might we recognize one another? A playful thought experiment about memory, attention, and identity.',next:'Try describing a friend without using a name, profession, or relationship label.',claim:'Speculative thought experiment. No evidence is offered that telepathy or new human abilities would emerge.'},
+curiosity:{icon:'🗝️',kind:'THE OBJECT ON THE TABLE',headline:'A page from the early web. What did it leave out?',description:'One preserved page, one sentence, three ways to look. The archive is real; your interpretation is yours.',next:'A later copy survives. The original wording stays unknown.',claim:'This object is the W3C history archive copy dated 3 November 1992, not the original 1991 page. CERN says the original page changed daily and no screenshots were made; this copy cannot establish the exact first wording.'},
 events:{icon:'🛰️',kind:'ONE EVENT · THREE QUESTIONS',headline:'A spacecraft is gone. Its data is not.',description:'A dated encounter with one event: what is confirmed, where the account comes from, and what the linked reports do not settle. One story, not a stream.',next:'The spacecraft is gone. The measurements remain.',claim:'Archive snapshot dated 8 November 2026. NASA reports Swift re-entered over North Sumatra on 4 November at 7:39 a.m. EST. The linked sources do not provide a confirmed debris-recovery account.'},
 cozy:{icon:'🕯️',kind:'A MOMENT TO LINGER',headline:'A room with no demands.',description:'A quiet invitation: notice one detail around you that you usually overlook. You do not have to share it.',next:'A cup cools. Light shifts. The room is allowed to be quiet.',claim:'Reflective exercise, not a sourced factual claim.'},
 fire:{icon:'🔥',kind:'THE CLAIM CLINIC',headline:'“Everyone is talking about it.” Are they?',description:'A dramatic headline is not evidence. Ask: who measured “everyone,” over what period, and against which baseline?',next:'Look for the original study, its sample size, its date, and whether the headline changed the meaning.',claim:'This is a fictional example of a misleading claim. It is NOT a real report or a verified current event.'},
 party:{icon:'🪩',kind:'THE PLAYFUL DETOUR',headline:'An invitation to delightful nonsense.',description:'Invent a new holiday in fifteen seconds. No ranking, no winning, no forced participation.',next:'The Festival of Lost Socks: everyone wears two different stories.',claim:'Creative fiction, not a factual assertion.'}
 };
-let current='cafe', explored=false;let cafeKeep='';let holidayKeep='';let holidayDraft={theme:'Lost Socks',ritual:'wear mismatched socks',rule:'participation is optional'};let eventKeep='';document.body.dataset.activeMood=current;
-const activity={cafe:['Ask an open question','A question to carry away'],curiosity:['Try the nameless challenge','An experiment to try'],events:['Open one story','A question to carry away'],cozy:['Let the room be quiet','Stay as long as you like'],fire:['Inspect the headline','What the claim leaves out'],party:['Invent a holiday','A tiny celebration']};
+let current='cafe', explored=false;let cafeKeep='';let curiosityKeep='',curiosityDraft='',curiosityLens='';let holidayKeep='';let holidayDraft={theme:'Lost Socks',ritual:'wear mismatched socks',rule:'participation is optional'};let eventKeep='';document.body.dataset.activeMood=current;
+const activity={cafe:['Ask an open question','A question to carry away'],curiosity:['Examine the object','A question to carry away'],events:['Open one story','A question to carry away'],cozy:['Let the room be quiet','Stay as long as you like'],fire:['Inspect the headline','What the claim leaves out'],party:['Invent a holiday','A tiny celebration']};
 const $=id=>document.getElementById(id);
 function show(){document.body.dataset.activeMood=current;const m=moods[current];$('activity').hidden=true;$('activity').replaceChildren();$('explore').setAttribute('aria-expanded','false');$('visual').textContent=m.icon;$('kind').textContent=m.kind;$('headline').textContent=explored?m.next:m.headline;$('description').textContent=m.description;$('evidence').classList.add('hidden');$('explore').textContent=explored?'Hide this activity':activity[current][0];$('verify').textContent=current==='fire'?'Inspect provenance':'What is this based on?';document.querySelectorAll('[data-mood]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mood===current)));}
-document.querySelectorAll('[data-mood]').forEach(b=>b.addEventListener('click',()=>{if(current===b.dataset.mood)return;current=b.dataset.mood;explored=false;cafeKeep='';holidayKeep='';holidayDraft={theme:'Lost Socks',ritual:'wear mismatched socks',rule:'participation is optional'};eventKeep='';$('keepsakeLine').textContent='';conversationTurn=0;clearDialogueChoices();$('chat').replaceChildren();dialogueBubble('muse','Welcome. You can talk, wander, or say nothing at all.');show();$('headline').focus();}));
+document.querySelectorAll('[data-mood]').forEach(b=>b.addEventListener('click',()=>{if(current===b.dataset.mood)return;current=b.dataset.mood;explored=false;cafeKeep='';curiosityKeep='';curiosityDraft='';curiosityLens='';holidayKeep='';holidayDraft={theme:'Lost Socks',ritual:'wear mismatched socks',rule:'participation is optional'};eventKeep='';$('keepsakeLine').textContent='';conversationTurn=0;clearDialogueChoices();$('chat').replaceChildren();dialogueBubble('muse','Welcome. You can talk, wander, or say nothing at all.');show();$('headline').focus();}));
 // This is a locally scripted interaction: no network, storage, or participant messaging.
 function activityButton(label,fn){const b=document.createElement('button');b.type='button';b.className='action secondary';b.textContent=label;b.addEventListener('click',fn);return b;}
 function renderActivity(){const a=$('activity');a.replaceChildren();a.hidden=false;$('explore').setAttribute('aria-expanded','true');
@@ -127,34 +161,77 @@ const carry=activityButton('Carry my question',()=>{const q=input.value.trim();i
 a.append(p,label,input,note,carry);
 }
 if(current==='curiosity'){
- const p=document.createElement('p');
- p.textContent='A person arrives. Describe them without a name, job, or family label.';
- const label=document.createElement('label');
- label.className='composer-label';
- label.htmlFor='curiosityDescription';
- label.textContent='Your description (optional)';
- const input=document.createElement('input');
- input.id='curiosityDescription';
- input.maxLength=180;
- input.placeholder='A voice like…';
- input.setAttribute('aria-describedby','curiosityDescriptionNote');
- input.style.cssText='width:100%;padding:12px;border-radius:10px;background:#211b28;color:#fff4df;border:1px solid #ffffff60;font:inherit';
- input.autocomplete='off';
- input.spellcheck=false;
- const note=document.createElement('p');
- note.id='curiosityDescriptionNote';
- note.className='note';
- note.textContent='Up to 180 characters. Keep it non-identifying. Your words stay only in this page; nothing is saved or sent.';
- const result=document.createElement('p');
- result.setAttribute('role','status');
- result.setAttribute('aria-live','polite');
- a.append(p,label,input,note,activityButton('Reflect locally',()=>{
-  const description=input.value.trim();
-  result.textContent=description?'You noticed: “'+description+'” Now ask: which detail makes this person recognizable, and which could belong to anyone? Your words stay in this browser and are not transmitted.':'You can also leave the description empty. Silence is a valid answer.';
- }),result);
+ const card=document.createElement('article');card.className='artifact-card';card.setAttribute('aria-labelledby','curiosityArtifactTitle');
+ const kicker=document.createElement('p');kicker.className='artifact-kicker';kicker.textContent='A SURVIVING COPY · 3 NOVEMBER 1992';
+ const title=document.createElement('h3');title.id='curiosityArtifactTitle';title.textContent='One sentence, still open.';
+ const provenance=document.createElement('p');provenance.className='artifact-meta';provenance.textContent='W3C’s history archive preserves this dated copy of the World Wide Web project page. It is a later copy, not a transcript of the page as first published in 1991.';
+ const quote=document.createElement('blockquote');quote.className='artifact-quote';quote.textContent='“The WorldWideWeb (W3) is a wide-area hypermedia information retrieval initiative aiming to give universal access to a large universe of documents.”';
+ const quoteNote=document.createElement('p');quoteNote.className='artifact-note';quoteNote.textContent='One line from the 3 November 1992 archive copy. Read it as an object from its time, not as a promise that was already fulfilled.';
+ const lensPrompt=document.createElement('p');lensPrompt.className='artifact-note';lensPrompt.textContent='Choose a lens. These are prompts written for this exercise, not historical statements or other visitors’ opinions.';
+ const lensGroup=document.createElement('div');lensGroup.className='artifact-lenses';lensGroup.setAttribute('role','group');lensGroup.setAttribute('aria-label','Choose a reading lens');
+ const lensResult=document.createElement('p');lensResult.id='curiosityLensResult';lensResult.className='artifact-lens-result';lensResult.setAttribute('role','status');lensResult.setAttribute('aria-live','polite');lensResult.setAttribute('aria-atomic','true');
+ const lenses=[
+  {key:'access',label:'Access',button:'Look through the access lens',prompt:'Who is included in universal access—and who might still be left out?'},
+  {key:'discovery',label:'Discovery',button:'Look through the discovery lens',prompt:'A document can exist without being found. Who or what makes it discoverable?'},
+  {key:'stewardship',label:'Stewardship',button:'Look through the stewardship lens',prompt:'Who keeps a link alive, corrects it, or notices when it disappears?'}
+ ];
+ let selectedLens=curiosityLens;
+ const lensButtons=[];
+ lenses.forEach(item=>{
+  const button=activityButton(item.button,()=>{
+   selectedLens=item.key;curiosityLens=item.key;
+   lensButtons.forEach(([key,el])=>el.setAttribute('aria-pressed',String(key===selectedLens)));
+   if(curiosityKeep){curiosityKeep='';lensResult.textContent='Your lens changed. Carry the question again if you want this reading on your receipt.';}
+   else lensResult.textContent=item.prompt;
+  });
+  button.className='artifact-lens';button.setAttribute('aria-pressed',String(selectedLens===item.key));
+  lensButtons.push([item.key,button]);lensGroup.append(button);
+ });
+ lensResult.textContent=curiosityKeep?'For your visit receipt: '+curiosityKeep+'. Nothing is saved or sent.':selectedLens?lenses.find(x=>x.key===selectedLens).prompt:'Choose a lens, or simply read the sentence. No interpretation is required.';
+ const reverse=document.createElement('details');reverse.className='artifact-back';
+ const reverseSummary=document.createElement('summary');reverseSummary.textContent='Turn the card over · what did not survive?';
+ const reverseText=document.createElement('p');reverseText.textContent='CERN’s historical record says the original page changed as the project developed and that no screenshots of that original page exist. The 1992 copy is evidence of a later state, not proof of the exact first wording.';
+ reverse.append(reverseSummary,reverseText);
+ const sources=document.createElement('details');sources.className='artifact-sources';
+ const sourcesSummary=document.createElement('summary');sourcesSummary.textContent='Check the provenance · archive and institutional history';
+ const externalNote=document.createElement('span');externalNote.id='curiosityExternalLinkNote';externalNote.className='sr-only';externalNote.textContent='Opens in a new tab.';
+ const addArtifactSource=(label,href,noteId,noteText)=>{
+  const row=document.createElement('p');const link=document.createElement('a');
+  link.href=href;link.target='_blank';link.rel='noopener noreferrer';link.textContent=label;
+  link.setAttribute('aria-describedby',noteId+' curiosityExternalLinkNote');
+  const note=document.createElement('span');note.id=noteId;note.className='artifact-note';note.textContent=' Source role: '+noteText;
+  row.append(link,note);return row;
+ };
+ sources.append(sourcesSummary,externalNote,
+  addArtifactSource('W3C archive copy · 3 Nov 1992','https://www.w3.org/History/19921103-hypertext/hypertext/WWW/TheProject.html','curiosityW3cRole','the dated page reproduced as this object.'),
+  addArtifactSource('CERN historical record · what survives','https://cds.cern.ch/record/1997535','curiosityCernRecordRole','CERN’s account of the original page’s changing content and missing screenshots.'),
+  addArtifactSource('CERN · where the web was born','https://home.cern/science/computing/the-birth-of-the-web/where-web-was-born/','curiosityCernHistoryRole','the first site’s purpose, its host, and CERN’s 2013 restoration work.')
+ );
+ const questionBox=document.createElement('div');questionBox.className='artifact-question';
+ const questionLabel=document.createElement('label');questionLabel.htmlFor='curiosityQuestion';questionLabel.textContent='Your question (optional)';
+ const question=document.createElement('textarea');question.id='curiosityQuestion';question.maxLength=240;question.rows=3;question.value=curiosityDraft;question.placeholder='What does this sentence leave out?';question.setAttribute('aria-describedby','curiosityQuestionNote');
+ const questionNote=document.createElement('p');questionNote.id='curiosityQuestionNote';questionNote.className='artifact-note';questionNote.textContent='Up to 240 characters. Keep it non-identifying. Your words stay only in this page; nothing is saved, sent, or shown to another visitor.';
+ const carryResult=document.createElement('p');carryResult.id='curiosityQuestionResult';carryResult.className='artifact-note';carryResult.setAttribute('role','status');carryResult.setAttribute('aria-live','polite');carryResult.setAttribute('aria-atomic','true');
+ carryResult.textContent=curiosityKeep?'For your visit receipt: '+curiosityKeep+'. Nothing is saved or sent.':'Your question is optional. Carry it away only if you want to.';
+ question.addEventListener('input',()=>{
+  curiosityDraft=question.value;
+  if(curiosityKeep){curiosityKeep='';carryResult.textContent='Your edit is not on the receipt yet. Carry it again if you want to keep it.';}
+  else carryResult.textContent='Your words stay in this page only.';
+ });
+ const carry=activityButton('Carry my question',()=>{
+  const text=question.value.trim();
+  if(!text){carryResult.textContent='Write a question first, or leave the table without one. Nothing is required.';question.focus();return;}
+  curiosityDraft=text;
+  const lens=lenses.find(x=>x.key===selectedLens);
+  curiosityKeep=(lens?lens.label+' lens · ':'')+'Question: '+text;
+  carryResult.textContent='For your visit receipt: '+curiosityKeep+'. Nothing is saved or sent.';
+  lensResult.textContent=lens?lens.prompt:'You chose your own question without a lens. That is a complete reading.';
+ });
+ questionBox.append(questionLabel,question,questionNote,carry,carryResult);
+ card.append(kicker,title,provenance,quote,quoteNote,lensPrompt,lensGroup,lensResult,reverse,sources,questionBox);
+ a.append(card);
 }
-
-if(current==='events'){
+ if(current==='events'){
 const story=document.createElement('article');story.className='event-story';story.setAttribute('aria-labelledby','eventStoryTitle');
 const stamp=document.createElement('p');stamp.className='event-kicker';stamp.textContent='ONE STORY · ARCHIVE SNAPSHOT · 8 NOV 2026';
 const title=document.createElement('h3');title.id='eventStoryTitle';title.textContent='Swift’s final descent';
@@ -283,6 +360,6 @@ $('quiet').addEventListener('click',()=>{
   dialogueBubble('muse','Then we can simply enjoy the quiet. No reply is required. ☕');
   if(focusWasInChoices)$('quiet').focus();
 });
-const takeaway={cafe:'Take one open question into your day. You do not owe anyone an answer.',curiosity:'Notice a detail you might otherwise miss. There is no right observation.',events:'What remains when an instrument goes quiet?',cozy:'One quiet moment is enough. Nothing needs to be completed.',fire:'When evidence is missing, UNKNOWN is a useful answer.',party:'Invent a celebration that belongs to no algorithm.'};
-$('leave').addEventListener('click',()=>{$('keepsakeLine').textContent='WIDEN CAFÉ RECEIPT · '+(current==='party'&&holidayKeep?holidayKeep:current==='events'&&eventKeep?eventKeep:current==='cafe'&&cafeKeep?cafeKeep:takeaway[current])+' · Yours to remember, copy, or leave here. Nothing saved or sent.';});
+const takeaway={cafe:'Take one open question into your day. You do not owe anyone an answer.',curiosity:'A page can outlive its first wording. Ask what the archive can prove—and what it cannot.',events:'What remains when an instrument goes quiet?',cozy:'One quiet moment is enough. Nothing needs to be completed.',fire:'When evidence is missing, UNKNOWN is a useful answer.',party:'Invent a celebration that belongs to no algorithm.'};
+$('leave').addEventListener('click',()=>{$('keepsakeLine').textContent='WIDEN CAFÉ RECEIPT · '+(current==='party'&&holidayKeep?holidayKeep:current==='events'&&eventKeep?eventKeep:current==='cafe'&&cafeKeep?cafeKeep:current==='curiosity'&&curiosityKeep?curiosityKeep:takeaway[current])+' · Yours to remember, copy, or leave here. Nothing saved or sent.';});
 </script></body></html>

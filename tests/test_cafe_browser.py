@@ -114,6 +114,11 @@ def main():
             assert "not two independent tracking measurements" in trail.inner_text()
             assert "thermospheric density" in story.inner_text()
             assert "not a second observation" in story.inner_text()
+            # The provenance panel must use the same snapshot date as the visible story.
+            page.get_by_role("button", name="What is this based on?").click()
+            evidence = page.locator("#evidence").inner_text()
+            assert "Archive snapshot dated 8 November 2026" in evidence
+            assert "Archive snapshot dated 6 November 2026" not in evidence
             assert "Cecilia Chirenti, Robert Nemiroff, Jerry Bonnell, and Keighley Rockcliffe" in trail.inner_text()
             nasa_mission = page.get_by_role("link", name="NASA mission update · Alise Fisher · 2 Nov 2026, updated 4 Nov")
             swift_archive = page.get_by_role("link", name="NASA Swift Archive · public observation data")

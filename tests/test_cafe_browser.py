@@ -348,14 +348,21 @@ def main():
             page.locator("#dialogueInput").fill("A thought that should not cross moods")
             page.get_by_role("button", name="Answer", exact=True).click()
             assert "A thought that should not cross moods" in page.locator("#chat").inner_text()
-            # Re-selecting the active mood is intentionally a no-op; a different mood resets the visit.
+            # Re-selecting Café is a no-op; leaving Café clears and hides its conversation.
             before_same_mood = page.locator("#chat .bubble").count()
-            page.locator('[data-mood="party"]').click()
+            page.locator('[data-mood="cafe"]').click()
             assert page.locator("#chat .bubble").count() == before_same_mood
             assert "A thought that should not cross moods" in page.locator("#chat").inner_text()
-            page.locator('[data-mood="cozy"]').click()
+            page.locator('[data-mood="party"]').click()
+            assert page.locator("#cafeConversation").is_hidden()
+            assert page.locator("#dialogueChoices").is_hidden()
             assert page.locator("#chat .bubble").count() == 1
-            assert "A thought that should not cross moods" not in page.locator("#chat").inner_text()
+            assert "A thought that should not cross moods" not in page.locator("#chat").text_content()
+            assert page.locator("#join").get_attribute("aria-expanded") == "false"
+            page.locator('[data-mood="cozy"]').click()
+            assert page.locator("#cafeConversation").is_hidden()
+            assert page.locator("#chat .bubble").count() == 1
+            assert "A thought that should not cross moods" not in page.locator("#chat").text_content()
             assert page.locator("#dialogueChoices").is_hidden()
             assert page.locator("#join").get_attribute("aria-expanded") == "false"
             assert page.locator("#headline").evaluate("(el) => document.activeElement === el")

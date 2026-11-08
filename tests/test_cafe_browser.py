@@ -288,7 +288,12 @@ def main():
             page.locator("#dialogueInput").fill("A thought that should not cross moods")
             page.get_by_role("button", name="Answer", exact=True).click()
             assert "A thought that should not cross moods" in page.locator("#chat").inner_text()
+            # Re-selecting the active mood is intentionally a no-op; a different mood resets the visit.
+            before_same_mood = page.locator("#chat .bubble").count()
             page.locator('[data-mood="party"]').click()
+            assert page.locator("#chat .bubble").count() == before_same_mood
+            assert "A thought that should not cross moods" in page.locator("#chat").inner_text()
+            page.locator('[data-mood="cozy"]').click()
             assert page.locator("#chat .bubble").count() == 1
             assert "A thought that should not cross moods" not in page.locator("#chat").inner_text()
             assert page.locator("#dialogueChoices").is_hidden()

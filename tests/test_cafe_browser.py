@@ -114,8 +114,8 @@ def main():
             assert "not two independent tracking measurements" in trail.inner_text()
             assert "Cecilia Chirenti, Robert Nemiroff, Jerry Bonnell, and Keighley Rockcliffe" in trail.inner_text()
             nasa_mission = page.get_by_role("link", name="NASA mission update · Alise Fisher · 2 Nov 2026, updated 4 Nov")
-    swift_archive = page.get_by_role("link", name="NASA Swift Archive · public observation data")
-    assert swift_archive.get_attribute("href") == "https://swift.gsfc.nasa.gov/archive/"
+            swift_archive = page.get_by_role("link", name="NASA Swift Archive · public observation data")
+            assert swift_archive.get_attribute("href") == "https://swift.gsfc.nasa.gov/archive/"
             assert nasa_mission.get_attribute("href") == "https://science.nasa.gov/blogs/swift/2026/11/02/nasas-swift-observatory-to-re-enter-atmosphere/"
             nasa_apod = page.get_by_role("link", name="NASA APOD · “A Farewell to Swift” · 6 Nov 2026")
             assert nasa_apod.get_attribute("href") == "https://science.nasa.gov/image-article/apod-2026-november-6-a-farewell-to-swift/"
@@ -127,9 +127,9 @@ def main():
                 assert page.locator("#externalLinkNote").inner_text() == "Opens in a new tab."
                 assert page.locator(f"#{note_id}").is_visible()
             assert "U.S. Space Force confirmed" in page.locator("#missionRoleNote").inner_text()
-    assert "public search and retrieval routes" in page.locator("#archiveRoleNote").inner_text()
-    assert "not re-entry tracking" in page.locator("#archiveRoleNote").inner_text()
-    assert "Two publishers, four links" in trail.inner_text()
+            assert "public search and retrieval routes" in page.locator("#archiveRoleNote").inner_text()
+            assert "not re-entry tracking" in page.locator("#archiveRoleNote").inner_text()
+            assert "Two publishers, four links" in trail.inner_text()
             assert "Retrospective image and mission context" in page.locator("#apodRoleNote").inner_text()
             assert "not a separate re-entry confirmation" in page.locator("#apodRoleNote").inner_text()
             assert "same U.S. Space Force confirmation" in page.locator("#reutersRoleNote").inner_text()

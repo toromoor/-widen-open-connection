@@ -258,15 +258,15 @@ def main():
             page.locator("#explore").click()
             fire_case = page.locator("#activity .fire-case")
             assert fire_case.count() == 1
-            assert origin.locator(".fire-choices").get_attribute("role") == "group"
-            assert origin.locator(".fire-feedback").get_attribute("aria-live") == "polite"
-            assert page.locator("#fireProgress").get_attribute("aria-live") == "polite"
             assert "FICTIONAL PRACTICE CASE" in fire_case.inner_text()
             assert "not a real event" in fire_case.inner_text().lower()
             assert "score" not in fire_case.inner_text().lower()
             clues = page.locator("#activity .fire-clue")
             assert clues.count() == 3
             origin, measure, echo = clues.nth(0), clues.nth(1), clues.nth(2)
+            assert origin.locator(".fire-choices").get_attribute("role") == "group"
+            assert origin.locator(".fire-feedback").get_attribute("aria-live") == "polite"
+            assert page.locator("#fireProgress").get_attribute("aria-live") == "polite"
             origin.get_by_role("button", name="Choose reading: It identifies the original publisher").click()
             assert origin.get_by_role("button", name="Choose reading: It identifies the original publisher").get_attribute("aria-pressed") == "true"
             origin.get_by_role("button", name="Compare this clue").click()

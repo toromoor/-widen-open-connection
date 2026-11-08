@@ -14,7 +14,7 @@ def main():
             page.on("pageerror", lambda exc: errors.append(str(exc)))
             page.goto(page_path.as_uri())
             assert page.title().startswith("WIDEN"), page.title()
-            assert page.locator("#visitNotice").inner_text() == "This visit is local and temporary. Changing moods clears unfinished activity and any finished keepsake; make a new one whenever you wish. Nothing is saved or sent. All six experimental moods are available in this local prototype."
+            assert page.locator("#visitNotice").inner_text() == "This visit is local and temporary. Changing moods clears the current conversation, unfinished activity, and any finished keepsake; make a new one whenever you wish. Nothing is saved or sent. All six experimental moods are available in this local prototype."
             page.get_by_role("link", name="Skip to experience").focus()
             page.keyboard.press("Enter")
             assert page.locator("#experience").evaluate("(el) => document.activeElement === el")
@@ -277,6 +277,17 @@ def main():
             assert page.locator("#join").evaluate("(el) => document.activeElement === el")
             page.locator("#leave").click()
             assert "Nothing saved or sent" in page.locator("#keepsakeLine").inner_text()
+            # A completed local reply is cleared when the visitor changes moods.
+            page.locator("#join").click()
+            page.locator("#dialogueInput").fill("A thought that should not cross moods")
+            page.get_by_role("button", name="Answer", exact=True).click()
+            assert "A thought that should not cross moods" in page.locator("#chat").inner_text()
+            page.locator('[data-mood="party"]').click()
+            assert page.locator("#chat .bubble").count() == 1
+            assert "A thought that should not cross moods" not in page.locator("#chat").inner_text()
+            assert page.locator("#dialogueChoices").is_hidden()
+            assert page.locator("#join").get_attribute("aria-expanded") == "false"
+            assert page.locator("#headline").evaluate("(el) => document.activeElement === el")
             assert not errors, errors
             assert not outbound, outbound
             assert page.evaluate("localStorage.length") == 0

@@ -127,8 +127,33 @@ const carry=activityButton('Carry my question',()=>{const q=input.value.trim();i
 a.append(p,label,input,note,carry);
 }
 if(current==='curiosity'){
-const p=document.createElement('p');p.textContent='A person arrives. Describe them without a name, job, or family label.';const input=document.createElement('input');input.setAttribute('aria-label','Private description for the nameless challenge');input.maxLength=180;input.placeholder='A voice like…';input.style.cssText='width:100%;padding:12px;border-radius:10px;background:#211b28;color:#fff4df;border:1px solid #ffffff60;font:inherit';input.autocomplete='off';input.spellcheck=false;const result=document.createElement('p');result.setAttribute('role','status');result.setAttribute('aria-live','polite');a.append(p,input,activityButton('Reflect locally',()=>{const description=input.value.trim();result.textContent=description?'You noticed: “'+description+'” Now ask: which detail makes this person recognizable, and which could belong to anyone? Your words stay in this browser and are not transmitted.':'You can also leave the description empty. Silence is a valid answer.';}),result);
+ const p=document.createElement('p');
+ p.textContent='A person arrives. Describe them without a name, job, or family label.';
+ const label=document.createElement('label');
+ label.className='composer-label';
+ label.htmlFor='curiosityDescription';
+ label.textContent='Your description (optional)';
+ const input=document.createElement('input');
+ input.id='curiosityDescription';
+ input.maxLength=180;
+ input.placeholder='A voice like…';
+ input.setAttribute('aria-describedby','curiosityDescriptionNote');
+ input.style.cssText='width:100%;padding:12px;border-radius:10px;background:#211b28;color:#fff4df;border:1px solid #ffffff60;font:inherit';
+ input.autocomplete='off';
+ input.spellcheck=false;
+ const note=document.createElement('p');
+ note.id='curiosityDescriptionNote';
+ note.className='note';
+ note.textContent='Up to 180 characters. Keep it non-identifying. Your words stay only in this page; nothing is saved or sent.';
+ const result=document.createElement('p');
+ result.setAttribute('role','status');
+ result.setAttribute('aria-live','polite');
+ a.append(p,label,input,note,activityButton('Reflect locally',()=>{
+  const description=input.value.trim();
+  result.textContent=description?'You noticed: “'+description+'” Now ask: which detail makes this person recognizable, and which could belong to anyone? Your words stay in this browser and are not transmitted.':'You can also leave the description empty. Silence is a valid answer.';
+ }),result);
 }
+
 if(current==='events'){
 const story=document.createElement('article');story.className='event-story';story.setAttribute('aria-labelledby','eventStoryTitle');
 const stamp=document.createElement('p');stamp.className='event-kicker';stamp.textContent='ONE STORY · ARCHIVE SNAPSHOT · 6 NOV 2026';

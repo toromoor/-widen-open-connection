@@ -34,6 +34,8 @@
 .artifact-question label{display:block;margin:8px 0;font-weight:750}
 .artifact-question textarea{width:100%;min-height:90px;padding:12px;border:1px solid #8d7459;border-radius:10px;background:#fff;color:#29231e;font:inherit;resize:vertical}
 .artifact-question .artifact-note{margin:7px 0}
+.artifact-question .action.secondary{min-height:44px;padding:10px 14px;background:#29231e;color:#fff1d5;border:1px solid #29231e}
+.artifact-question .action.secondary:hover{background:#493521;color:#fff8e9}
 @media(max-width:560px){.artifact-lenses{grid-template-columns:1fr}.artifact-lens{min-height:48px}}
 
 /* Each mood has its own atmosphere, not merely a different headline. */
@@ -118,6 +120,7 @@ body[data-active-mood] .mood[aria-pressed="true"],body[data-active-mood] .action
   body[data-active-mood] a, a { color: LinkText; text-decoration: underline; }
    .artifact-card h3, .artifact-quote, .artifact-lens-result, .artifact-back summary, .artifact-sources summary { color: CanvasText; }
    .artifact-question textarea { background: Field; color: FieldText; border-color: FieldText; }
+   .artifact-question .action.secondary { background: ButtonFace; color: ButtonText; border-color: ButtonText; }
   .skip:focus { background: Highlight; color: HighlightText; }
   button:focus-visible, a:focus-visible, input:focus-visible,
   select:focus-visible, summary:focus-visible, #experience:focus,

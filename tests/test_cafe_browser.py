@@ -192,6 +192,10 @@ def main():
             assert page.locator("#curiosityQuestionNote").is_visible()
             assert "nothing is saved, sent, or shown to another visitor" in page.locator("#curiosityQuestionNote").inner_text()
             assert page.locator("#curiosityQuestionResult").get_attribute("aria-live") == "polite"
+            carry_button = page.get_by_role("button", name="Carry my question")
+            carry_style = carry_button.evaluate("(el) => { const s = getComputedStyle(el); return {color: s.color, background: s.backgroundColor}; }")
+            assert carry_style["color"] == "rgb(255, 241, 213)", carry_style
+            assert carry_style["background"] == "rgb(41, 35, 30)", carry_style
             page.get_by_role("button", name="Carry my question").click()
             assert "Write a question first" in page.locator("#curiosityQuestionResult").inner_text()
             assert curiosity_input.evaluate("(el) => document.activeElement === el")
@@ -433,11 +437,12 @@ def main():
                 card: style(".artifact-card"), quote: style(".artifact-quote"),
                 lens: style(".artifact-lens[aria-pressed='true']"),
                 back: style("details.artifact-back"), question: style(".artifact-question"),
+                carry: style(".artifact-question .action.secondary"),
                 link: style("details.artifact-sources a"),
                 linkDecoration: getComputedStyle(document.querySelector("details.artifact-sources a")).textDecorationLine
             };
         }""")
-        for name in ["card", "quote", "lens", "back", "question"]:
+        for name in ["card", "quote", "lens", "back", "question", "carry"]:
             metric = artifact_metrics[name]
             assert metric["borderStyle"] == "solid" and metric["borderWidth"] != "0px", f"forced-colors artifact {name} boundary missing: {metric}"
             assert metric["background"] != "rgba(0, 0, 0, 0)", f"forced-colors artifact {name} background missing: {metric}"

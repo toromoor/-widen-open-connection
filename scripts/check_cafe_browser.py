@@ -37,6 +37,7 @@ def check(browser, width, height, name):
     for mood in ("cafe", "curiosity", "events", "cozy", "fire", "party"):
         page.locator(f"[data-mood='{mood}']").click()
         assert page.locator("body").get_attribute("data-active-mood") == mood
+        assert page.locator("#cafeConversation").is_visible() == (mood == "cafe")
         mood_visuals[mood] = page.locator("#visual").evaluate("(el) => getComputedStyle(el).backgroundImage")
         mood_backgrounds[mood] = page.evaluate("getComputedStyle(document.body).backgroundImage")
         page.screenshot(path=str(ARTIFACTS / f"mood-{mood}-{name}.png"), full_page=True)
@@ -127,6 +128,7 @@ def check(browser, width, height, name):
     # Curiosity is a source-grounded object encounter, not a questionnaire.
     page.locator("[data-mood='curiosity']").click()
     page.get_by_role("button", name="Examine the object").click()
+    page.screenshot(path=str(ARTIFACTS / f"curiosity-object-{name}.png"), full_page=True)
     artifact = page.locator("#activity .artifact-card")
     assert artifact.count() == 1
     assert "A SURVIVING COPY · 3 NOVEMBER 1992" in artifact.inner_text()

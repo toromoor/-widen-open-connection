@@ -26,6 +26,7 @@ def main():
             for mood in ["curiosity", "events", "cozy", "fire", "party", "cafe"]:
                 page.locator(f'[data-mood="{mood}"]').click()
                 assert page.locator(f'[data-mood="{mood}"]').get_attribute("aria-pressed") == "true"
+                assert page.locator("#cafeConversation").is_visible() == (mood == "cafe")
                 assert page.locator("#headline").evaluate("(el) => document.activeElement === el")
                 assert page.locator("#headline").evaluate("(el) => getComputedStyle(el).outlineStyle") == "solid", f"focused mood heading has no visible focus indicator: {mood}"
                 assert page.locator("#headline").evaluate("(el) => getComputedStyle(el).outlineWidth") == "3px"
@@ -292,14 +293,18 @@ def main():
             assert page.locator("#dialogueInputStatus").inner_text() == ""
             page.get_by_role("button", name="Answer", exact=True).click()
             assert page.locator("#dialogueInput").evaluate("(el) => document.activeElement === el")
-            # Mood switching must discard an unfinished local conversation,
-            # remove its temporary controls, and put focus on the new heading.
+            # The Café conversation belongs to the Café mood, not every room.
+            # Switching away discards the unfinished local turn and hides the room;
+            # returning to Café restores only its opening line.
             page.locator("#join").click()
             page.locator("#dialogueInput").fill("Unfinished private thought")
             page.locator('[data-mood="party"]').click()
+            assert page.locator("#cafeConversation").is_hidden()
             assert page.locator("#dialogueChoices").is_hidden()
             assert page.locator("#join").get_attribute("aria-expanded") == "false"
             assert page.locator("#headline").evaluate("(el) => document.activeElement === el")
+            page.locator('[data-mood="cafe"]').click()
+            assert page.locator("#cafeConversation").is_visible()
             assert page.locator("#chat .bubble").count() == 1
             assert "Welcome. You can talk" in page.locator("#chat").inner_text()
             assert "Unfinished private thought" not in page.locator("#chat").inner_text()

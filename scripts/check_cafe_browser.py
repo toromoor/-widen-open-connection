@@ -256,6 +256,10 @@ def check(browser, width, height, name):
     page.get_by_role("button", name="Let the room be quiet").click()
     assert "Nothing to complete" in page.locator("#activity").inner_text()
 
+    # Conversation belongs to Café au Lait, not the Cozy or Curiosity rooms.
+    page.locator("[data-mood='cafe']").click()
+    assert page.locator("#cafeConversation").is_visible()
+
     # Three rounds with an independent exit/silence choice at every round.
     page.get_by_role("button", name="Try a conversation").click()
     assert page.locator("#join").get_attribute("aria-controls") == "dialogueChoices"
@@ -300,8 +304,9 @@ def check(browser, width, height, name):
     page.get_by_role("button", name="Answer", exact=True).click()
     assert "A thought that should not cross moods" in page.locator("#chat").inner_text()
     page.locator("[data-mood='party']").click()
+    assert page.locator("#cafeConversation").is_hidden()
     assert page.locator("#chat .bubble").count() == 1
-    assert "A thought that should not cross moods" not in page.locator("#chat").inner_text()
+    assert "A thought that should not cross moods" not in page.locator("#chat").text_content()
     assert page.locator("#dialogueChoices").is_hidden()
     assert page.locator("#join").get_attribute("aria-expanded") == "false"
     assert page.locator("#headline").evaluate("(el) => document.activeElement === el")

@@ -147,6 +147,12 @@ def main():
             page.locator("#explore").click()
             # Exercise local-only input and composition, not just mood navigation.
             curiosity_input = page.locator("#activity input")
+            assert page.get_by_label("Your description (optional)").count() == 1
+            assert curiosity_input.get_attribute("id") == "curiosityDescription"
+            assert curiosity_input.get_attribute("aria-describedby") == "curiosityDescriptionNote"
+            assert page.locator("#curiosityDescriptionNote").is_visible()
+            assert "non-identifying" in page.locator("#curiosityDescriptionNote").inner_text()
+            assert "nothing is saved or sent" in page.locator("#curiosityDescriptionNote").inner_text()
             curiosity_text = "A person who listens before speaking"
             assert curiosity_input.get_attribute("maxlength") == "180"
             assert page.locator("#activity [role='status']").get_attribute("aria-live") == "polite"

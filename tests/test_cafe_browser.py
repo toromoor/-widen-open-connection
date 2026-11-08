@@ -27,6 +27,11 @@ def main():
                 page.locator(f'[data-mood="{mood}"]').click()
                 assert page.locator(f'[data-mood="{mood}"]').get_attribute("aria-pressed") == "true"
                 assert page.locator("#cafeConversation").is_visible() == (mood == "cafe")
+                single_room = page.locator("#experience").evaluate("(el) => el.classList.contains('single-room')")
+                assert single_room == (mood != "cafe")
+                grid_columns = page.locator("#experience").evaluate("(el) => getComputedStyle(el).gridTemplateColumns.trim().split(/\\s+/).length")
+                expected_columns = 1 if width <= 720 or mood != "cafe" else 2
+                assert grid_columns == expected_columns, f"{mood} layout has {grid_columns} columns at {width}px"
                 assert page.locator("#headline").evaluate("(el) => document.activeElement === el")
                 assert page.locator("#headline").evaluate("(el) => getComputedStyle(el).outlineStyle") == "solid", f"focused mood heading has no visible focus indicator: {mood}"
                 assert page.locator("#headline").evaluate("(el) => getComputedStyle(el).outlineWidth") == "3px"

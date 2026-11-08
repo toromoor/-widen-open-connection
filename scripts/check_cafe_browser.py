@@ -38,6 +38,11 @@ def check(browser, width, height, name):
         page.locator(f"[data-mood='{mood}']").click()
         assert page.locator("body").get_attribute("data-active-mood") == mood
         assert page.locator("#cafeConversation").is_visible() == (mood == "cafe")
+        single_room = page.locator("#experience").evaluate("(el) => el.classList.contains('single-room')")
+        assert single_room == (mood != "cafe")
+        grid_columns = page.locator("#experience").evaluate("(el) => getComputedStyle(el).gridTemplateColumns.trim().split(/\\s+/).length")
+        expected_columns = 1 if width <= 720 or mood != "cafe" else 2
+        assert grid_columns == expected_columns, f"{mood} layout has {grid_columns} columns at {width}px"
         mood_visuals[mood] = page.locator("#visual").evaluate("(el) => getComputedStyle(el).backgroundImage")
         mood_backgrounds[mood] = page.evaluate("getComputedStyle(document.body).backgroundImage")
         page.screenshot(path=str(ARTIFACTS / f"mood-{mood}-{name}.png"), full_page=True)

@@ -148,3 +148,15 @@ def test_invalid_stalls_and_oversized_unicode_bodies_are_rejected(client):
 def test_read_only_compatibility_routes_remain_closed(client):
     assert client.post("/v1/posts", json={"text": "still closed"}).status_code == 403
     assert client.get("/api/protocol").json()["version"] == "0.1"
+
+
+def test_beta_serves_the_live_wall_and_uses_a_separate_same_origin_script(client):
+    page = client.get("/")
+    assert page.status_code == 200
+    assert "A night market" in page.text
+    assert 'src="/souk.js"' in page.text
+    script = client.get("/souk.js")
+    assert script.status_code == 200
+    assert "textContent" in script.text
+    assert "innerHTML" not in script.text
+    assert client.get("/api/status").json()["writing"] == "paused"

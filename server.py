@@ -3,10 +3,10 @@ from pathlib import Path
 import base64
 import hashlib
 import re
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import FileResponse, PlainTextResponse, JSONResponse
 from sqlalchemy import text
-from souk_service import router as souk_router, initialize_database, SessionLocal
+from souk_service import router as souk_router, initialize_database, SessionLocal, SoukError
 
 ROOT=Path(__file__).resolve().parent
 
@@ -34,6 +34,10 @@ CSP = "; ".join([
 ])
 app=FastAPI(title="WIDEN Open Connection",docs_url=None,redoc_url=None,openapi_url=None)
 app.include_router(souk_router)
+
+@app.exception_handler(SoukError)
+async def souk_error_handler(request: Request, exc: SoukError):
+    return JSONResponse({"error": exc.detail}, status_code=exc.status_code, headers=HEADERS)
 
 @app.on_event("startup")
 def startup_souk_database():

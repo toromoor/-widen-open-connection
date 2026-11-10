@@ -19,6 +19,7 @@ from typing import Literal
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from sqlalchemy import and_, or_
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, create_engine, select, update
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
@@ -117,11 +118,16 @@ def initialize_database() -> None:
 
 router = APIRouter(prefix="/api", tags=["souk"])
 
+class SoukError(HTTPException):
+    """Protocol-shaped error handled separately from legacy preview errors."""
+
 def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 def _error(status: int, code: str, message: str):
-    raise HTTPException(status_code=status, detail={"error": {"code": code, "message": message}})
+    raise SoukError(status_code=status, detail={
+        "code": code, "message": message, "request_id": uuid.uuid4().hex
+    })
 
 def _admin(authorization: str | None = Header(default=None)) -> str:
     expected = os.getenv("SOUK_ADMIN_TOKEN", "")
@@ -243,14 +249,23 @@ def list_messages(before: str | None = None, limit: int = 20):
         query = select(Message).where(Message.status == "approved")
         if before:
             try:
-                before_dt = datetime.fromisoformat(before.replace("Z", "+00:00"))
-            except ValueError:
+                decoded = base64.urlsafe_b64decode(before + "=" * (-len(before) % 4)).decode("utf-8")
+                before_text, before_id = decoded.rsplit("|", 1)
+                before_dt = datetime.fromisoformat(before_text)
+                uuid.UUID(before_id)
+            except (ValueError, UnicodeDecodeError):
                 _error(400, "invalid_request", "Invalid pagination cursor.")
-            query = query.where(Message.created_at < before_dt)
+            query = query.where(or_(
+                Message.created_at < before_dt,
+                and_(Message.created_at == before_dt, Message.id < before_id),
+            ))
         rows = db.execute(query.order_by(Message.created_at.desc(), Message.id.desc()).limit(limit + 1)).scalars().all()
     has_more = len(rows) > limit
     rows = list(reversed(rows[:limit]))
-    next_before = rows[0].created_at.isoformat() if has_more and rows else None
+    next_before = (
+        base64.urlsafe_b64encode(f"{rows[0].created_at.isoformat()}|{rows[0].id}".encode("utf-8")).decode("ascii").rstrip("=")
+        if has_more and rows else None
+    )
     return {"messages": [_message_json(row) for row in rows], "next_before": next_before}
 
 @router.get("/messages/{message_id}")

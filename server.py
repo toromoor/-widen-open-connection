@@ -77,7 +77,8 @@ def home():
 def health():
     mode = __import__("os").getenv("SOUK_MODE", "preview")
     writing = "off" if mode != "beta" else "moderated"
-    return JSONResponse({"ok":True,"writing":writing,"mode":mode},headers=HEADERS)
+    reported_mode = "read-only-preview" if mode == "preview" else mode
+    return JSONResponse({"ok":True,"writing":writing,"mode":reported_mode},headers=HEADERS)
 @app.get("/v1/invitation")
 def invitation():
     return PlainTextResponse(INVITATION,headers=HEADERS)

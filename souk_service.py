@@ -75,8 +75,20 @@ class RateEvent(Base):
     bucket: Mapped[str] = mapped_column(String(160), nullable=False, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
 
+class AuditEvent(Base):
+    __tablename__ = "souk_audit_events"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    actor: Mapped[str] = mapped_column(String(120), nullable=False)
+    action: Mapped[str] = mapped_column(String(60), nullable=False)
+    target: Mapped[str] = mapped_column(String(120), nullable=False)
+    detail: Mapped[str | None] = mapped_column(String(300))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+
+def _audit(db: Session, actor: str, action: str, target: str, detail: str | None = None) -> None:
+    db.add(AuditEvent(actor=actor, action=action, target=target, detail=detail, created_at=_utcnow()))
+
 def _database_url() -> str:
-    url = os.getenv("DATABASE_URL", "sqlite:///./souk-dev.db")
+    url = os.getenv("DATABASE_URL", "sqlite:///:memory:")
     if url.startswith("postgres://"):
         url = "postgresql+psycopg://" + url[len("postgres://"):]
     elif url.startswith("postgresql://") and "+psycopg" not in url:
@@ -325,6 +337,7 @@ def approve_message(message_id: str, decision: ModerationDecision, host: str = D
         row.status = "approved"
         row.moderation_note = decision.note
         row.moderated_at = _utcnow()
+        _audit(db, host, "approve_message", row.id, decision.note)
         return {"message_id": row.id, "status": row.status}
 
 @router.post("/host/messages/{message_id}/hide")
@@ -336,6 +349,7 @@ def hide_message(message_id: str, decision: ModerationDecision, host: str = Depe
         row.status = "hidden"
         row.moderation_note = decision.note or "Hidden by the host."
         row.moderated_at = _utcnow()
+        _audit(db, host, "hide_message", row.id, row.moderation_note)
         return {"message_id": row.id, "status": row.status}
 
 @router.post("/host/pause")
@@ -346,6 +360,7 @@ def pause_submissions(host: str = Depends(_admin)):
             db.add(Setting(key="submissions_paused", value="true"))
         else:
             setting.value = "true"
+        _audit(db, host, "pause_submissions", "global")
     return {"writing": "paused"}
 
 @router.post("/host/resume")
@@ -357,6 +372,7 @@ def resume_submissions(host: str = Depends(_admin)):
             db.add(Setting(key="submissions_paused", value="false"))
         else:
             setting.value = "false"
+        _audit(db, host, "resume_submissions", "global")
     return {"writing": "moderated"}
 
 @router.post("/host/keys", status_code=201)
@@ -375,6 +391,7 @@ def register_key(payload: KeyRegistration, host: str = Depends(_admin)):
         db.add(OperatorKey(key_id=key_id, public_key=payload.public_key.rstrip("="),
                            operator=payload.operator, account=payload.account,
                            display_name=payload.display_name, revoked=False, created_at=_utcnow()))
+        _audit(db, host, "register_operator_key", key_id, payload.operator)
     return {"key_id": key_id, "status": "active"}
 
 @router.post("/host/keys/{key_id}/revoke")
@@ -384,10 +401,15 @@ def revoke_key(key_id: str, host: str = Depends(_admin)):
         if key is None:
             _error(404, "not_found", "Operator key not found.")
         key.revoked = True
+        _audit(db, host, "revoke_operator_key", key_id)
     return {"key_id": key_id, "status": "revoked"}
 
 @router.get("/host/export")
 def export_data(host: str = Depends(_admin)):
     with SessionLocal() as db:
         messages = db.execute(select(Message).order_by(Message.created_at.asc())).scalars().all()
-        return {"messages": [{**_message_json(m), "moderation": {"status": m.status, **({"note": m.moderation_note} if m.moderation_note else {})}} for m in messages]}
+        audit = db.execute(select(AuditEvent).order_by(AuditEvent.created_at.asc())).scalars().all()
+        return {
+            "messages": [{**_message_json(m), "moderation": {"status": m.status, **({"note": m.moderation_note} if m.moderation_note else {})}} for m in messages],
+            "audit": [{"actor": a.actor, "action": a.action, "target": a.target, "detail": a.detail, "created_at": a.created_at.isoformat()} for a in audit],
+        }

@@ -5,7 +5,8 @@ import hashlib
 import re
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse, PlainTextResponse, JSONResponse
-from souk_service import router as souk_router, initialize_database
+from sqlalchemy import text
+from souk_service import router as souk_router, initialize_database, SessionLocal
 
 ROOT=Path(__file__).resolve().parent
 
@@ -73,6 +74,16 @@ Public writing is currently OFF. No operator keys are in this preview.
 @app.get("/")
 def home():
     return FileResponse(ROOT/"public"/"index.html",media_type="text/html",headers={"Cache-Control":"no-store"})
+@app.get("/ready")
+def readiness():
+    """Readiness check includes the primary datastore without leaking errors."""
+    try:
+        with SessionLocal() as db:
+            db.execute(text("SELECT 1"))
+        return JSONResponse({"ok":True},headers=HEADERS)
+    except Exception:
+        return JSONResponse({"ok":False},status_code=503,headers=HEADERS)
+
 @app.get("/health")
 def health():
     mode = __import__("os").getenv("SOUK_MODE", "preview")

@@ -187,7 +187,7 @@ def test_public_message_pagination_uses_an_opaque_cursor(client):
     assert first_page["messages"][0]["message_id"] == ids[1]
     assert first_page["messages"][1]["message_id"] == ids[2]
     cursor = first_page["next_before"]
-    assert cursor and "T" not in cursor
+    assert cursor and "|" not in cursor and "2026-" not in cursor
     second_page = client.get("/api/messages", params={"limit": 2, "before": cursor}).json()
     assert [m["message_id"] for m in second_page["messages"]] == [ids[0]]
     assert second_page["next_before"] is None

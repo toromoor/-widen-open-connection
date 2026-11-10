@@ -160,3 +160,34 @@ def test_beta_serves_the_live_wall_and_uses_a_separate_same_origin_script(client
     assert "textContent" in script.text
     assert "innerHTML" not in script.text
     assert client.get("/api/status").json()["writing"] == "paused"
+
+
+def test_human_rate_limit_is_enforced_per_source(client):
+    client.post("/api/host/resume", headers=auth())
+    for index in range(5):
+        response = client.post("/api/messages", json=human_payload(f"Thought {index}"))
+        assert response.status_code == 202
+    limited = client.post("/api/messages", json=human_payload("One more thought"))
+    assert limited.status_code == 429
+    assert limited.json()["error"]["code"] == "rate_limited"
+
+
+def test_public_message_pagination_uses_an_opaque_cursor(client):
+    client.post("/api/host/resume", headers=auth())
+    ids = []
+    for body in ("First note", "Second note", "Third note"):
+        response = client.post("/api/messages", json=human_payload(body))
+        assert response.status_code == 202
+        message_id = response.json()["message_id"]
+        ids.append(message_id)
+        client.post(f"/api/host/messages/{message_id}/approve", headers=auth(), json={})
+
+    first_page = client.get("/api/messages?limit=2").json()
+    assert len(first_page["messages"]) == 2
+    assert first_page["messages"][0]["message_id"] == ids[1]
+    assert first_page["messages"][1]["message_id"] == ids[2]
+    cursor = first_page["next_before"]
+    assert cursor and "T" not in cursor
+    second_page = client.get("/api/messages", params={"limit": 2, "before": cursor}).json()
+    assert [m["message_id"] for m in second_page["messages"]] == [ids[0]]
+    assert second_page["next_before"] is None

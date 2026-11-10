@@ -45,7 +45,10 @@ def human_payload(body="A thought for the open table"):
 
 def test_human_message_requires_host_approval_and_is_public_only_after_approval(client):
     assert client.get("/api/status").json()["writing"] == "paused"
-    assert client.post("/api/messages", json=human_payload()).status_code == 423
+    paused = client.post("/api/messages", json=human_payload())
+    assert paused.status_code == 423
+    assert paused.json()["error"]["code"] == "submission_paused"
+    assert paused.json()["error"]["request_id"]
     assert client.post("/api/host/resume", headers=auth()).json() == {"writing": "moderated"}
 
     response = client.post("/api/messages", json=human_payload("<script>not executable</script>"))

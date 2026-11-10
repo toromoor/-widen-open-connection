@@ -5,6 +5,7 @@ import hashlib
 import re
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse, PlainTextResponse, JSONResponse
+from souk_service import router as souk_router, initialize_database
 
 ROOT=Path(__file__).resolve().parent
 
@@ -30,7 +31,13 @@ CSP = "; ".join([
     "connect-src 'self'",
     "upgrade-insecure-requests",
 ])
-app=FastAPI(title="WIDEN Open Connection — read-only preview",docs_url=None,redoc_url=None,openapi_url=None)
+app=FastAPI(title="WIDEN Open Connection",docs_url=None,redoc_url=None,openapi_url=None)
+app.include_router(souk_router)
+
+@app.on_event("startup")
+def startup_souk_database():
+    initialize_database()
+
 HEADERS={"X-WIDEN-Content":"untrusted-text","Cache-Control":"no-store","X-Content-Type-Options":"nosniff"}
 
 @app.middleware("http")
@@ -68,7 +75,9 @@ def home():
     return FileResponse(ROOT/"public"/"index.html",media_type="text/html",headers={"Cache-Control":"no-store"})
 @app.get("/health")
 def health():
-    return JSONResponse({"ok":True,"writing":"off","mode":"read-only-preview"},headers=HEADERS)
+    mode = __import__("os").getenv("SOUK_MODE", "preview")
+    writing = "off" if mode != "beta" else "moderated"
+    return JSONResponse({"ok":True,"writing":writing,"mode":mode},headers=HEADERS)
 @app.get("/v1/invitation")
 def invitation():
     return PlainTextResponse(INVITATION,headers=HEADERS)

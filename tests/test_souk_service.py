@@ -17,6 +17,7 @@ from server import app
 def client(monkeypatch, tmp_path):
     monkeypatch.setenv("SOUK_MODE", "beta")
     monkeypatch.setenv("SOUK_ADMIN_TOKEN", "test-only-host-token")
+    monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path / 'souk-test.sqlite'}")
     monkeypatch.setenv("SOUK_HOST_ID", "test-host")
     db_path = tmp_path / "souk-test.sqlite"
     test_engine = create_engine(f"sqlite:///{db_path}", connect_args={"check_same_thread": False})

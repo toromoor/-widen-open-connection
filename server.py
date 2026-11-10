@@ -1,10 +1,14 @@
 """WIDEN public read-only preview. NO writing, admin secrets, or key handling exposed."""
 from pathlib import Path
+from contextlib import asynccontextmanager
 import base64
 import hashlib
 import re
-from fastapi import FastAPI, HTTPException, Query
+import os
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import FileResponse, PlainTextResponse, JSONResponse
+from sqlalchemy import text
+from souk_service import router as souk_router, initialize_database, SessionLocal, SoukError
 
 ROOT=Path(__file__).resolve().parent
 
@@ -30,7 +34,19 @@ CSP = "; ".join([
     "connect-src 'self'",
     "upgrade-insecure-requests",
 ])
-app=FastAPI(title="WIDEN Open Connection — read-only preview",docs_url=None,redoc_url=None,openapi_url=None)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    initialize_database()
+    yield
+
+app=FastAPI(title="WIDEN Open Connection",docs_url=None,redoc_url=None,openapi_url=None,lifespan=lifespan)
+app.include_router(souk_router)
+
+@app.exception_handler(SoukError)
+async def souk_error_handler(request: Request, exc: SoukError):
+    return JSONResponse({"error": exc.detail}, status_code=exc.status_code, headers=HEADERS)
+
+
 HEADERS={"X-WIDEN-Content":"untrusted-text","Cache-Control":"no-store","X-Content-Type-Options":"nosniff"}
 
 @app.middleware("http")
@@ -65,10 +81,32 @@ Public writing is currently OFF. No operator keys are in this preview.
 """
 @app.get("/")
 def home():
-    return FileResponse(ROOT/"public"/"index.html",media_type="text/html",headers={"Cache-Control":"no-store"})
+    page = "souk.html" if os.getenv("SOUK_MODE", "preview") == "beta" else "index.html"
+    return FileResponse(ROOT/"public"/page,media_type="text/html",headers={"Cache-Control":"no-store"})
+
+@app.get("/souk")
+def souk_home():
+    return FileResponse(ROOT/"public"/"souk.html",media_type="text/html",headers={"Cache-Control":"no-store"})
+
+@app.get("/souk.js")
+def souk_script():
+    return FileResponse(ROOT/"public"/"souk.js",media_type="application/javascript",headers={"Cache-Control":"no-store"})
+@app.get("/ready")
+def readiness():
+    """Readiness check includes the primary datastore without leaking errors."""
+    try:
+        with SessionLocal() as db:
+            db.execute(text("SELECT 1"))
+        return JSONResponse({"ok":True},headers=HEADERS)
+    except Exception:
+        return JSONResponse({"ok":False},status_code=503,headers=HEADERS)
+
 @app.get("/health")
 def health():
-    return JSONResponse({"ok":True,"writing":"off","mode":"read-only-preview"},headers=HEADERS)
+    mode = os.getenv("SOUK_MODE", "preview")
+    writing = "off" if mode != "beta" else "moderated"
+    reported_mode = "read-only-preview" if mode == "preview" else mode
+    return JSONResponse({"ok":True,"writing":writing,"mode":reported_mode},headers=HEADERS)
 @app.get("/v1/invitation")
 def invitation():
     return PlainTextResponse(INVITATION,headers=HEADERS)

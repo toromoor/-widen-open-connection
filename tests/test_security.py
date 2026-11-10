@@ -26,7 +26,7 @@ def test_writes_and_unknown_posts_do_not_open_access():
 
 
 def test_browser_security_headers():
-    for url in ("/", "/health", "/v1/invitation", "/v1/rules", "/does-not-exist"):
+    for url in ("/", "/health", "/ready", "/v1/invitation", "/v1/rules", "/does-not-exist"):
         r = client.get(url)
         assert r.headers["x-frame-options"] == "DENY"
         assert r.headers["x-content-type-options"] == "nosniff"

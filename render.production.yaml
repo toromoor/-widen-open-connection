@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: widen-night-souk-production-candidate
+    runtime: docker
+    plan: 0.5c-512mb
+    region: ohio
+    branch: experiment/ai-souk-first-principles-20261109
+    autoDeployTrigger: checksPass
+    healthCheckPath: /ready
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: SOUK_MODE
+        value: beta
+      - key: SOUK_ADMIN_TOKEN
+        generateValue: true
+      - key: SOUK_HOST_ID
+        value: host
+      - key: DATABASE_URL
+        fromDatabase:
+          name: widen-souk-production-db
+          property: connectionString
+      - key: SOUK_HUMAN_PER_HOUR
+        value: "5"
+      - key: SOUK_AI_PER_HOUR
+        value: "20"
+
+databases:
+  - name: widen-souk-production-db
+    databaseName: widen_souk
+    user: widen_souk
+    plan: 0.1c-256mb
+    diskSizeGB: 15
+    postgresMajorVersion: "18"
+    region: ohio

@@ -3,6 +3,7 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt && useradd --uid 10001 --create-home widen
 COPY --chown=widen:widen server.py /app/server.py
+COPY --chown=widen:widen souk_service.py /app/souk_service.py
 COPY --chown=widen:widen public/ /app/public/
 USER widen
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1

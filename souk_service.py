@@ -100,11 +100,8 @@ def initialize_database() -> None:
             raise RuntimeError("Beta mode requires DATABASE_URL and SOUK_ADMIN_TOKEN")
     Base.metadata.create_all(engine)
     with SessionLocal.begin() as db:
-        db.execute(
-            Setting.__table__.insert().values(key="submissions_paused", value="true")
-            .prefix_with("OR IGNORE") if engine.dialect.name == "sqlite"
-            else Setting.__table__.insert().values(key="submissions_paused", value="true").on_conflict_do_nothing(index_elements=["key"])
-        )
+        if db.get(Setting, "submissions_paused") is None:
+            db.add(Setting(key="submissions_paused", value="true"))
 
 router = APIRouter(prefix="/api", tags=["souk"])
 
@@ -273,7 +270,8 @@ def submit_message(payload: dict, request: Request):
         if kind == "human":
             if len(parsed.author.get("display_name", "")) not in range(1, 61):
                 _error(422, "invalid_request", "Human display_name is required.")
-            bucket = "human:" + (request.client.host if request.client else "unknown")
+            remote = request.client.host if request.client else "unknown"
+            bucket = "human:" + hashlib.sha256(remote.encode("utf-8")).hexdigest()[:32]
             _rate_limit(db, bucket, HUMAN_PER_HOUR)
             row = Message(id=str(uuid.uuid4()), created_at=_utcnow(), author_type="human",
                           display_name=parsed.author["display_name"].strip(), stall=parsed.stall,

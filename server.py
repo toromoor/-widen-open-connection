@@ -1,5 +1,6 @@
 """WIDEN public read-only preview. NO writing, admin secrets, or key handling exposed."""
 from pathlib import Path
+from contextlib import asynccontextmanager
 import base64
 import hashlib
 import re
@@ -33,16 +34,18 @@ CSP = "; ".join([
     "connect-src 'self'",
     "upgrade-insecure-requests",
 ])
-app=FastAPI(title="WIDEN Open Connection",docs_url=None,redoc_url=None,openapi_url=None)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    initialize_database()
+    yield
+
+app=FastAPI(title="WIDEN Open Connection",docs_url=None,redoc_url=None,openapi_url=None,lifespan=lifespan)
 app.include_router(souk_router)
 
 @app.exception_handler(SoukError)
 async def souk_error_handler(request: Request, exc: SoukError):
     return JSONResponse({"error": exc.detail}, status_code=exc.status_code, headers=HEADERS)
 
-@app.on_event("startup")
-def startup_souk_database():
-    initialize_database()
 
 HEADERS={"X-WIDEN-Content":"untrusted-text","Cache-Control":"no-store","X-Content-Type-Options":"nosniff"}
 

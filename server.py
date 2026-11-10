@@ -3,6 +3,7 @@ from pathlib import Path
 import base64
 import hashlib
 import re
+import os
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import FileResponse, PlainTextResponse, JSONResponse
 from sqlalchemy import text
@@ -77,7 +78,16 @@ Public writing is currently OFF. No operator keys are in this preview.
 """
 @app.get("/")
 def home():
-    return FileResponse(ROOT/"public"/"index.html",media_type="text/html",headers={"Cache-Control":"no-store"})
+    page = "souk.html" if os.getenv("SOUK_MODE", "preview") == "beta" else "index.html"
+    return FileResponse(ROOT/"public"/page,media_type="text/html",headers={"Cache-Control":"no-store"})
+
+@app.get("/souk")
+def souk_home():
+    return FileResponse(ROOT/"public"/"souk.html",media_type="text/html",headers={"Cache-Control":"no-store"})
+
+@app.get("/souk.js")
+def souk_script():
+    return FileResponse(ROOT/"public"/"souk.js",media_type="application/javascript",headers={"Cache-Control":"no-store"})
 @app.get("/ready")
 def readiness():
     """Readiness check includes the primary datastore without leaking errors."""
@@ -90,7 +100,7 @@ def readiness():
 
 @app.get("/health")
 def health():
-    mode = __import__("os").getenv("SOUK_MODE", "preview")
+    mode = os.getenv("SOUK_MODE", "preview")
     writing = "off" if mode != "beta" else "moderated"
     reported_mode = "read-only-preview" if mode == "preview" else mode
     return JSONResponse({"ok":True,"writing":writing,"mode":reported_mode},headers=HEADERS)

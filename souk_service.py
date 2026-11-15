@@ -111,6 +111,9 @@ def initialize_database() -> None:
     if os.getenv("SOUK_MODE", "preview") == "beta":
         if not os.getenv("DATABASE_URL") or not os.getenv("SOUK_ADMIN_TOKEN"):
             raise RuntimeError("Beta mode requires DATABASE_URL and SOUK_ADMIN_TOKEN")
+        host_id = os.getenv("SOUK_HOST_ID", "").strip()
+        if not host_id or len(host_id) > 120:
+            raise RuntimeError("Beta mode requires an explicit SOUK_HOST_ID (1–120 characters)")
     Base.metadata.create_all(engine)
     with SessionLocal.begin() as db:
         if db.get(Setting, "submissions_paused") is None:
@@ -134,7 +137,10 @@ def _admin(authorization: str | None = Header(default=None)) -> str:
     supplied = authorization.removeprefix("Bearer ").strip() if authorization else ""
     if not expected or not hmac.compare_digest(supplied, expected):
         _error(401, "unauthorized", "A valid host authorization token is required.")
-    return os.getenv("SOUK_HOST_ID", "host")
+    host_id = os.getenv("SOUK_HOST_ID", "").strip()
+    if not host_id or len(host_id) > 120:
+        _error(503, "host_identity_unconfigured", "Host identity is not configured.")
+    return host_id
 
 def _require_beta() -> None:
     if os.getenv("SOUK_MODE", "preview") != "beta":

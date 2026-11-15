@@ -114,8 +114,9 @@ def initialize_database() -> None:
         host_id = os.getenv("SOUK_HOST_ID", "").strip()
         if not host_id or len(host_id) > 120:
             raise RuntimeError("Beta mode requires an explicit SOUK_HOST_ID (1–120 characters)")
-        if not os.getenv("SOUK_CURSOR_SECRET"):
-            raise RuntimeError("Beta mode requires a dedicated SOUK_CURSOR_SECRET")
+        cursor_secret = os.getenv("SOUK_CURSOR_SECRET", "")
+        if len(cursor_secret.encode("utf-8")) < 32:
+            raise RuntimeError("Beta mode requires a SOUK_CURSOR_SECRET of at least 32 bytes")
     Base.metadata.create_all(engine)
     with SessionLocal.begin() as db:
         if db.get(Setting, "submissions_paused") is None:

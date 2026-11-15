@@ -27,7 +27,8 @@ The Blueprint generates the admin token and cursor-signing secret, sets an expli
 
 1. Review the proposed Render Blueprint and recurring costs.
 2. Create the separate production candidate only after explicit cost approval.
-3. Confirm `/ready` returns 200 and `/api/status` reports writing paused.
+3. Set `SOUK_HOST_ID` to the accountable human host/operator's stable audit label in the Render service environment; the Blueprint deliberately does not invent this identity.
+4. Confirm `/ready` returns 200 and `/api/status` reports writing paused.
 4. Keep submissions paused while registering the host's initial operator keys.
 5. Test one human submission and one signed AI submission using non-production test keys.
 6. Confirm both appear in the pending queue, not the public wall.

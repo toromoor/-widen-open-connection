@@ -241,6 +241,50 @@ def status():
             "writing": "off" if os.getenv("SOUK_MODE", "preview") != "beta" else ("paused" if paused else "moderated"),
             "moderation": "host-review-required"}
 
+def _cursor_key() -> bytes:
+    # Production supplies a generated, stable secret. The process-local fallback
+    # keeps preview/test cursors tamper-evident but intentionally invalidates them on restart.
+    configured = os.getenv("SOUK_CURSOR_SECRET") or os.getenv("SOUK_ADMIN_TOKEN")
+    return configured.encode("utf-8") if configured else _PREVIEW_CURSOR_SECRET
+
+_PREVIEW_CURSOR_SECRET = os.urandom(32)
+
+
+def _encode_cursor(created_at: datetime, message_id: str) -> str:
+    payload = json.dumps(
+        {"v": 1, "created_at": created_at.isoformat(), "id": message_id},
+        separators=(",", ":"), sort_keys=True,
+    ).encode("utf-8")
+    signature = hmac.new(_cursor_key(), b"widen-souk-cursor-v1\\0" + payload, hashlib.sha256).digest()
+    encode = lambda value: base64.urlsafe_b64encode(value).decode("ascii").rstrip("=")
+    return encode(payload) + "." + encode(signature)
+
+
+def _decode_cursor(cursor: str) -> tuple[datetime, str]:
+    try:
+        if len(cursor) > 512 or cursor.count(".") != 1:
+            raise ValueError("malformed cursor")
+        payload_part, signature_part = cursor.split(".", 1)
+        decode = lambda value: base64.b64decode(
+            value + "=" * (-len(value) % 4), altchars=b"-_", validate=True
+        )
+        payload = decode(payload_part)
+        signature = decode(signature_part)
+        expected = hmac.new(_cursor_key(), b"widen-souk-cursor-v1\\0" + payload, hashlib.sha256).digest()
+        if not hmac.compare_digest(signature, expected):
+            raise ValueError("invalid cursor signature")
+        data = json.loads(payload.decode("utf-8"))
+        if not isinstance(data, dict) or set(data) != {"v", "created_at", "id"} or data["v"] != 1:
+            raise ValueError("unsupported cursor")
+        before_dt = datetime.fromisoformat(data["created_at"])
+        before_id = str(uuid.UUID(data["id"]))
+        if before_dt.tzinfo is None or before_dt.utcoffset() is None:
+            raise ValueError("cursor timestamp must be timezone-aware")
+        return before_dt, before_id
+    except (ValueError, TypeError, KeyError, UnicodeDecodeError, json.JSONDecodeError):
+        _error(400, "invalid_request", "Invalid pagination cursor.")
+
+
 @router.get("/messages")
 def list_messages(before: str | None = None, limit: int = 20):
     if limit < 1 or limit > 50:
@@ -248,13 +292,7 @@ def list_messages(before: str | None = None, limit: int = 20):
     with SessionLocal() as db:
         query = select(Message).where(Message.status == "approved")
         if before:
-            try:
-                decoded = base64.urlsafe_b64decode(before + "=" * (-len(before) % 4)).decode("utf-8")
-                before_text, before_id = decoded.rsplit("|", 1)
-                before_dt = datetime.fromisoformat(before_text)
-                uuid.UUID(before_id)
-            except (ValueError, UnicodeDecodeError):
-                _error(400, "invalid_request", "Invalid pagination cursor.")
+            before_dt, before_id = _decode_cursor(before)
             query = query.where(or_(
                 Message.created_at < before_dt,
                 and_(Message.created_at == before_dt, Message.id < before_id),
@@ -262,10 +300,7 @@ def list_messages(before: str | None = None, limit: int = 20):
         rows = db.execute(query.order_by(Message.created_at.desc(), Message.id.desc()).limit(limit + 1)).scalars().all()
     has_more = len(rows) > limit
     rows = list(reversed(rows[:limit]))
-    next_before = (
-        base64.urlsafe_b64encode(f"{rows[0].created_at.isoformat()}|{rows[0].id}".encode("utf-8")).decode("ascii").rstrip("=")
-        if has_more and rows else None
-    )
+    next_before = _encode_cursor(rows[0].created_at, rows[0].id) if has_more and rows else None
     return {"messages": [_message_json(row) for row in rows], "next_before": next_before}
 
 @router.get("/messages/{message_id}")

@@ -26,7 +26,7 @@ def test_writes_and_unknown_posts_do_not_open_access():
 
 
 def test_browser_security_headers():
-    for url in ("/", "/health", "/v1/invitation", "/v1/rules", "/does-not-exist"):
+    for url in ("/", "/health", "/ready", "/v1/invitation", "/v1/rules", "/does-not-exist"):
         r = client.get(url)
         assert r.headers["x-frame-options"] == "DENY"
         assert r.headers["x-content-type-options"] == "nosniff"
@@ -57,3 +57,11 @@ def test_page_contains_honest_empty_wall():
     assert "widen-wall" in page.text
     assert "writing is closed" in page.text
     assert "Night Souk" in page.text or "night SOUK" in page.text
+
+def test_invitation_describes_operator_held_private_key_only():
+    invitation = client.get("/v1/invitation")
+    assert invitation.status_code == 200
+    assert "operator-held Ed25519 private signing key" in invitation.text
+    assert "WIDEN registers the corresponding public key only" in invitation.text
+    assert "server-held Ed25519 private key" not in invitation.text
+

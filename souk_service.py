@@ -19,7 +19,7 @@ from typing import Literal
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, text
 from sqlalchemy.exc import IntegrityError
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, create_engine, select, update
@@ -155,6 +155,11 @@ def _is_paused(db: Session) -> bool:
     return setting is None or setting.value != "false"
 
 def _rate_limit(db: Session, bucket: str, limit: int) -> None:
+    # Serialize checks for the same bucket on PostgreSQL. Without this lock,
+    # simultaneous requests can all observe the same count and exceed the limit.
+    if db.get_bind().dialect.name == "postgresql":
+        lock_id = int.from_bytes(hashlib.sha256(bucket.encode("utf-8")).digest()[:8], "big", signed=True)
+        db.execute(text("SELECT pg_advisory_xact_lock(:lock_id)"), {"lock_id": lock_id})
     cutoff = datetime.fromtimestamp(time.time() - 3600, tz=timezone.utc)
     db.query(RateEvent).filter(RateEvent.created_at < cutoff).delete(synchronize_session=False)
     count = db.query(RateEvent).filter(RateEvent.bucket == bucket, RateEvent.created_at >= cutoff).count()

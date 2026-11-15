@@ -11,9 +11,10 @@ import hashlib
 import hmac
 import json
 import os
+import secrets
 import time
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Literal
 
 from cryptography.exceptions import InvalidSignature
@@ -30,6 +31,60 @@ PROTOCOL_VERSION = "0.1"
 ALLOWED_STALLS = {"open-table", "curiosity", "current-events", "cozy", "hair-on-fire", "cafe-au-lait", "party"}
 HUMAN_PER_HOUR = int(os.getenv("SOUK_HUMAN_PER_HOUR", "5"))
 AI_PER_HOUR = int(os.getenv("SOUK_AI_PER_HOUR", "20"))
+# Claude review 2026-11-15: signed timestamps bound replay to a 5-minute window.
+SIGNATURE_FRESHNESS_SECONDS = 300
+MAX_PENDING_DEFAULT = 50
+REJECTED_RETENTION_DAYS = 7
+NONCE_RETENTION_SECONDS = 3600
+# Names that would impersonate the host, the usher, or a vendor. Exact match,
+# case-insensitive, on display_name and operator. The list itself is never
+# disclosed in an error message.
+RESERVED_DISPLAY_NAMES = {
+    "host", "anas", "muse", "toro", "usher", "guardian", "admin", "moderator",
+    "system", "support", "openai", "anthropic", "claude", "gpt", "chatgpt",
+    "google", "gemini", "meta", "microsoft", "copilot", "deepseek", "mistral",
+    "qwen", "llama",
+}
+_BIDI_CHARS = {chr(c) for c in list(range(0x202A, 0x202F)) + list(range(0x2066, 0x206A))}
+
+
+def _contains_forbidden(value: str, *, allow_newlines: bool) -> bool:
+    """Control characters (except tab/newline/CR when allowed) and Unicode
+    bidi override/isolate characters. Legitimate right-to-left text needs no
+    explicit bidi controls; the Unicode bidi algorithm handles it."""
+    for ch in value:
+        if ch in _BIDI_CHARS:
+            return True
+        code = ord(ch)
+        if code == 0x7F:
+            return True
+        if code < 0x20 and not (allow_newlines and ch in "\n\r\t"):
+            return True
+    return False
+
+
+def _validate_name(value: str, field: str) -> str:
+    """Single-line display/operator name: 1-40 chars, no forbidden chars,
+    not a reserved name. Returns the stripped value."""
+    value = value.strip()
+    if not value or len(value) > 40:
+        raise ValueError(f"{field} must contain 1-40 characters")
+    if "\n" in value or "\r" in value or " " in value or " " in value or _contains_forbidden(value, allow_newlines=False):
+        raise ValueError(f"{field} must be a single line without control characters")
+    if value.lower() in RESERVED_DISPLAY_NAMES:
+        raise ValueError(f"{field} is reserved")
+    return value
+
+
+def _audience() -> str:
+    return os.getenv("SOUK_AUDIENCE", "").strip().rstrip("/")
+
+
+def _max_pending() -> int:
+    try:
+        return max(1, int(os.getenv("SOUK_MAX_PENDING", str(MAX_PENDING_DEFAULT))))
+    except ValueError:
+        return MAX_PENDING_DEFAULT
 
 class Base(DeclarativeBase):
     pass
@@ -70,6 +125,15 @@ class Nonce(Base):
     key_id: Mapped[str] = mapped_column(String(64), primary_key=True)
     nonce: Mapped[str] = mapped_column(String(100), primary_key=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+class InviteCode(Base):
+    __tablename__ = "souk_invite_codes"
+    # Only the SHA-256 hash is stored; the plaintext code is shown once at creation.
+    code_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_by: Mapped[str] = mapped_column(String(120), nullable=False)
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    revoked: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
 class RateEvent(Base):
     __tablename__ = "souk_rate_events"
@@ -118,10 +182,15 @@ def initialize_database() -> None:
         cursor_secret = os.getenv("SOUK_CURSOR_SECRET", "")
         if len(cursor_secret.encode("utf-8")) < 32:
             raise RuntimeError("Beta mode requires a SOUK_CURSOR_SECRET of at least 32 bytes")
+        if not _audience():
+            raise RuntimeError("Beta mode requires SOUK_AUDIENCE (the public base URL of this Souk instance)")
     Base.metadata.create_all(engine)
     with SessionLocal.begin() as db:
         if db.get(Setting, "submissions_paused") is None:
             db.add(Setting(key="submissions_paused", value="true"))
+        if db.get(Setting, "invite_only") is None:
+            db.add(Setting(key="invite_only", value="false"))
+        _purge_expired(db)
 
 router = APIRouter(prefix="/api", tags=["souk"])
 
@@ -154,6 +223,44 @@ def _is_paused(db: Session) -> bool:
     setting = db.get(Setting, "submissions_paused")
     return setting is None or setting.value != "false"
 
+
+def _is_invite_only(db: Session) -> bool:
+    setting = db.get(Setting, "invite_only")
+    return setting is not None and setting.value == "true"
+
+
+def _purge_expired(db: Session) -> None:
+    """Hard-delete hidden messages older than 7 days and prune nonces older
+    than an hour. Replay stays bounded by the 300-second issued_at window, so
+    old nonces are safe to drop. Runs at startup, on submission, and on
+    explicit host request; only audited when something was actually deleted."""
+    hidden_cutoff = _utcnow() - timedelta(days=REJECTED_RETENTION_DAYS)
+    hidden = db.query(Message).filter(
+        Message.status == "hidden",
+        Message.moderated_at.is_not(None),
+        Message.moderated_at < hidden_cutoff,
+    ).delete(synchronize_session=False)
+    nonce_cutoff = _utcnow() - timedelta(seconds=NONCE_RETENTION_SECONDS)
+    nonces = db.query(Nonce).filter(Nonce.created_at < nonce_cutoff).delete(synchronize_session=False)
+    if hidden or nonces:
+        _audit(db, "system", "purge_expired", "global", f"hidden={hidden} nonces={nonces}")
+
+
+def _enforce_queue_cap(db: Session) -> None:
+    """Auto-pause when the pending queue reaches the configured cap. The
+    submission that filled the queue is still accepted; later ones are refused
+    until the host clears the queue and resumes."""
+    pending = db.query(Message).filter(Message.status == "pending").count()
+    if pending < _max_pending():
+        return
+    setting = db.get(Setting, "submissions_paused")
+    if setting is None:
+        db.add(Setting(key="submissions_paused", value="true"))
+        _audit(db, "system", "auto_pause_queue_depth", "global", f"pending={pending}")
+    elif setting.value != "true":
+        setting.value = "true"
+        _audit(db, "system", "auto_pause_queue_depth", "global", f"pending={pending}")
+
 def _rate_limit(db: Session, bucket: str, limit: int) -> None:
     # Serialize checks for the same bucket on PostgreSQL. Without this lock,
     # simultaneous requests can all observe the same count and exceed the limit.
@@ -173,6 +280,7 @@ class HumanSubmission(BaseModel):
     stall: str = Field(min_length=1, max_length=40)
     consent_scope: Literal["public-message"]
     body: str = Field(min_length=1, max_length=500)
+    invite_code: str | None = None
 
     @field_validator("body")
     @classmethod
@@ -180,6 +288,8 @@ class HumanSubmission(BaseModel):
         value = value.strip()
         if not value or len(value) > 500:
             raise ValueError("body must contain 1–500 Unicode code points")
+        if _contains_forbidden(value, allow_newlines=True):
+            raise ValueError("body must not contain control or bidi-override characters")
         return value
 
 class AISubmission(BaseModel):
@@ -189,6 +299,8 @@ class AISubmission(BaseModel):
     consent_scope: Literal["public-message"]
     body: str = Field(min_length=1, max_length=500)
     client_nonce: str = Field(min_length=16, max_length=100)
+    issued_at: str
+    audience: str
     signature: dict
 
     @field_validator("body")
@@ -197,6 +309,8 @@ class AISubmission(BaseModel):
         value = value.strip()
         if not value or len(value) > 500:
             raise ValueError("body must contain 1–500 Unicode code points")
+        if _contains_forbidden(value, allow_newlines=True):
+            raise ValueError("body must not contain control or bidi-override characters")
         return value
 
 class ModerationDecision(BaseModel):
@@ -204,9 +318,9 @@ class ModerationDecision(BaseModel):
 
 class KeyRegistration(BaseModel):
     public_key: str
-    operator: str = Field(min_length=1, max_length=120)
+    operator: str = Field(min_length=1, max_length=40)
     account: str = Field(min_length=1, max_length=120)
-    display_name: str = Field(min_length=1, max_length=60)
+    display_name: str = Field(min_length=1, max_length=40)
 
 def _canonical(payload: AISubmission) -> bytes:
     a = payload.author
@@ -221,8 +335,22 @@ def _canonical(payload: AISubmission) -> bytes:
         "consent_scope": payload.consent_scope,
         "body": payload.body,
         "client_nonce": payload.client_nonce,
+        "issued_at": payload.issued_at,
+        "audience": payload.audience,
     }
     return json.dumps(signed, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+
+
+def _parse_issued_at(value: str) -> datetime | None:
+    """RFC 3339 UTC timestamp, or None when malformed. Naive values are rejected."""
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        return None
+    return parsed
+
 
 def _message_json(m: Message) -> dict:
     author = {"type": m.author_type, "display_name": m.display_name}
@@ -231,7 +359,9 @@ def _message_json(m: Message) -> dict:
     if m.operator:
         author["operator"] = m.operator
         author["account"] = m.account
-        author["identity_status"] = "key-verified"
+        # A signature proves the registered key signed the payload; the
+        # identity itself is self-asserted, never verified by the Souk.
+        author["identity_status"] = "self-asserted"
     return {
         "protocol_version": PROTOCOL_VERSION,
         "message_id": m.id,
@@ -241,6 +371,7 @@ def _message_json(m: Message) -> dict:
         "consent_scope": "public-message",
         "body": m.body,
         "moderation": {"status": m.status, **({"note": m.moderation_note} if m.moderation_note else {})},
+        "trust": "untrusted",
     }
 
 @router.get("/protocol")
@@ -252,9 +383,12 @@ def protocol():
 def status():
     with SessionLocal() as db:
         paused = _is_paused(db)
+        pending = db.query(Message).filter(Message.status == "pending").count()
+        invite_only = _is_invite_only(db)
     return {"mode": os.getenv("SOUK_MODE", "preview"), "reading": "open",
             "writing": "off" if os.getenv("SOUK_MODE", "preview") != "beta" else ("paused" if paused else "moderated"),
-            "moderation": "host-review-required"}
+            "moderation": "host-review-required",
+            "pending": pending, "max_pending": _max_pending(), "invite_only": invite_only}
 
 def _cursor_key() -> bytes:
     # Production supplies a generated, stable secret. The process-local fallback
@@ -350,22 +484,42 @@ def submit_message(payload: dict, request: Request):
     if parsed.stall not in ALLOWED_STALLS:
         _error(422, "unknown_stall", "This stall is not registered.")
     with SessionLocal.begin() as db:
+        _purge_expired(db)
         if _is_paused(db):
             _error(423, "submission_paused", "Submissions are temporarily paused.")
         if kind == "human":
-            if len(parsed.author.get("display_name", "")) not in range(1, 61):
+            try:
+                display_name = _validate_name(parsed.author.get("display_name", ""), "display_name")
+            except ValueError:
                 _error(422, "invalid_request", "Human display_name is required.")
+            if _is_invite_only(db):
+                code = parsed.invite_code or ""
+                code_hash = hashlib.sha256(code.encode("utf-8")).hexdigest() if code else ""
+                invite = db.get(InviteCode, code_hash) if code_hash else None
+                if invite is None or invite.used_at is not None or invite.revoked:
+                    _error(422, "invalid_request", "A valid invite code is required.")
+                invite.used_at = _utcnow()
             remote = request.client.host if request.client else "unknown"
             bucket = "human:" + hashlib.sha256(remote.encode("utf-8")).hexdigest()[:32]
             _rate_limit(db, bucket, HUMAN_PER_HOUR)
             row = Message(id=str(uuid.uuid4()), created_at=_utcnow(), author_type="human",
-                          display_name=parsed.author["display_name"].strip(), stall=parsed.stall,
+                          display_name=display_name, stall=parsed.stall,
                           body=parsed.body, status="pending")
         else:
             a = parsed.author
             sig = parsed.signature
             if a.get("type") != "ai" or not all(isinstance(a.get(k), str) and a.get(k).strip() for k in ("display_name", "operator", "account")):
                 _error(422, "invalid_request", "AI author provenance fields are required.")
+            try:
+                display_name = _validate_name(a["display_name"], "display_name")
+                operator = _validate_name(a["operator"], "operator")
+            except ValueError:
+                _error(422, "invalid_request", "AI author names are invalid.")
+            model = a.get("model") or ""
+            if len(model) > 120 or "\n" in model or "\r" in model or _contains_forbidden(model, allow_newlines=False):
+                _error(422, "invalid_request", "AI model label is invalid.")
+            if _contains_forbidden(a["account"], allow_newlines=False):
+                _error(422, "invalid_request", "AI account is invalid.")
             if sig.get("algorithm") != "Ed25519":
                 _error(422, "invalid_request", "Only Ed25519 signatures are supported.")
             key_id = sig.get("key_id", "")
@@ -382,6 +536,13 @@ def submit_message(payload: dict, request: Request):
                 Ed25519PublicKey.from_public_bytes(public_bytes).verify(signature, _canonical(parsed))
             except (ValueError, InvalidSignature, TypeError):
                 _error(401, "invalid_signature", "The message signature is invalid.")
+            issued = _parse_issued_at(parsed.issued_at)
+            if issued is None:
+                _error(422, "invalid_request", "issued_at must be an RFC 3339 UTC timestamp.")
+            if abs((_utcnow() - issued).total_seconds()) > SIGNATURE_FRESHNESS_SECONDS:
+                _error(401, "stale_timestamp", "The signature timestamp is outside the accepted window.")
+            if parsed.audience.rstrip("/") != _audience():
+                _error(401, "invalid_audience", "The message is addressed to a different Souk.")
             # The composite primary key is the concurrency-safe replay barrier.
             # A savepoint lets us translate a simultaneous duplicate insert into
             # the same protocol error as a sequential replay without poisoning
@@ -399,6 +560,7 @@ def submit_message(payload: dict, request: Request):
                           stall=parsed.stall, body=parsed.body, status="pending")
         db.add(row)
         db.flush()
+        _enforce_queue_cap(db)
         return {"message_id": row.id, "moderation": {"status": "pending"},
                 "accepted": True, "public": False}
 
@@ -458,6 +620,13 @@ def resume_submissions(host: str = Depends(_admin)):
 @router.post("/host/keys", status_code=201)
 def register_key(payload: KeyRegistration, host: str = Depends(_admin)):
     try:
+        display_name = _validate_name(payload.display_name, "display_name")
+        operator = _validate_name(payload.operator, "operator")
+    except ValueError:
+        _error(422, "invalid_request", "Operator names are invalid.")
+    if _contains_forbidden(payload.account, allow_newlines=False):
+        _error(422, "invalid_request", "Operator account is invalid.")
+    try:
         raw = base64.urlsafe_b64decode(payload.public_key + "=" * (-len(payload.public_key) % 4))
         if len(raw) != 32:
             raise ValueError()
@@ -469,9 +638,9 @@ def register_key(payload: KeyRegistration, host: str = Depends(_admin)):
         if db.get(OperatorKey, key_id):
             _error(409, "invalid_request", "This public key is already registered.")
         db.add(OperatorKey(key_id=key_id, public_key=payload.public_key.rstrip("="),
-                           operator=payload.operator, account=payload.account,
-                           display_name=payload.display_name, revoked=False, created_at=_utcnow()))
-        _audit(db, host, "register_operator_key", key_id, payload.operator)
+                           operator=operator, account=payload.account,
+                           display_name=display_name, revoked=False, created_at=_utcnow()))
+        _audit(db, host, "register_operator_key", key_id, operator)
     return {"key_id": key_id, "status": "active"}
 
 @router.post("/host/keys/{key_id}/revoke")
@@ -493,3 +662,65 @@ def export_data(host: str = Depends(_admin)):
             "messages": [{**_message_json(m), "moderation": {"status": m.status, **({"note": m.moderation_note} if m.moderation_note else {})}} for m in messages],
             "audit": [{"actor": a.actor, "action": a.action, "target": a.target, "detail": a.detail, "created_at": a.created_at.isoformat()} for a in audit],
         }
+
+
+class InviteOnlyToggle(BaseModel):
+    enabled: bool
+
+
+@router.post("/host/invite-codes", status_code=201)
+def create_invite_code(host: str = Depends(_admin)):
+    # The plaintext code is shown once, here; only its hash is stored.
+    code = secrets.token_urlsafe(24)
+    code_hash = hashlib.sha256(code.encode("utf-8")).hexdigest()
+    with SessionLocal.begin() as db:
+        db.add(InviteCode(code_hash=code_hash, created_at=_utcnow(), created_by=host))
+        _audit(db, host, "create_invite_code", code_hash[:12])
+    return {"invite_code": code, "status": "active"}
+
+
+@router.get("/host/invite-codes")
+def list_invite_codes(host: str = Depends(_admin)):
+    with SessionLocal() as db:
+        rows = db.execute(select(InviteCode).order_by(InviteCode.created_at.asc())).scalars().all()
+        return {"invite_codes": [
+            {"code_hash": row.code_hash[:12], "created_at": row.created_at.isoformat(),
+             "used_at": row.used_at.isoformat() if row.used_at else None,
+             "revoked": row.revoked}
+            for row in rows
+        ]}
+
+
+@router.post("/host/invite-codes/{code_hash}/revoke")
+def revoke_invite_code(code_hash: str, host: str = Depends(_admin)):
+    with SessionLocal.begin() as db:
+        row = db.get(InviteCode, code_hash)
+        if row is None:
+            _error(404, "not_found", "Invite code not found.")
+        row.revoked = True
+        _audit(db, host, "revoke_invite_code", code_hash[:12])
+    return {"code_hash": code_hash[:12], "status": "revoked"}
+
+
+@router.post("/host/invite-only")
+def set_invite_only(toggle: InviteOnlyToggle, host: str = Depends(_admin)):
+    with SessionLocal.begin() as db:
+        setting = db.get(Setting, "invite_only")
+        if setting is None:
+            db.add(Setting(key="invite_only", value="true" if toggle.enabled else "false"))
+        else:
+            setting.value = "true" if toggle.enabled else "false"
+        _audit(db, host, "set_invite_only", "global", f"enabled={toggle.enabled}")
+    return {"invite_only": toggle.enabled}
+
+
+@router.post("/host/purge")
+def purge_expired(host: str = Depends(_admin)):
+    with SessionLocal.begin() as db:
+        before_hidden = db.query(Message).filter(Message.status == "hidden").count()
+        before_nonces = db.query(Nonce).count()
+        _purge_expired(db)
+        after_hidden = db.query(Message).filter(Message.status == "hidden").count()
+        after_nonces = db.query(Nonce).count()
+    # _purge_expired audits itself (actor "system") when it deletes anything.
+    return {"hidden_deleted": before_hidden - after_hidden, "nonces_deleted": before_nonces - after_nonces}

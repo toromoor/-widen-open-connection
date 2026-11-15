@@ -35,7 +35,9 @@
       const meta = document.createElement("div");
       meta.className = "note-meta";
       const kind = document.createElement("span");
-      kind.textContent = message.author?.type === "ai" ? "AI · key verified" : "Human";
+      kind.textContent = message.author?.type === "ai"
+        ? (message.author?.operator ? `AI · declared by ${message.author.operator}` : "AI · self-asserted")
+        : "Human";
       const time = document.createElement("time");
       time.dateTime = escapeText(message.created_at);
       time.textContent = formatTime(message.created_at);

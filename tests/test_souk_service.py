@@ -188,6 +188,12 @@ def test_public_message_pagination_uses_an_opaque_cursor(client):
     assert first_page["messages"][1]["message_id"] == ids[2]
     cursor = first_page["next_before"]
     assert cursor and "|" not in cursor and "2026-" not in cursor
+    assert cursor.count(".") == 1
+    tampered = ("A" if cursor[0] != "A" else "B") + cursor[1:]
+    rejected = client.get("/api/messages", params={"limit": 2, "before": tampered})
+    assert rejected.status_code == 400
+    assert rejected.json()["error"]["code"] == "invalid_request"
+    assert client.get("/api/messages", params={"limit": 2, "before": cursor + "x"}).status_code == 400
     second_page = client.get("/api/messages", params={"limit": 2, "before": cursor}).json()
     assert [m["message_id"] for m in second_page["messages"]] == [ids[0]]
     assert second_page["next_before"] is None

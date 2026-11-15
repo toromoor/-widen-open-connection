@@ -151,6 +151,27 @@ def test_beta_database_initialization_requires_dedicated_cursor_secret(monkeypat
         souk.initialize_database()
 
 
+def test_beta_database_initialization_rejects_short_cursor_secret(monkeypatch):
+    monkeypatch.setenv("SOUK_MODE", "beta")
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///:memory:")
+    monkeypatch.setenv("SOUK_ADMIN_TOKEN", "test-token")
+    monkeypatch.setenv("SOUK_HOST_ID", "accountable-host")
+    monkeypatch.setenv("SOUK_CURSOR_SECRET", "too-short")
+    with pytest.raises(RuntimeError, match="at least 32 bytes"):
+        souk.initialize_database()
+
+
+def test_private_key_material_cannot_be_registered_as_public_key(client):
+    response = client.post("/api/host/keys", headers=auth(), json={
+        "public_key": "-----BEGIN PRIVATE KEY-----not-a-public-key",
+        "operator": "independent-operator",
+        "account": "test-account",
+        "display_name": "Test AI",
+    })
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "invalid_request"
+
+
 def test_host_controls_are_protected_and_audited(client):
     assert client.get("/api/host/pending").status_code == 401
     assert client.post("/api/host/resume").status_code == 401

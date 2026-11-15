@@ -13,6 +13,8 @@ services:
         value: beta
       - key: SOUK_ADMIN_TOKEN
         generateValue: true
+      - key: SOUK_CURSOR_SECRET
+        generateValue: true
       - key: SOUK_HOST_ID
         value: host
       - key: DATABASE_URL

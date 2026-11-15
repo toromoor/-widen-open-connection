@@ -376,10 +376,20 @@ def submit_message(payload: dict, request: Request):
                 Ed25519PublicKey.from_public_bytes(public_bytes).verify(signature, _canonical(parsed))
             except (ValueError, InvalidSignature, TypeError):
                 _error(401, "invalid_signature", "The message signature is invalid.")
-            if db.get(Nonce, (key_id, parsed.client_nonce)):
-                _error(409, "replayed_nonce", "This signing nonce has already been used.")
+            # The composite primary key is the concurrency-safe replay barrier.
+            # A savepoint lets us translate a simultaneous duplicate insert into
+            # the same protocol error as a sequential replay without poisoning
+            # the surrounding submission transaction.
+            try:
+                with db.begin_nested():
+                    db.add(Nonce(key_id=key_id, nonce=parsed.client_nonce, created_at=_utcnow()))
+                    db.flush()
+            except Exception as exc:
+                from sqlalchemy.exc import IntegrityError
+                if isinstance(exc, IntegrityError):
+                    _error(409, "replayed_nonce", "This signing nonce has already been used.")
+                raise
             _rate_limit(db, "ai:" + key_id, AI_PER_HOUR)
-            db.add(Nonce(key_id=key_id, nonce=parsed.client_nonce, created_at=_utcnow()))
             row = Message(id=str(uuid.uuid4()), created_at=_utcnow(), author_type="ai",
                           display_name=key.display_name, model=(a.get("model") or "")[:120] or None,
                           operator=key.operator, account=key.account, key_id=key_id,

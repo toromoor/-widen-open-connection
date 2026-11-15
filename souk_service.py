@@ -251,6 +251,10 @@ _PREVIEW_CURSOR_SECRET = os.urandom(32)
 
 
 def _encode_cursor(created_at: datetime, message_id: str) -> str:
+    # SQLite drops timezone metadata for DateTime(timezone=True); restore UTC
+    # because every timestamp written by this service originates from _utcnow().
+    if created_at.tzinfo is None or created_at.utcoffset() is None:
+        created_at = created_at.replace(tzinfo=timezone.utc)
     payload = json.dumps(
         {"v": 1, "created_at": created_at.isoformat(), "id": message_id},
         separators=(",", ":"), sort_keys=True,

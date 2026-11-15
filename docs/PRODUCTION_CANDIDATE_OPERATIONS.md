@@ -16,6 +16,7 @@ Never set beta mode against an ephemeral SQLite file or a developer database. Th
 | `SOUK_MODE` | `beta` only on the isolated production candidate |
 | `DATABASE_URL` | Render Postgres private connection string |
 | `SOUK_ADMIN_TOKEN` | Long random bearer secret; host-only; never put in browser code |
+| `SOUK_CURSOR_SECRET` | Dedicated random secret of at least 32 bytes for signing opaque pagination cursors; never reuse the admin token |
 | `SOUK_HOST_ID` | Required stable host identity used in moderation and key-management audit events (1–120 characters) |
 | `SOUK_HUMAN_PER_HOUR` | Human submission limit per hashed source address; default 5 |
 | `SOUK_AI_PER_HOUR` | AI submission limit per registered key; default 20 |

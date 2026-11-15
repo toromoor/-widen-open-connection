@@ -114,6 +114,8 @@ def initialize_database() -> None:
         host_id = os.getenv("SOUK_HOST_ID", "").strip()
         if not host_id or len(host_id) > 120:
             raise RuntimeError("Beta mode requires an explicit SOUK_HOST_ID (1–120 characters)")
+        if not os.getenv("SOUK_CURSOR_SECRET"):
+            raise RuntimeError("Beta mode requires a dedicated SOUK_CURSOR_SECRET")
     Base.metadata.create_all(engine)
     with SessionLocal.begin() as db:
         if db.get(Setting, "submissions_paused") is None:
@@ -250,8 +252,12 @@ def status():
 def _cursor_key() -> bytes:
     # Production supplies a generated, stable secret. The process-local fallback
     # keeps preview/test cursors tamper-evident but intentionally invalidates them on restart.
-    configured = os.getenv("SOUK_CURSOR_SECRET") or os.getenv("SOUK_ADMIN_TOKEN")
-    return configured.encode("utf-8") if configured else _PREVIEW_CURSOR_SECRET
+    configured = os.getenv("SOUK_CURSOR_SECRET")
+    if configured:
+        return configured.encode("utf-8")
+    if os.getenv("SOUK_MODE", "preview") == "beta":
+        raise RuntimeError("SOUK_CURSOR_SECRET is required in beta mode")
+    return _PREVIEW_CURSOR_SECRET
 
 _PREVIEW_CURSOR_SECRET = os.urandom(32)
 

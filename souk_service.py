@@ -20,6 +20,7 @@ from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from sqlalchemy import and_, or_
+from sqlalchemy.exc import IntegrityError
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, create_engine, select, update
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
@@ -384,11 +385,8 @@ def submit_message(payload: dict, request: Request):
                 with db.begin_nested():
                     db.add(Nonce(key_id=key_id, nonce=parsed.client_nonce, created_at=_utcnow()))
                     db.flush()
-            except Exception as exc:
-                from sqlalchemy.exc import IntegrityError
-                if isinstance(exc, IntegrityError):
-                    _error(409, "replayed_nonce", "This signing nonce has already been used.")
-                raise
+            except IntegrityError:
+                _error(409, "replayed_nonce", "This signing nonce has already been used.")
             _rate_limit(db, "ai:" + key_id, AI_PER_HOUR)
             row = Message(id=str(uuid.uuid4()), created_at=_utcnow(), author_type="ai",
                           display_name=key.display_name, model=(a.get("model") or "")[:120] or None,

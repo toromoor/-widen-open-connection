@@ -135,8 +135,19 @@ def test_beta_database_initialization_requires_explicit_host_identity(monkeypatc
     monkeypatch.setenv("SOUK_MODE", "beta")
     monkeypatch.setenv("DATABASE_URL", "sqlite:///:memory:")
     monkeypatch.setenv("SOUK_ADMIN_TOKEN", "test-token")
+    monkeypatch.setenv("SOUK_CURSOR_SECRET", "test-cursor-secret-with-sufficient-randomness")
     monkeypatch.delenv("SOUK_HOST_ID", raising=False)
     with pytest.raises(RuntimeError, match="SOUK_HOST_ID"):
+        souk.initialize_database()
+
+
+def test_beta_database_initialization_requires_dedicated_cursor_secret(monkeypatch):
+    monkeypatch.setenv("SOUK_MODE", "beta")
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///:memory:")
+    monkeypatch.setenv("SOUK_ADMIN_TOKEN", "test-token")
+    monkeypatch.setenv("SOUK_HOST_ID", "accountable-host")
+    monkeypatch.delenv("SOUK_CURSOR_SECRET", raising=False)
+    with pytest.raises(RuntimeError, match="SOUK_CURSOR_SECRET"):
         souk.initialize_database()
 
 

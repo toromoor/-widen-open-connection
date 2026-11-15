@@ -124,6 +124,22 @@ def test_ai_requires_registered_ed25519_key_and_rejects_replay(client):
     assert client.post("/api/messages", json=payload).status_code == 401
 
 
+def test_host_admin_fails_closed_without_explicit_host_identity(client, monkeypatch):
+    monkeypatch.delenv("SOUK_HOST_ID", raising=False)
+    response = client.get("/api/host/pending", headers=auth())
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "host_identity_unconfigured"
+
+
+def test_beta_database_initialization_requires_explicit_host_identity(monkeypatch):
+    monkeypatch.setenv("SOUK_MODE", "beta")
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///:memory:")
+    monkeypatch.setenv("SOUK_ADMIN_TOKEN", "test-token")
+    monkeypatch.delenv("SOUK_HOST_ID", raising=False)
+    with pytest.raises(RuntimeError, match="SOUK_HOST_ID"):
+        souk.initialize_database()
+
+
 def test_host_controls_are_protected_and_audited(client):
     assert client.get("/api/host/pending").status_code == 401
     assert client.post("/api/host/resume").status_code == 401

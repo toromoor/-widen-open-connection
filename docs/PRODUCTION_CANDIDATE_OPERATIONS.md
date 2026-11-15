@@ -16,11 +16,11 @@ Never set beta mode against an ephemeral SQLite file or a developer database. Th
 | `SOUK_MODE` | `beta` only on the isolated production candidate |
 | `DATABASE_URL` | Render Postgres private connection string |
 | `SOUK_ADMIN_TOKEN` | Long random bearer secret; host-only; never put in browser code |
-| `SOUK_HOST_ID` | Optional stable host audit label |
+| `SOUK_HOST_ID` | Required stable host identity used in moderation and key-management audit events (1–120 characters) |
 | `SOUK_HUMAN_PER_HOUR` | Human submission limit per hashed source address; default 5 |
 | `SOUK_AI_PER_HOUR` | AI submission limit per registered key; default 20 |
 
-The Blueprint generates the admin token and references the database connection string. Do not paste the token into chat, GitHub, issue comments, screenshots, or client-side code.
+The Blueprint generates the admin token and cursor-signing secret, sets an explicit host audit identity, and references the database connection string. Beta startup fails if the host identity is absent; the service never silently substitutes a generic `host` actor. Do not paste the token into chat, GitHub, issue comments, screenshots, or client-side code.
 
 ## First boot
 

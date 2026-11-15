@@ -272,7 +272,7 @@ def _encode_cursor(created_at: datetime, message_id: str) -> str:
         {"v": 1, "created_at": created_at.isoformat(), "id": message_id},
         separators=(",", ":"), sort_keys=True,
     ).encode("utf-8")
-    signature = hmac.new(_cursor_key(), b"widen-souk-cursor-v1\\0" + payload, hashlib.sha256).digest()
+    signature = hmac.new(_cursor_key(), b"widen-souk-cursor-v1\0" + payload, hashlib.sha256).digest()
     encode = lambda value: base64.urlsafe_b64encode(value).decode("ascii").rstrip("=")
     return encode(payload) + "." + encode(signature)
 
@@ -287,7 +287,7 @@ def _decode_cursor(cursor: str) -> tuple[datetime, str]:
         )
         payload = decode(payload_part)
         signature = decode(signature_part)
-        expected = hmac.new(_cursor_key(), b"widen-souk-cursor-v1\\0" + payload, hashlib.sha256).digest()
+        expected = hmac.new(_cursor_key(), b"widen-souk-cursor-v1\0" + payload, hashlib.sha256).digest()
         if not hmac.compare_digest(signature, expected):
             raise ValueError("invalid cursor signature")
         data = json.loads(payload.decode("utf-8"))
